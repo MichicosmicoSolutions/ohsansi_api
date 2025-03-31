@@ -17,8 +17,7 @@ class CreateAreasTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->string('monto_precio');
-            $table->timestamps();
+            $table->integer('price');
         });
     }
 
