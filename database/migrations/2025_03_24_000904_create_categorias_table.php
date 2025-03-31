@@ -16,7 +16,7 @@ class CreateCategoriasTable extends Migration
         Schema::create('categorias', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('range_course');
+            $table->json('range_course');
             $table->foreignId('area_id')->constrained('categorias')->onDelete('cascade');
             $table->timestamps();
         });
