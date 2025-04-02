@@ -23,3 +23,4 @@ Route::get('/categorias',[CategoriaController::class,'index']);
 Route::get('/areas',[AreasController::class,'index']);
 Route::post('/areas', [AreasController::class, 'store']);
 Route::post('/categorias', [CategoriaController::class, 'store']);
+Route::patch('/areas/{id}/monto', [AreasController::class, 'updateMonto']);
