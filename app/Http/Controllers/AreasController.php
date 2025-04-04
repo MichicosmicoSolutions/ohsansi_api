@@ -11,6 +11,7 @@ class AreasController extends Controller
     {
         return response()->json(['areas' => Areas::all()]);
     }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -26,5 +27,22 @@ class AreasController extends Controller
         return response()->json([
             'message' => 'Área creada con éxito'
         ], 201);
+    }
+
+    public function updatePrice(Request $request, $id)
+    {
+        $area = Areas::find($id);
+        if (!$area) {
+            return response()->json(['error' => 'Área no encontrada'], 404);
+        }
+
+        $request->validate([
+            'price' => 'required|numeric|min:0|max:999'
+        ]);
+
+        $area->price = $request->price;
+        $area->save();
+
+        return response()->json(['message' => 'Monto actualizado', 'area' => $area]);
     }
 }

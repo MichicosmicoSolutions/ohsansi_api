@@ -30,6 +30,9 @@ Route::middleware('auth:sanctum')->group(function () {
 // Rutas para areas
 Route::get('/areas', [AreasController::class, 'index']);
 Route::post('/areas', [AreasController::class, 'store']);
+Route::patch('/areas/{id}/pricing', [AreasController::class, 'updatePrice']);
+
+
 
 // Rutas para Categoriess
 Route::get('/categories', [CategoriesController::class, 'index']);
