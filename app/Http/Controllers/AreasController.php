@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Areas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 
@@ -18,17 +19,33 @@ class AreasController extends Controller
     public function store(Request $request)
     {
 
-        $normalizedName = Str::ascii(strtolower($request->name));
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|integer|min:0'
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.string' => 'El nombre debe ser una cadena de texto.',
+            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
+            'price.required' => 'El precio es obligatorio.',
+            'price.integer' => 'El precio debe ser un número.',
+            'price.min' => 'El precio debe ser mayor o igual a 0.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
 
         $exists = DB::table('areas')
-            ->whereRaw("LOWER(name) = ?", [$normalizedName])
+            ->whereRaw("name = ?", [$request->name])
             ->exists();
 
         if ($exists) {
             return response()->json([
-                'message' => 'El área ya existe',
-                'error_code' => 409
+                'errors' => [
+                    'name' => ['El área ya existe']
+                ],
             ], 409);
         }
 
@@ -36,7 +53,7 @@ class AreasController extends Controller
         $area = new Areas;
         $area->name = $request->name;
         $area->description = $request->description;
-        $area->monto_precio = $request->monto_precio;
+        $area->price = $request->price;
         $area->save();
 
         return response()->json([
@@ -47,15 +64,23 @@ class AreasController extends Controller
 
     public function updatePrice(Request $request, $id)
     {
-        $area = Areas::find($id);
-        if (!$area) {
-            return response()->json(['error' => 'Área no encontrada'], 404);
-        }
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'price' => 'required|numeric|min:0|max:99999'
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $area = Areas::find($id);
+        if (!$area) {
+            return response()->json([
+                'errors' => ['Área no encontrada']
+            ], 404);
+        }
         $area->price = $request->price;
         $area->save();
 
