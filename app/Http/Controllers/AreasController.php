@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Areas;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 
 class AreasController extends Controller
 {
@@ -14,32 +18,69 @@ class AreasController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
+
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'price' => 'required|integer|min:0'
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.string' => 'El nombre debe ser una cadena de texto.',
+            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
+            'price.required' => 'El precio es obligatorio.',
+            'price.integer' => 'El precio debe ser un número.',
+            'price.min' => 'El precio debe ser mayor o igual a 0.'
         ]);
-        $areas = new Areas;
-        $areas->name = $validatedData['name'];
-        $areas->description = $validatedData['description'];
-        $areas->price = $validatedData['price'];
-        $areas->save();
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+
+        $exists = DB::table('areas')
+            ->whereRaw("name = ?", [$request->name])
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'errors' => [
+                    'name' => ['El área ya existe']
+                ],
+            ], 409);
+        }
+
+        // Guardar el nuevo área
+        $area = new Areas;
+        $area->name = $request->name;
+        $area->description = $request->description;
+        $area->price = $request->price;
+        $area->save();
+
         return response()->json([
+            'error' => 200,
             'message' => 'Área creada con éxito'
         ], 201);
     }
 
     public function updatePrice(Request $request, $id)
     {
-        $area = Areas::find($id);
-        if (!$area) {
-            return response()->json(['error' => 'Área no encontrada'], 404);
-        }
 
-        $request->validate([
-            'price' => 'required|numeric|min:0|max:999'
+        $validator = Validator::make($request->all(), [
+            'price' => 'required|numeric|min:0|max:99999'
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $area = Areas::find($id);
+        if (!$area) {
+            return response()->json([
+                'errors' => ['Área no encontrada']
+            ], 404);
+        }
         $area->price = $request->price;
         $area->save();
 

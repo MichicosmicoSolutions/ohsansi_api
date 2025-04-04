@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 use App\Enums\RangeCourse;
-use App\Models\Areas;
 use App\Services\InscriptionService;
 
 class InscriptionController extends Controller
