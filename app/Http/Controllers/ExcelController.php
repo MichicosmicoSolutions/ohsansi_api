@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Storage;
+
+
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ExcelController extends Controller
@@ -61,15 +63,15 @@ class ExcelController extends Controller
     {
         //
     }
-    public function downloadTemplate(): BinaryFileResponse
+    public function downloadTemplate()
     {
-        $filePath = storage_path('app/public/templates/Plantilla-inscripciones.xlsx'); // Ruta del archivo
+        $filePath = storage_path('../public/templates/Plantilla-inscripciones.xlsx'); // Ruta del archivo
         $fileName = 'Plantilla-inscripciones.xlsx';
-    
+
         if (!file_exists($filePath)) {
             return response()->json(['error' => 'Archivo no encontrado.'], 404);
         }
-    
+
         return response()->download($filePath, $fileName, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ]);
