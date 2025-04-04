@@ -5,7 +5,7 @@ use App\Http\Controllers\CategoriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\InscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +30,15 @@ Route::middleware('auth:sanctum')->group(function () {
 // Rutas para areas
 Route::get('/areas', [AreasController::class, 'index']);
 Route::post('/areas', [AreasController::class, 'store']);
+Route::patch('/areas/{id}/pricing', [AreasController::class, 'updatePrice']);
+
+
 
 // Rutas para Categoriess
 Route::get('/categories', [CategoriesController::class, 'index']);
 Route::post('/categories', [CategoriesController::class, 'store']);
+
+
+// Rutas para inscripciones
+Route::get('/inscriptions', [InscriptionController::class, 'index']);
+Route::post('/inscriptions', [InscriptionController::class, 'store']);

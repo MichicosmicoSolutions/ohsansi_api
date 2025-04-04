@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Olympics;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -16,5 +17,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AreaAndCategoriesSeeder::class);
         User::factory(1)->create();
+        Olympics::factory(1)->create();
     }
 }
