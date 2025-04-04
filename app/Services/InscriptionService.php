@@ -46,7 +46,7 @@ class InscriptionService
             }
             $legalTutor = LegalTutors::where('personal_data_id', $legalTutorData->id)->first();
             if (!$legalTutor) {
-                LegalTutors::create(['personal_data_id' => $legalTutorData->id]);
+                $legalTutor = LegalTutors::create(['personal_data_id' => $legalTutorData->id]);
             }
 
 

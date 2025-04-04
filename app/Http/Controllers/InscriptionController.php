@@ -151,23 +151,6 @@ class InscriptionController extends Controller
 
         $validatedData = $validator->validated();
 
-        // $errors = [];
-        // foreach ($validatedData['competitors'] as $index => &$competitor) {
-        //     $selectedAreasIds = $competitor['selected_areas'];
-        //     $areas = Areas::whereIn('id', $selectedAreasIds)->get();
-        //     if (count($areas) >= 2) {
-        //         $errors[] = [
-        //             'competitors.' . $index . '.selected_areas' => 'El competidor ' . $competitor['last_names'] . ' yá está inscrito en esas áreas'
-        //         ];
-        //     }
-        // }
-
-        // if (count($errors) > 0) {
-        //     return response()->json([
-        //         'errors' => $errors,
-        //     ], 422);
-        // }
-
         return $this->inscriptionService->createInscription($validatedData);
     }
 
