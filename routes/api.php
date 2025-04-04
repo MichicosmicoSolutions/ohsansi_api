@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\InscriptionController;
 
 /*
@@ -42,3 +43,7 @@ Route::post('/categories', [CategoriesController::class, 'store']);
 // Rutas para inscripciones
 Route::get('/inscriptions', [InscriptionController::class, 'index']);
 Route::post('/inscriptions', [InscriptionController::class, 'store']);
+
+
+// Rutas para  excel
+Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTemplate']);
