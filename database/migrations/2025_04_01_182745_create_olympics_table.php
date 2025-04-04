@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAreasTable extends Migration
+class CreateOlympicsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateAreasTable extends Migration
      */
     public function up()
     {
-        Schema::create('areas', function (Blueprint $table) {
+        Schema::create('olympics', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->integer('price');
+            $table->string('title');
+            $table->text('description');
+            $table->date('start_date');
+            $table->date('end_date');
         });
     }
 
@@ -28,6 +29,6 @@ class CreateAreasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('areas');
+        Schema::dropIfExists('olympics');
     }
 }
