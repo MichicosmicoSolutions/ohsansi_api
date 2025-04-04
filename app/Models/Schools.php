@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Categories extends Model
+class Schools extends Model
 {
     use HasFactory;
-    public $timestamps = false;
 
-    protected $casts = [
-        'range_course' => 'array',
+    protected $fillable = [
+        'name',
+        'department',
+        'province',
     ];
 }
