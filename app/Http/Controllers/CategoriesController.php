@@ -2,35 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Categories;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
+use Illuminate\Support\Facades\DB;
 
 class CategoriesController extends Controller
 {
-    public function index()
-    {
-        return response()->json(['Categories' => Categories::all()]);
+    public function index (){
+        return response()->json(['categorias'=>Categories::all()]);
     }
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'range_course' => 'required|array',
-            'area_id' => 'required|integer|exists:areas,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        $normalizedName = Str::ascii(strtolower($request->name));
+    
+       
+        $exists = DB::table('categorias')
+            ->whereRaw("LOWER(name) = ?", [$normalizedName])
+            ->exists();
+    
+        if ($exists) {
+            return response()->json([
+                'message' => 'La Categoria ya existe',
+                'error_code' => 409
+            ], 409);
         }
-
-        $category = new Categories;
-        $category->name = $request->name;
-        $category->range_course = json_encode($request->range_course);
-        $category->area_id = $request->area_id;
-        $category->save();
-        return response()->json([
-            'message' => 'Área creada con éxito'
-        ], 201);
+      $categorias=new Categories;
+      $categorias->name = $request->name;
+      $categorias->range_course = json_encode($request->range_course);
+      $categorias->area_id = $request->area_id;
+      $categorias->save();
+      return response()->json([
+        'error_code' => 200,
+        'message' => 'Categoria creada con éxito'
+    ], 201);
     }
 }
