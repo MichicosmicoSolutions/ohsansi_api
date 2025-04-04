@@ -2,15 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Department;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 use App\Enums\RangeCourse;
+use App\Models\Areas;
+use App\Services\InscriptionService;
 
 class InscriptionController extends Controller
 {
+    protected $inscriptionService;
+
+    public function __construct(InscriptionService $inscriptionService)
+    {
+        $this->inscriptionService = $inscriptionService;
+    }
 
     public function index()
     {
@@ -21,6 +30,8 @@ class InscriptionController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $maxBirthDate = now()->subYears(6)->format('Y-m-d');
+
         $validator = Validator::make($request->all(), [
             'competitors' => 'required|array',
             'competitors.*.ci' => 'required|integer',
@@ -32,14 +43,18 @@ class InscriptionController extends Controller
             'competitors.*.phone_number' => 'required|string',
             'competitors.*.school_data' => 'required|array',
             'competitors.*.school_data.name' => 'required|string',
-            'competitors.*.school_data.department' => 'required|string',
+            'competitors.*.school_data.department' => [
+                'required',
+                'string',
+                Rule::in(Department::getValues()),
+            ],
             'competitors.*.school_data.province' => 'required|string',
             'competitors.*.school_data.course' => [
                 'required',
                 'string',
                 Rule::in(RangeCourse::getValues()),
             ],
-            'competitors.*.selected_areas' => 'required|array',
+            'competitors.*.selected_areas' => 'required|array|max:2',
             'competitors.*.selected_areas.*' => 'required|integer|min:1',
             'legal_tutor' => 'required|array',
             'legal_tutor.ci' => 'required|integer',
@@ -80,6 +95,8 @@ class InscriptionController extends Controller
             'competitors.*.school_data.name.string' => 'El campo nombre de la escuela debe ser una cadena de texto para cada competidor.',
             'competitors.*.school_data.department.required' => 'El campo departamento es requerido para cada competidor.',
             'competitors.*.school_data.department.string' => 'El campo departamento debe ser una cadena de texto para cada competidor.',
+            'competitors.*.school_data.department.in' => 'El departamento seleccionado no es válido. Debe ser uno de los siguientes: ' .
+                implode(', ', Department::getValues()) . '.',
             'competitors.*.school_data.province.required' => 'El campo provincia es requerido para cada competidor.',
             'competitors.*.school_data.province.string' => 'El campo provincia debe ser una cadena de texto para cada competidor.',
             'competitors.*.school_data.course.required' => 'El curso es requerido.',
@@ -88,6 +105,7 @@ class InscriptionController extends Controller
                 implode(', ', RangeCourse::getValues()) . '.',
             'competitors.*.selected_areas.required' => 'El campo áreas seleccionadas es requerido para cada competidor.',
             'competitors.*.selected_areas.array' => 'El campo áreas seleccionadas debe ser un array para cada competidor.',
+            'competitors.*.selected_areas.max' => 'El campo áreas seleccionadas debe contener máximo 2 elementos.',
             'competitors.*.selected_areas.*.required' => 'El campo áreas seleccionadas debe contener valores para cada competidor.',
             'competitors.*.selected_areas.*.integer' => 'Cada área seleccionada debe ser un número entero para cada competidor.',
             'competitors.*.selected_areas.*.min' => 'Cada área seleccionada debe ser un número entero mayor o igual a 1 para cada competidor.',
@@ -131,18 +149,28 @@ class InscriptionController extends Controller
             ], 422);
         }
 
-        return response()->json([
-            "message" => "Data validated successfully",
-            "validatedData" => $validator->validated(),
-        ]);
+        $validatedData = $validator->validated();
+
+        $errors = [];
+        foreach ($validatedData['competitors'] as $index => &$competitor) {
+            $selectedAreasIds = $competitor['selected_areas'];
+            $areas = Areas::whereIn('id', $selectedAreasIds)->get();
+            if (count($areas) >= 2) {
+                $errors[] = [
+                    'competitors.' . $index . '.selected_areas' => 'El competidor ' . $competitor['last_names'] . ' yá está inscrito en esas áreas'
+                ];
+            }
+        }
+
+        if (count($errors) > 0) {
+            return response()->json([
+                'errors' => $errors,
+            ], 422);
+        }
+
+        return $this->inscriptionService->createInscription($validatedData);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         return response()->json([
@@ -150,13 +178,6 @@ class InscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         return response()->json([
@@ -164,12 +185,6 @@ class InscriptionController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         return response()->json([

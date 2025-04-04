@@ -5,12 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Categories extends Model
+class Olympics extends Model
 {
     use HasFactory;
-    public $timestamps = false;
 
-    protected $casts = [
-        'range_course' => 'array',
-    ];
+    public $timestamps = false;
 }
