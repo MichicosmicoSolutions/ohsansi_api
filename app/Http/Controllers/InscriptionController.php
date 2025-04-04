@@ -23,8 +23,9 @@ class InscriptionController extends Controller
 
     public function index()
     {
+        $inscriptions = $this->inscriptionService->getInscriptions();
         return response()->json([
-            "message" => "Not Implemented"
+            "data" => $inscriptions,
         ]);
     }
 

@@ -17,6 +17,16 @@ use Illuminate\Support\Facades\Log;
 
 class InscriptionService
 {
+
+    public function getInscriptions()
+    {
+        return Inscriptions::with([
+            'competitor.school',
+            'competitor.academicTutor.personalData',
+            'competitor.legalTutor.personalData',
+        ])->get();
+    }
+
     public function createInscription($validatedData)
     {
         DB::beginTransaction();
