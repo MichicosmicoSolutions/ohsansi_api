@@ -46,4 +46,5 @@ Route::post('/inscriptions', [InscriptionController::class, 'store']);
 
 
 // Rutas para  excel
+Route::post('/inscriptions/excel', [ExcelController::class, 'store']);
 Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTemplate']);
