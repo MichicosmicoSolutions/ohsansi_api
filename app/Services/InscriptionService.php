@@ -119,13 +119,6 @@ class InscriptionService
                         ->first();
 
 
-                    Log::info('Competitor ID: ' . $competitor->id);
-                    Log::info('Olympic ID: ' . $olympic->id);
-                    Log::info('Area ID: ' . $area->id);
-                    Log::info('Category ID: ' . $category->id);
-                    Log::info('Status: ' . InscriptionStatus::PENDING);
-
-
                     $inscription = Inscriptions::create([
                         'competitor_id' => $competitor->id,
                         'olympic_id' => $olympic->id,
@@ -142,12 +135,30 @@ class InscriptionService
             return response()->json([
                 "message" => "Data validated successfully",
             ], 201);
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Database\QueryException $e) {
 
+            DB::rollBack();
+            if ($e->getCode() === '23505') {
+                // Assuming the unique constraint is on the email field
+                if (strpos($e->getMessage(), 'email') !== false) {
+                    // Use a regular expression to extract the email from the error message
+                    preg_match('/Key \((.*?)\)=\((.*?)\)/', $e->getMessage(), $matches);
+                    $email = isset($matches[2]) ? $matches[2] : 'desconocido';
+
+                    return response()->json([
+                        "error" => "El correo electrónico {$email} ya está en uso. Por favor, verifica tus datos e intenta nuevamente.",
+                    ], 400);
+                }
+            }
+
+            return response()->json([
+                "error" => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde. Error: " . $e->getMessage() . " Línea: " . $e->getLine(),
+            ], 500);
+        } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json([
-                "error" => "An error occurred while processing your request. Please try again later. Error: " . $e->getMessage() . " Line: " . $e->getLine(),
+                "error" => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde. Error: " . $e->getMessage() . " Línea: " . $e->getLine(),
             ], 500);
         }
     }

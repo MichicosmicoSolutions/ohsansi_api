@@ -70,6 +70,14 @@ class ExcelController extends Controller
 
         $validatedData = $validator->validated();
 
+        $errors = InscriptionsValidator::validateInscriptions($validatedData);
+
+        if ($errors) {
+            return response()->json([
+                "errors" => $errors,
+            ], 422);
+        }
+
         return $this->inscriptionService->createInscription($validatedData);
     }
 

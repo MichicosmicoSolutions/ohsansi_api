@@ -5,6 +5,7 @@ namespace App\Validators;
 
 use App\Enums\Department;
 use App\Enums\RangeCourse;
+use App\Models\Competitors;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -123,5 +124,57 @@ class InscriptionsValidator
             'academic_tutor.phone_number.string' => 'El campo número de teléfono del tutor académico debe ser una cadena de texto.',
         ]);
         return $validator;
+    }
+    public static function validateInscriptions($data)
+    {
+        $CIs = array_map(function ($item) {
+            return $item['ci'];
+        }, array_values($data['competitors']));
+
+        $competitors = Competitors::with([
+            'inscriptions',
+            'inscriptions.area',
+            'personalData',
+        ])
+            ->whereHas('personalData', function ($query) use ($CIs) {
+                $query->whereIn('ci', $CIs);
+            })
+            ->get();
+
+        $competitorsDict = [];
+        foreach ($competitors as $competitor) {
+            $competitorsDict[$competitor->personalData->ci] = $competitor;
+        }
+
+        $errors = [];
+        foreach ($data['competitors'] as $index => $competitor) {
+            $ci = $competitor['ci'];
+            $selected_areas = $competitor['selected_areas'];
+            $competitor_data = $competitorsDict[$ci] ?? null;
+
+            if (!$competitor_data) {
+                continue;
+            }
+
+
+            $totalInscriptions = count($competitor_data->inscriptions);
+
+            if ($totalInscriptions >= 2) {
+                $errors['competitors.' . $index . '.selected_areas'] = 'El competidor '  . $competitor['last_names'] . ' con el CI ' . $ci . ' ya no puede inscribirse en más áreas';
+                continue;
+            }
+
+            foreach ($competitor_data->inscriptions as $inscription) {
+                if (in_array($inscription->area_id, $selected_areas)) {
+                    $errors['competitors.' . $index . '.selected_areas'] = 'El competidor '  . $competitor['last_names'] . ' con el CI ' . $ci . ' ya está inscrito en el área ' . $inscription->area->name;
+                    continue 2;
+                }
+            }
+        }
+
+        if (count($errors) > 0) {
+            return $errors;
+        }
+        return null;
     }
 }
