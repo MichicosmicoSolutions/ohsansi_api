@@ -32,4 +32,9 @@ class Competitors extends Model
     {
         return $this->belongsTo(PersonalData::class, 'personal_data_id');
     }
+    public function inscriptions()
+    {
+        return $this->hasMany(Inscriptions::class, 'competitor_id');
+    }
 }
+

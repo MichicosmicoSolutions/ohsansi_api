@@ -2,16 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Department;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-
-use App\Enums\RangeCourse;
 use App\Services\InscriptionService;
 use App\Validators\InscriptionsValidator;
-use Illuminate\Support\Facades\Log;
 
 class InscriptionController extends Controller
 {
@@ -32,11 +27,8 @@ class InscriptionController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $maxBirthDate = now()->subYears(6)->format('Y-m-d');
 
         $validator = InscriptionsValidator::getValidator($request->all());
-
-        Log::info('Data: ' . print_r($request->all(), true));
 
         if ($validator->fails()) {
             return response()->json([
@@ -45,6 +37,14 @@ class InscriptionController extends Controller
         }
 
         $validatedData = $validator->validated();
+
+        $errors = InscriptionsValidator::validateInscriptions($validatedData);
+
+        if ($errors) {
+            return response()->json([
+                "errors" => $errors,
+            ], 422);
+        }
 
         return $this->inscriptionService->createInscription($validatedData);
     }
