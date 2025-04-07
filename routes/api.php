@@ -38,7 +38,7 @@ Route::patch('/areas/{id}/pricing', [AreasController::class, 'updatePrice']);
 // Rutas para Categoriess
 Route::get('/categories', [CategoriesController::class, 'index']);
 Route::post('/categories', [CategoriesController::class, 'store']);
-Route::get('/categorias/area/{area_id}', [CategoriesController::class, 'getCategoriasPorArea']);
+Route::get('/categories/area/{area_id}', [CategoriesController::class, 'getCategoriasPorArea']);
 
 // Rutas para inscripciones
 Route::get('/inscriptions', [InscriptionController::class, 'index']);
