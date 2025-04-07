@@ -18,6 +18,14 @@ class CategoriesController extends Controller
         return response()->json(['categorias' => Categories::all()]);
     }
 
+    public function getCategoriasPorArea($area_id)
+{
+    $categorias = Categories::with('area')
+                    ->where('area_id', $area_id)
+                    ->get();
+
+    return response()->json(['categorias' => $categorias]);
+}
     public function store(Request $request)
     {
 
