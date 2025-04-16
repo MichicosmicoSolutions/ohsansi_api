@@ -1,0 +1,554 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de ejemplo",
+        "description": "Documentación de la API de ejemplo",
+        "contact": {
+            "email": "contacto@example.com"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/inscriptions": {
+            "get": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Get all inscriptions",
+                "description": "Returns a list of all inscriptions",
+                "operationId": "d551b7def953fb88c9245569c5762b7d",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Example"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "example@example.com"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Store a new inscription",
+                "description": "Create a new inscription with the provided data",
+                "operationId": "c88d0618702fc1e3a00fd27a70d4f641",
+                "requestBody": {
+                    "description": "Data for creating an inscription",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "legal_tutor",
+                                    "responsable",
+                                    "competitor"
+                                ],
+                                "properties": {
+                                    "legal_tutor": {
+                                        "description": "Legal tutor information",
+                                        "required": [
+                                            "ci",
+                                            "ci_expedition",
+                                            "names",
+                                            "last_names",
+                                            "birthdate",
+                                            "email",
+                                            "phone_number"
+                                        ],
+                                        "properties": {
+                                            "ci": {
+                                                "type": "integer",
+                                                "example": 7890123
+                                            },
+                                            "ci_expedition": {
+                                                "type": "string",
+                                                "example": "Santa Cruz"
+                                            },
+                                            "names": {
+                                                "type": "string",
+                                                "example": "Maria Garcia"
+                                            },
+                                            "last_names": {
+                                                "type": "string",
+                                                "example": "Rodriguez Gomez"
+                                            },
+                                            "birthdate": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "1965-11-24"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "maria.garcia@example.com"
+                                            },
+                                            "phone_number": {
+                                                "type": "string",
+                                                "pattern": "+591 [0-9]{8}",
+                                                "example": "+591 78901234"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "responsable": {
+                                        "description": "Responsable information",
+                                        "required": [
+                                            "ci",
+                                            "ci_expedition",
+                                            "names",
+                                            "last_names",
+                                            "birthdate",
+                                            "email",
+                                            "phone_number"
+                                        ],
+                                        "properties": {
+                                            "ci": {
+                                                "type": "integer",
+                                                "example": 7890123
+                                            },
+                                            "ci_expedition": {
+                                                "type": "string",
+                                                "example": "Santa Cruz"
+                                            },
+                                            "names": {
+                                                "type": "string",
+                                                "example": "Maria Garcia"
+                                            },
+                                            "last_names": {
+                                                "type": "string",
+                                                "example": "Rodriguez Gomez"
+                                            },
+                                            "birthdate": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "1965-11-24"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "maria.garcia@example.com"
+                                            },
+                                            "phone_number": {
+                                                "type": "string",
+                                                "pattern": "+591 [0-9]{8}",
+                                                "example": "+591 78901234"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "competitor": {
+                                        "description": "Competitor information",
+                                        "required": [
+                                            "ci",
+                                            "ci_expedition",
+                                            "names",
+                                            "last_names",
+                                            "birthdate",
+                                            "email",
+                                            "phone_number",
+                                            "school_data",
+                                            "selected_areas"
+                                        ],
+                                        "properties": {
+                                            "ci": {
+                                                "type": "integer",
+                                                "example": 9387321
+                                            },
+                                            "ci_expedition": {
+                                                "type": "string",
+                                                "example": "Cochabamba"
+                                            },
+                                            "names": {
+                                                "type": "string",
+                                                "example": "Juan Perez"
+                                            },
+                                            "last_names": {
+                                                "type": "string",
+                                                "example": "Gonzalez Lopez"
+                                            },
+                                            "birthdate": {
+                                                "type": "string",
+                                                "format": "date",
+                                                "example": "2020-05-18"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "juan2.perez@example.com"
+                                            },
+                                            "phone_number": {
+                                                "type": "string",
+                                                "pattern": "+591 [0-9]{8}",
+                                                "example": "+591 67834512"
+                                            },
+                                            "school_data": {
+                                                "description": "School data information",
+                                                "required": [
+                                                    "name",
+                                                    "department",
+                                                    "province",
+                                                    "course"
+                                                ],
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Colegio San Jose"
+                                                    },
+                                                    "department": {
+                                                        "type": "string",
+                                                        "example": "Cochabamba"
+                                                    },
+                                                    "province": {
+                                                        "type": "string",
+                                                        "example": "Cercado"
+                                                    },
+                                                    "course": {
+                                                        "type": "string",
+                                                        "example": "3ro Primaria"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            },
+                                            "selected_areas": {
+                                                "description": "Selected areas information",
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "area_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "academic_tutor": {
+                                                            "description": "Academic tutor information",
+                                                            "properties": {
+                                                                "ci": {
+                                                                    "type": "integer",
+                                                                    "example": 4567890
+                                                                },
+                                                                "ci_expedition": {
+                                                                    "type": "string",
+                                                                    "example": "Cochabamba"
+                                                                },
+                                                                "names": {
+                                                                    "type": "string",
+                                                                    "example": "Carlos Sanchez"
+                                                                },
+                                                                "last_names": {
+                                                                    "type": "string",
+                                                                    "example": "Lopez Perez"
+                                                                },
+                                                                "birthdate": {
+                                                                    "type": "string",
+                                                                    "format": "date",
+                                                                    "example": "1972-03-12"
+                                                                },
+                                                                "email": {
+                                                                    "type": "string",
+                                                                    "format": "email",
+                                                                    "example": "carlos.sanchez@example.com"
+                                                                },
+                                                                "phone_number": {
+                                                                    "type": "string",
+                                                                    "pattern": "+591 [0-9]{8}",
+                                                                    "example": "+591 89012345"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Inscription created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data saved successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed validation errors for each field that failed validation.",
+                                            "properties": {
+                                                "legal_tutor.ci": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The legal tutor ci field is required."
+                                                    }
+                                                },
+                                                "responsable.email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "The responsable email must be a valid email address."
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for internal server errors.",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/inscriptions/{id}": {
+            "get": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Get an inscription by ID",
+                "description": "Returns an inscription by ID",
+                "operationId": "7aab9006b3f0b2e904297eef86fb9fb6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Example"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "example@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Inscription not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Update an inscription",
+                "description": "Updates an inscription",
+                "operationId": "95cab9680fd0a04b2f7a6f6ff6f1d667",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "other_data": {
+                                        "type": "string",
+                                        "example": "Some other data"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Inscription not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Delete an inscription",
+                "description": "Deletes an inscription",
+                "operationId": "48bee95784e92974faf55deac42c83d5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful response"
+                    },
+                    "404": {
+                        "description": "Inscription not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Inscriptions",
+            "description": "Inscriptions"
+        }
+    ]
+}
