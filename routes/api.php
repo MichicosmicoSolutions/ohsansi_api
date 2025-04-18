@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\InscriptionController;
+use App\Http\Controllers\OlympicsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,3 +49,8 @@ Route::post('/inscriptions', [InscriptionController::class, 'store']);
 // Rutas para  excel
 Route::post('/inscriptions/excel', [ExcelController::class, 'store']);
 Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTemplate']);
+
+
+// Rutas para  Olympiadas
+Route::post('/olympics', [OlympicsController::class, 'store']);
+Route::put('/olympics/{id}', [OlympicsController::class, 'update']);
