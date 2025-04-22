@@ -19,13 +19,19 @@ class AreasController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[A-Za-z0-9 ]+$/'
+            ],
             'description' => 'nullable|string',
             'price' => 'required|integer|min:0'
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'name.string' => 'El nombre debe ser una cadena de texto.',
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
+            'name.regex' => 'El nombre solo puede contener letras sin tildes, números y espacios (sin acentos ni caracteres especiales).',
             'price.required' => 'El precio es obligatorio.',
             'price.integer' => 'El precio debe ser un número.',
             'price.min' => 'El precio debe ser mayor o igual a 0.'
