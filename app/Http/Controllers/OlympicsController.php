@@ -51,7 +51,7 @@ class OlympicsController extends Controller
 
     $olympic = $this->service->create($request->all());
     return response()->json($olympic, 201);
-}
+}   
 
     public function update(Request $request, $id)
     {
