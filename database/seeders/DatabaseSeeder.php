@@ -14,9 +14,14 @@ class DatabaseSeeder extends Seeder
      * @return void
      */
     public function run()
-    {
-        $this->call(AreaAndCategoriesSeeder::class);
-        User::factory(1)->create();
-        Olympics::factory(1)->create();
-    }
+{
+    $this->call([
+        AreaAndCategoriesSeeder::class,
+        PersonalDataSeeder::class, // 👈 nuevo seeder
+    ]);
+
+    User::factory(1)->create();
+    Olympics::factory(1)->create();
+}
+
 }

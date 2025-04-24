@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\OlympicsController;
+use App\Http\Controllers\PersonSearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,3 +56,5 @@ Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTem
 // Rutas para  Olympiadas
 Route::post('/olympics', [OlympicsController::class, 'store']);
 Route::put('/olympics/{id}', [OlympicsController::class, 'update']);
+// Rutas para   Buscar
+Route::get('/students/by-ci/{ci}', [PersonSearchController::class, 'searchStudent']);
