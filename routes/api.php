@@ -60,4 +60,7 @@ Route::patch('/olympics/{id}/price', [OlympicsController::class, 'updatePrice'])
 
 
 // Rutas para   Buscar
-Route::get('/students/by-ci/{ci}', [PersonSearchController::class, 'searchStudent']);
+Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStudent']);
+Route::get('/search-inscriptions/by-status/{status}', [PersonSearchController::class, 'searchByStatus']);
+Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
+Route::get('/search-inscriptions/by-date', [PersonSearchController::class, 'searchByDate']);

@@ -34,7 +34,6 @@ class CreatePersonalDataTable extends Migration
 
         Schema::create('competitors', function (Blueprint $table) {
             $table->id();
-            $table->enum('course', RangeCourse::getValues());
             $table->foreignId('school_id')->constrained('schools')->onDelete('cascade');
             $table->foreignId('legal_tutor_id')->constrained('legal_tutors')->onDelete('cascade');
             $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');

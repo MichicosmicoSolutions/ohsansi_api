@@ -21,7 +21,7 @@ class CreateInscriptionsTable extends Migration
             $table->foreignId('olympic_id')->constrained('olympics')->onDelete('cascade');
             $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->enum('status', InscriptionStatus::getValues());
+            $table->string('status');
             $table->dateTime('paid_at')->nullable();
             $table->timestamps();
         });
