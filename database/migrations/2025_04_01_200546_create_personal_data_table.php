@@ -25,11 +25,6 @@ class CreatePersonalDataTable extends Migration
             $table->string('phone_number');
         });
 
-        Schema::create('academic_tutors', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');
-            $table->timestamps();
-        });
 
         Schema::create('legal_tutors', function (Blueprint $table) {
             $table->id();
@@ -53,10 +48,10 @@ class CreatePersonalDataTable extends Migration
      * @return void
      */
     public function down()
-    {
-        Schema::dropIfExists('competitors');
-        Schema::dropIfExists('academic_tutors');
-        Schema::dropIfExists('legal_tutors');
-        Schema::dropIfExists('personal_data');
-    }
+{
+    Schema::dropIfExists('competitors');
+    Schema::dropIfExists('legal_tutors');
+    Schema::dropIfExists('personal_data');
+}
+
 }

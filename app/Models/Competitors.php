@@ -13,7 +13,6 @@ class Competitors extends Model
         'course',
         'school_id',
         'legal_tutor_id',
-        'academic_tutor_id',
         'personal_data_id',
     ];
     public function school()

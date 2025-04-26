@@ -15,13 +15,13 @@ class AreaAndCategoriesSeeder extends Seeder
     public function run()
     {
         $areas = [
-            ['name' => 'ASTRONOMÍA - ASTROFÍSICA', 'description' => 'Exploración del universo y los astros.', 'price' => 5000],
-            ['name' => 'BIOLOGÍA', 'description' => 'Estudio de los seres vivos y su entorno.', 'price' => 4500],
-            ['name' => 'FÍSICA', 'description' => 'Ciencia que estudia la materia y la energía.', 'price' => 6000],
-            ['name' => 'INFORMÁTICA', 'description' => 'Desarrollo de software y análisis de datos.', 'price' => 7000],
-            ['name' => 'MATEMÁTICAS', 'description' => 'Cálculo, álgebra y estructuras numéricas.', 'price' => 5500],
-            ['name' => 'QUÍMICA', 'description' => 'Estudio de la composición de las sustancias.', 'price' => 4800],
-            ['name' => 'ROBÓTICA', 'description' => 'Diseño y programación de sistemas automatizados.', 'price' => 7500]
+            ['name' => 'ASTRONOMÍA - ASTROFÍSICA', 'description' => 'Exploración del universo y los astros.'],
+            ['name' => 'BIOLOGÍA', 'description' => 'Estudio de los seres vivos y su entorno.'],
+            ['name' => 'FÍSICA', 'description' => 'Ciencia que estudia la materia y la energía.'],
+            ['name' => 'INFORMÁTICA', 'description' => 'Desarrollo de software y análisis de datos.'],
+            ['name' => 'MATEMÁTICAS', 'description' => 'Cálculo, álgebra y estructuras numéricas.'],
+            ['name' => 'QUÍMICA', 'description' => 'Estudio de la composición de las sustancias.'],
+            ['name' => 'ROBÓTICA', 'description' => 'Diseño y programación de sistemas automatizados.']
         ];
 
         DB::table('areas')->insert($areas);

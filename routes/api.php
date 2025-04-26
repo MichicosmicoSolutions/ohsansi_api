@@ -56,5 +56,8 @@ Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTem
 // Rutas para  Olympiadas
 Route::post('/olympics', [OlympicsController::class, 'store']);
 Route::put('/olympics/{id}', [OlympicsController::class, 'update']);
+Route::patch('/olympics/{id}/price', [OlympicsController::class, 'updatePrice']);
+
+
 // Rutas para   Buscar
 Route::get('/students/by-ci/{ci}', [PersonSearchController::class, 'searchStudent']);
