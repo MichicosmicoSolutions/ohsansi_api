@@ -16,11 +16,15 @@ class CreateOlympicsTable extends Migration
         Schema::create('olympics', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('description');
-            $table->integer('price');
+            $table->text('description')->nullable();
+            $table->integer('price')->nullable();
             $table->string('status');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->string('Presentation')->nullable();
+            $table->string('Requirements')->nullable();
+            $table->string('awards')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->string('Contacts')->nullable();
         });
     }
 

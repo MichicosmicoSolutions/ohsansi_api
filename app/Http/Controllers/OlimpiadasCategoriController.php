@@ -9,7 +9,7 @@ class OlimpiadasCategoriController extends Controller
 {
     public function store(Request $request)
     {
-        // Validación de los campos requeridos
+        
         $request->validate([
             'olympic_id' => 'required|exists:olympics,id',
             'area_id' => 'required|exists:areas,id',

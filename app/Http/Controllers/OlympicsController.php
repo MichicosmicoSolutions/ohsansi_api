@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Olympics;
+
 class OlympicsController extends Controller
 {
     protected $service;
@@ -17,10 +18,12 @@ class OlympicsController extends Controller
     {
         $this->service = $service;
     }
+
     public function index()
     {
         return response()->json(['Olympics' => Olympics::all()]);
     }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -30,7 +33,6 @@ class OlympicsController extends Controller
                 'max:255',
                 function ($attribute, $value, $fail) {
                     $normalizedTitle = Str::ascii(strtolower($value));
-
                     $exists = DB::table('olympics')
                         ->get()
                         ->some(function ($olympic) use ($normalizedTitle) {
@@ -44,8 +46,12 @@ class OlympicsController extends Controller
             ],
             'description' => 'required|string',
             'price' => 'required|integer|min:0',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'Presentation' => 'nullable|string',
+            'Requirements' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'Contacts' => 'nullable|string',
+            'awards' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -54,9 +60,16 @@ class OlympicsController extends Controller
             ], 422);
         }
 
-        // Agregar el status por defecto
         $data = $request->all();
         $data['status'] = 'No Publico';
+
+        // Asignar "No especificado" si algún campo opcional viene vacío
+        $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
+        $data['Requirements'] = $data['Requirements'] ?? 'No especificado';
+        $data['start_date'] = $data['start_date'] ?? null;
+        $data['end_date'] = $data['end_date'] ?? null;
+        $data['Contacts'] = $data['Contacts'] ?? 'No especificado';
+        $data['awards'] = $data['awards'] ?? 'No especificado';
 
         $olympic = $this->service->create($data);
 
@@ -69,8 +82,12 @@ class OlympicsController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|integer|min:0',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'Presentation' => 'nullable|string',
+            'Requirements' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'Contacts' => 'nullable|string',
+            'awards' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -112,12 +129,54 @@ class OlympicsController extends Controller
         ], 200);
     }
 
-    // Nuevo método para publicar una olimpiada
-    public function publish($id)
+    public function publish(Request $request, $id)
     {
-        $olympic = $this->service->update($id, [
-            'status' => 'Publico',
-            'end_date' => Carbon::now(), // Fecha actual
+        $validator = Validator::make($request->all(), [
+            'Presentation' => 'nullable|string',
+            'Requirements' => 'nullable|string',
+            'awards' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'Contacts' => 'nullable|string',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()->toArray()
+            ], 422);
+        }
+    
+        $data = $request->only([
+            'Presentation',
+            'Requirements',
+            'awards',
+            'start_date',
+            'end_date',
+            'Contacts'
+        ]);
+    
+        $data['status'] = 'Publico';
+    
+        $olympic = $this->service->update($id, $data);
+    
+        if (!$olympic) {
+            return response()->json(['message' => 'Olympic not found'], 404);
+        }
+    
+        return response()->json([
+            'message' => 'Olimpiada publicada exitosamente y datos actualizados',
+            'data' => $olympic
+        ], 200);
+    }
+    
+    public function getOlympicInfo($id)
+    {
+        $olympic = Olympics::find($id, [
+            'Presentation',
+            'Requirements',
+            'start_date',
+            'awards',
+            'Contacts'
         ]);
 
         if (!$olympic) {
@@ -125,8 +184,11 @@ class OlympicsController extends Controller
         }
 
         return response()->json([
-            'message' => 'Olimpiada publicada exitosamente',
-            'data' => $olympic
+            'Presentation' => $olympic->Presentation,
+            'Requirements' => $olympic->Requirements,
+            'Fechas_Importantes' => $olympic->start_date,
+            'Premios' => $olympic->awards,
+            'Contacts' => $olympic->Contacts,
         ], 200);
     }
 }
