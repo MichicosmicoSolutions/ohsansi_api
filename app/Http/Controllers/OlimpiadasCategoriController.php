@@ -1,29 +1,29 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\OlimpycAndCategoria;
-
+use App\Models\OlimpycAndCategorias; 
 class OlimpiadasCategoriController extends Controller
 {
     public function store(Request $request)
     {
+        // Validación de los campos requeridos
         $request->validate([
             'olympic_id' => 'required|exists:olympics,id',
             'area_id' => 'required|exists:areas,id',
-            'category_id' => 'required|exists:cotegoreis,id',
+            'category_id' => 'required|exists:categories,id',
         ]);
 
-        $association = OlimpycAndCategoria::create([
-            'olympic_id' => $request->olympic_id,
-            'area_id' => $request->area_id,
-            'category_id' => $request->category_id,
-        ]);
-
+        $olimpiada = new OlimpycAndCategorias;
+        $olimpiada->olympic_id = $request->olympic_id;
+        $olimpiada->area_id = $request->area_id;
+        $olimpiada->category_id = $request->category_id;
+        $olimpiada->save();
         return response()->json([
-            'message' => 'Área y categoría asociadas correctamente a la olimpiada.',
-            'data' => $association
+            'error' => 200,
+            'message' => 'Olimpiada creada exitosamente'
         ], 201);
     }
 }

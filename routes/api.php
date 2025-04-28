@@ -55,18 +55,29 @@ Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTem
 
 
 // Rutas para  Olympiadas
+//PB14
+// Rutas para areas
+Route::get('/olympics', [OlympicsController::class, 'index']);
 Route::post('/olympics', [OlympicsController::class, 'store']);
 Route::put('/olympics/{id}', [OlympicsController::class, 'update']);
+// PB 02
 Route::patch('/olympics/{id}/price', [OlympicsController::class, 'updatePrice']);
+//PB 16
 Route::patch('/olympics/{id}/publish', [OlympicsController::class, 'publish']);
 
 
 
 // Rutas para   Buscar
 Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStudent']);
+
+// Rutas De Reportes
+//PB 11
 Route::get('/search-inscriptions/by-status/{status}', [PersonSearchController::class, 'searchByStatus']);
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
-Route::get('/search-inscriptions/by-date', [PersonSearchController::class, 'searchByDate']);
+
+Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
+Route::get('/search-inscriptions', [PersonSearchController::class, 'index']);
 
 // Rutas para  Asociar Olimpiadas y categorias 
+//PB 15
 Route::post('/olimpiadas-categorias', [OlimpiadasCategoriController::class, 'store']);

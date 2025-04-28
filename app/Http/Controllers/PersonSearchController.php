@@ -9,6 +9,11 @@ use App\Models\Inscriptions;
 
 class PersonSearchController extends Controller
 {
+
+    public function index()
+    {
+        return response()->json(['Inscriptions' => Inscriptions::all()]);
+    }
     public function searchStudent($ci)
     {
         return response()->json(PersonalData::where('ci', $ci)->first());
