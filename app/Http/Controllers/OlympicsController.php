@@ -172,9 +172,12 @@ class OlympicsController extends Controller
     public function getOlympicInfo($id)
     {
         $olympic = Olympics::find($id, [
+            'title',
+            'description',
             'Presentation',
             'Requirements',
             'start_date',
+            'end_date',
             'awards',
             'Contacts'
         ]);
@@ -184,10 +187,13 @@ class OlympicsController extends Controller
         }
 
         return response()->json([
+            'title'=>$olympic-> title,
+            'description'=>$olympic->description,
             'Presentation' => $olympic->Presentation,
             'Requirements' => $olympic->Requirements,
-            'Fechas_Importantes' => $olympic->start_date,
-            'Premios' => $olympic->awards,
+            'Start_date' => $olympic->start_date,
+            'End_date' => $olympic->end_date,
+            'Awards' => $olympic->awards,
             'Contacts' => $olympic->Contacts,
         ], 200);
     }

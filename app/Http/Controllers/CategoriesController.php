@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Enums\RangeCourse;
-
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -19,67 +17,80 @@ class CategoriesController extends Controller
     }
 
     public function getCategoriasPorArea($area_id)
-{
-    $categorias = Categories::with('area')
-                    ->where('area_id', $area_id)
-                    ->get();
+    {
+        $categorias = Categories::with('area')
+            ->where('area_id', $area_id)
+            ->get();
 
-    return response()->json(['categorias' => $categorias]);
-}
-public function store(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'name' => [
-            'required',
-            'string',
-            'max:255',
-            function ($attribute, $value, $fail) {
-                $normalizedInput = Str::ascii(strtolower($value));
-                
-                $exists = DB::table('categories')
-                    ->get()
-                    ->some(function ($cat) use ($normalizedInput) {
-                        $normalizedExisting = Str::ascii(strtolower($cat->name));
-                        return $normalizedExisting === $normalizedInput;
-                    });
-
-                if ($exists) {
-                    $fail('La categoría ya existe.');
-                }
-            }
-        ],
-        'range_course' => [
-            'required',
-            'array',
-            function ($attribute, $value, $fail) {
-                $validValues = RangeCourse::getValues();
-                foreach ($value as $item) {
-                    if (!in_array($item, $validValues)) {
-                        $fail("El valor '$item' en $attribute no es válido.");
-                    }
-                }
-            }
-        ],
-        'area_id' => 'required|integer|min:1'
-    ], [
-        'name.required' => 'El campo name es obligatorio.',
-        'range_course.required' => 'El campo range_course es obligatorio.',
-        'area_id.required' => 'El campo area_id es obligatorio.',
-        'range_course.array' => 'El campo range_course debe ser un array.',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+        return response()->json(['categorias' => $categorias]);
     }
 
-    $categories = new Categories;
-    $categories->name = $request->name;
-    $categories->range_course = json_encode($request->range_course);
-    $categories->area_id = $request->area_id;
-    $categories->save();
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) use ($request) {
+                    $normalizedInput = Str::ascii(strtolower($value));
+                    $areaId = $request->input('area_id');
 
-    return response()->json([
-        'message' => 'Categoría creada con éxito'
-    ], 201);
-}
+                    
+                    $exists = DB::table('categories')
+                        ->where('area_id', $areaId)
+                        ->get()
+                        ->some(function ($cat) use ($normalizedInput) {
+                            $normalizedExisting = Str::ascii(strtolower($cat->name));
+                            return $normalizedExisting === $normalizedInput;
+                        });
+
+                    if ($exists) {
+                        return $fail('Ya existe una categoría con ese nombre en esta área.');
+                    }
+
+                  
+                    $area = DB::table('areas')->where('id', $areaId)->first();
+                    if ($area) {
+                        $normalizedAreaName = Str::ascii(strtolower($area->name));
+                        if ($normalizedAreaName === $normalizedInput) {
+                            return $fail('El nombre de la categoría no puede ser igual al nombre del área.');
+                        }
+                    }
+                }
+            ],
+            'range_course' => [
+                'required',
+                'array',
+                function ($attribute, $value, $fail) {
+                    $validValues = RangeCourse::getValues();
+                    foreach ($value as $item) {
+                        if (!in_array($item, $validValues)) {
+                            $fail("El valor '$item' en $attribute no es válido.");
+                        }
+                    }
+                }
+            ],
+            'area_id' => 'required|integer|min:1'
+        ], [
+            'name.required' => 'El campo name es obligatorio.',
+            'range_course.required' => 'El campo range_course es obligatorio.',
+            'area_id.required' => 'El campo area_id es obligatorio.',
+            'range_course.array' => 'El campo range_course debe ser un array.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $categories = new Categories;
+        $categories->name = $request->name;
+        $categories->range_course = $request->range_course;
+        $categories->area_id = $request->area_id;
+        $categories->save();
+
+        return response()->json([
+            'message' => 'Categoría creada con éxito'
+        ], 201);
+    }
 }
