@@ -65,6 +65,9 @@ Route::patch('/olympics/{id}/price', [OlympicsController::class, 'updatePrice'])
 //PB 16
 Route::patch('/olympics/{id}/publish', [OlympicsController::class, 'publish']);
 
+Route::get('/olympics/getOlympicInfo/{id}', [OlympicsController::class, 'getOlympicInfo']);
+
+
 
 
 // Rutas para   Buscar
@@ -76,6 +79,7 @@ Route::get('/search-inscriptions/by-status/{status}', [PersonSearchController::c
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
+//PB 12
 Route::get('/search-inscriptions', [PersonSearchController::class, 'index']);
 
 // Rutas para  Asociar Olimpiadas y categorias 

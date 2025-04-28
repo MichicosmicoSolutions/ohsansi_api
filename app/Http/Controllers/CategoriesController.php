@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Enums\RangeCourse;
-
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,6 +29,7 @@ class CategoriesController extends Controller
 
         return response()->json(['categorias' => $categorias]);
     }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -38,10 +37,13 @@ class CategoriesController extends Controller
                 'required',
                 'string',
                 'max:255',
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail) use ($request) {
                     $normalizedInput = Str::ascii(strtolower($value));
+                    $areaId = $request->input('area_id');
+
 
                     $exists = DB::table('categories')
+                        ->where('area_id', $areaId)
                         ->get()
                         ->some(function ($cat) use ($normalizedInput) {
                             $normalizedExisting = Str::ascii(strtolower($cat->name));
@@ -49,7 +51,16 @@ class CategoriesController extends Controller
                         });
 
                     if ($exists) {
-                        $fail('La categoría ya existe.');
+                        return $fail('Ya existe una categoría con ese nombre en esta área.');
+                    }
+
+
+                    $area = DB::table('areas')->where('id', $areaId)->first();
+                    if ($area) {
+                        $normalizedAreaName = Str::ascii(strtolower($area->name));
+                        if ($normalizedAreaName === $normalizedInput) {
+                            return $fail('El nombre de la categoría no puede ser igual al nombre del área.');
+                        }
                     }
                 }
             ],
@@ -79,7 +90,7 @@ class CategoriesController extends Controller
 
         $categories = new Categories;
         $categories->name = $request->name;
-        $categories->range_course = json_encode($request->range_course);
+        $categories->range_course = $request->range_course;
         $categories->area_id = $request->area_id;
         $categories->save();
 

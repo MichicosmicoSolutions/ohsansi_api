@@ -15,7 +15,11 @@ class Olympics extends Model
         'description',
         'price',
         'status',
+        'Presentation',
+        'Requirements',
         'start_date',
         'end_date',
+        'Contactos',
+        'awards',
     ];
 }
