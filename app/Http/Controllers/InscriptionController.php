@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\InscriptionService;
+use Illuminate\Support\Facades\Validator;
 use App\Validators\InscriptionsValidator;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class InscriptionController
@@ -81,7 +83,8 @@ class InscriptionController extends Controller
      *         description="Data for creating an inscription",
      *         @OA\JsonContent(
      *             type="object",
-     *             required={"legal_tutor", "responsable", "competitor"},
+     *             required={"olympic_id", "legal_tutor", "responsable", "competitor"},
+     *             @OA\Property(property="olympic_id", type="integer", description="The ID of the Olympic event", example=1),
      *             @OA\Property(property="legal_tutor", type="object",
      *                 description="Legal tutor information",
      *                 required={"ci", "ci_expedition", "names", "last_names", "birthdate", "email", "phone_number"},
@@ -125,7 +128,9 @@ class InscriptionController extends Controller
      *                 @OA\Property(property="selected_areas", type="array",
      *                     description="Selected areas information",
      *                     @OA\Items(
+     *                         required={"area_id", "category_id"},
      *                         @OA\Property(property="area_id", type="integer", example=1,),
+     *                         @OA\Property(property="category_id", type="integer", example=1,),
      *                         @OA\Property(property="academic_tutor", type="object",
      *                             description="Academic tutor information",
      *                             @OA\Property(property="ci", type="integer", example=4567890),
@@ -176,25 +181,36 @@ class InscriptionController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $validator = InscriptionsValidator::getValidator($request->all());
+
+        $validator = Validator::make(
+            $request->all(),
+            InscriptionsValidator::rules(),
+            InscriptionsValidator::messages()
+        );
+
 
         if ($validator->fails()) {
+            Log::error($validator->errors());
             return response()->json([
                 "errors" => $validator->errors(),
             ], 422);
         }
 
-        $validatedData = $validator->validated();
+        $body = $validator->validated();
 
-        $errors = InscriptionsValidator::validateInscriptions($validatedData);
 
-        if ($errors) {
+
+        $result = $this->inscriptionService->createInscription($body);
+
+        if ($result && isset($result['errors']) && !empty($result['errors'])) {
             return response()->json([
-                "errors" => $errors,
-            ], 422);
+                'errors' => $result['errors'],
+            ], 409);
         }
 
-        return $this->inscriptionService->createInscription($validatedData);
+        return response()->json([
+            "data" => $result['data'] + ['body' => $body],
+        ], 201);
     }
 
     /**
