@@ -83,7 +83,8 @@ class InscriptionController extends Controller
      *         description="Data for creating an inscription",
      *         @OA\JsonContent(
      *             type="object",
-     *             required={"legal_tutor", "responsable", "competitor"},
+     *             required={"olympic_id", "legal_tutor", "responsable", "competitor"},
+     *             @OA\Property(property="olympic_id", type="integer", description="The ID of the Olympic event", example=1),
      *             @OA\Property(property="legal_tutor", type="object",
      *                 description="Legal tutor information",
      *                 required={"ci", "ci_expedition", "names", "last_names", "birthdate", "email", "phone_number"},
@@ -127,7 +128,9 @@ class InscriptionController extends Controller
      *                 @OA\Property(property="selected_areas", type="array",
      *                     description="Selected areas information",
      *                     @OA\Items(
+     *                         required={"area_id", "category_id"},
      *                         @OA\Property(property="area_id", type="integer", example=1,),
+     *                         @OA\Property(property="category_id", type="integer", example=1,),
      *                         @OA\Property(property="academic_tutor", type="object",
      *                             description="Academic tutor information",
      *                             @OA\Property(property="ci", type="integer", example=4567890),
