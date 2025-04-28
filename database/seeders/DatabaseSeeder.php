@@ -17,7 +17,9 @@ class DatabaseSeeder extends Seeder
 {
     $this->call([
         AreaAndCategoriesSeeder::class,
-        PersonalDataSeeder::class, // 👈 nuevo seeder
+        PersonalDataSeeder::class, 
+        DemoSeeder::class,
+         SchoolSeeder::class
     ]);
 
     User::factory(1)->create();

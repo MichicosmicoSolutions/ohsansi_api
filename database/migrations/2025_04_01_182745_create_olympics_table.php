@@ -17,6 +17,7 @@ class CreateOlympicsTable extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
+            $table->integer('price');
             $table->date('start_date');
             $table->date('end_date');
         });

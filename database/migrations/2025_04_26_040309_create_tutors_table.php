@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAreasTable extends Migration
+class CreateTutorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateAreasTable extends Migration
      */
     public function up()
     {
-        Schema::create('areas', function (Blueprint $table) {
+        Schema::create('tutor', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
-
+            $table->string('Name');
+            $table->string('LastName');
+            $table->date('FechaNacimiento');
+            $table->string('TipoTutor', 100);
+            $table->timestamps(); 
         });
     }
 
@@ -28,6 +30,6 @@ class CreateAreasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('areas');
+        Schema::dropIfExists('tutor');
     }
 }

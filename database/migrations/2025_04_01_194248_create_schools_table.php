@@ -17,7 +17,7 @@ class CreateSchoolsTable extends Migration
         Schema::create('schools', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('department', Department::getValues());
+            $table->string('department');
             $table->string('province')->nullable();
             $table->timestamps();
         });
