@@ -197,16 +197,17 @@ class InscriptionController extends Controller
 
 
 
+        $result = $this->inscriptionService->createInscription($body);
 
-
-
+        if ($result && isset($result['errors']) && !empty($result['errors'])) {
+            return response()->json([
+                'errors' => $result['errors'],
+            ], 409);
+        }
 
         return response()->json([
-            "data" => $body,
+            "data" => $result['data'] + ['body' => $body],
         ], 201);
-
-
-        // return $this->inscriptionService->createInscription($validatedData);
     }
 
     /**

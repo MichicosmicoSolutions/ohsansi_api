@@ -25,6 +25,12 @@ class CreatePersonalDataTable extends Migration
             $table->string('phone_number');
         });
 
+        Schema::create('responsables', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');
+            $table->string('code');
+            $table->timestamps();
+        });
 
         Schema::create('legal_tutors', function (Blueprint $table) {
             $table->id();
@@ -36,6 +42,7 @@ class CreatePersonalDataTable extends Migration
             $table->id();
             $table->foreignId('school_id')->constrained('schools')->onDelete('cascade');
             $table->foreignId('legal_tutor_id')->constrained('legal_tutors')->onDelete('cascade');
+            $table->foreignId('responsable_id')->constrained('responsables')->onDelete('cascade');
             $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');
             $table->enum('course', RangeCourse::getValues());
             $table->timestamps();

@@ -12,8 +12,8 @@ class SelectedAreaValidator implements ValidatesInput
         return array_merge(
             [
                 "{$dot}area_id" => 'required|integer',
+                "{$dot}category_id" => 'required|integer',
                 "{$dot}academic_tutor" => 'sometimes|array',
-
             ],
             PersonalDataValidator::rules("{$dot}academic_tutor")
         );
