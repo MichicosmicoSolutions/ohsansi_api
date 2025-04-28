@@ -69,11 +69,17 @@
                         "application/json": {
                             "schema": {
                                 "required": [
+                                    "olympic_id",
                                     "legal_tutor",
                                     "responsable",
                                     "competitor"
                                 ],
                                 "properties": {
+                                    "olympic_id": {
+                                        "description": "The ID of the Olympic event",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
                                     "legal_tutor": {
                                         "description": "Legal tutor information",
                                         "required": [
@@ -243,8 +249,16 @@
                                                 "description": "Selected areas information",
                                                 "type": "array",
                                                 "items": {
+                                                    "required": [
+                                                        "area_id",
+                                                        "category_id"
+                                                    ],
                                                     "properties": {
                                                         "area_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "category_id": {
                                                             "type": "integer",
                                                             "example": 1
                                                         },

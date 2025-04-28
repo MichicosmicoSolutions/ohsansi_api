@@ -11,9 +11,14 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoriesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(['categorias' => Categories::all()]);
+        $query = Categories::query();
+
+        if ($request->has('area_id')) {
+            $query->where('area_id', $request->input('area_id'));
+        }
+        return response()->json(['categorias' => $query->get()]);
     }
 
     public function getCategoriasPorArea($area_id)
@@ -36,7 +41,7 @@ class CategoriesController extends Controller
                     $normalizedInput = Str::ascii(strtolower($value));
                     $areaId = $request->input('area_id');
 
-                    
+
                     $exists = DB::table('categories')
                         ->where('area_id', $areaId)
                         ->get()
@@ -49,7 +54,7 @@ class CategoriesController extends Controller
                         return $fail('Ya existe una categoría con ese nombre en esta área.');
                     }
 
-                  
+
                     $area = DB::table('areas')->where('id', $areaId)->first();
                     if ($area) {
                         $normalizedAreaName = Str::ascii(strtolower($area->name));
