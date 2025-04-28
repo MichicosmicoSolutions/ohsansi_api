@@ -41,23 +41,13 @@ class DemoSeeder extends Seeder
             ]));
         }
 
-        // Aseguramos que existan al menos unas areas, categories y olympics
-        $area = Areas::firstOrCreate(
-            ['name' => 'Natación'],
-            ['description' => 'Área de prueba para natación']
-        );
-        $category = Categories::firstOrCreate(
-            ['name' => 'Infantil'],
-            [
-                'range_course' => 'BEGINNER', // Asegúrate que es válido según tu enum
-                'area_id' => $area->id,
-            ]
-        );
+
         $olympic = Olympics::firstOrCreate(
             ['title' => 'Olimpiadas 2025'],
             [
                 'description' => 'Competencia nacional de prueba',
                 'price' => 1500,
+                'status' => 'Publico',
                 'start_date' => Carbon::parse('2025-06-01'),
                 'end_date' => Carbon::parse('2025-06-07'),
             ]
@@ -92,8 +82,8 @@ class DemoSeeder extends Seeder
                 'competitor_id' => $competitor->id,
                 'drive_url' => null,
                 'olympic_id' => $olympic->id,
-                'area_id' => $area->id,
-                'category_id' => $category->id,
+                'area_id' => 1,
+                'category_id' => 1,
                 'status' => 'Active', // o algún valor permitido por tu Enum
                 'paid_at' => Carbon::now(),
             ]);
