@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\InscriptionController;
+use App\Http\Controllers\OlimpiadasCategoriController;
 use App\Http\Controllers\OlympicsController;
 use App\Http\Controllers\PersonSearchController;
 
@@ -57,6 +58,8 @@ Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTem
 Route::post('/olympics', [OlympicsController::class, 'store']);
 Route::put('/olympics/{id}', [OlympicsController::class, 'update']);
 Route::patch('/olympics/{id}/price', [OlympicsController::class, 'updatePrice']);
+Route::patch('/olympics/{id}/publish', [OlympicsController::class, 'publish']);
+
 
 
 // Rutas para   Buscar
@@ -64,3 +67,6 @@ Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStuden
 Route::get('/search-inscriptions/by-status/{status}', [PersonSearchController::class, 'searchByStatus']);
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 Route::get('/search-inscriptions/by-date', [PersonSearchController::class, 'searchByDate']);
+
+// Rutas para  Asociar Olimpiadas y categorias 
+Route::post('/olimpiadas-categorias', [OlimpiadasCategoriController::class, 'store']);
