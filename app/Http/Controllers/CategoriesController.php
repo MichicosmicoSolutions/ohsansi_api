@@ -74,7 +74,7 @@ class CategoriesController extends Controller
     
         $categories = new Categories;
         $categories->name = $request->name;
-        $categories->range_course = json_encode($request->range_course);
+        $categories->range_course = $request->range_course; 
         $categories->area_id = $request->area_id;
         $categories->save();
     
@@ -82,4 +82,16 @@ class CategoriesController extends Controller
             'message' => 'Categoría creada con éxito'
         ], 201);
     }
+    public function destroy($id)
+{
+    $category = Categories::find($id);
+
+    if (!$category) {
+        return response()->json(['message' => 'Categoría no encontrada.'], 404);
+    }
+
+    $category->delete();
+
+    return response()->json(['message' => 'Categoría eliminada con éxito.'], 200);
+}
 }
