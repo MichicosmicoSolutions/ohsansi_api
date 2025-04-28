@@ -13,6 +13,8 @@ class Olympics extends Model
     protected $fillable = [
         'title',
         'description',
+        'price',
+        'status',
         'start_date',
         'end_date',
     ];

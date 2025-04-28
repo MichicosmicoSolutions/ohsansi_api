@@ -8,7 +8,7 @@ use App\Services\OlympicsService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-
+use App\Models\Olympics;
 class OlympicsController extends Controller
 {
     protected $service;
@@ -17,7 +17,10 @@ class OlympicsController extends Controller
     {
         $this->service = $service;
     }
-
+    public function index()
+    {
+        return response()->json(['Olympics' => Olympics::all()]);
+    }
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
