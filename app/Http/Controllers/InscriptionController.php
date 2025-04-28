@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\InscriptionService;
+use Illuminate\Support\Facades\Validator;
 use App\Validators\InscriptionsValidator;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class InscriptionController
@@ -176,25 +178,35 @@ class InscriptionController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $validator = InscriptionsValidator::getValidator($request->all());
+
+        $validator = Validator::make(
+            $request->all(),
+            InscriptionsValidator::rules(),
+            InscriptionsValidator::messages()
+        );
+
 
         if ($validator->fails()) {
+            Log::error($validator->errors());
             return response()->json([
                 "errors" => $validator->errors(),
             ], 422);
         }
 
-        $validatedData = $validator->validated();
+        $body = $validator->validated();
 
-        $errors = InscriptionsValidator::validateInscriptions($validatedData);
 
-        if ($errors) {
-            return response()->json([
-                "errors" => $errors,
-            ], 422);
-        }
 
-        return $this->inscriptionService->createInscription($validatedData);
+
+
+
+
+        return response()->json([
+            "data" => $body,
+        ], 201);
+
+
+        // return $this->inscriptionService->createInscription($validatedData);
     }
 
     /**
