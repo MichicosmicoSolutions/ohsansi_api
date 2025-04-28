@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RangeCourse;
 use Illuminate\Database\Seeder;
 use App\Models\PersonalData;
 use App\Models\LegalTutors;
@@ -10,8 +11,9 @@ use App\Models\Inscriptions;
 use App\Models\Areas;
 use App\Models\Categories;
 use App\Models\Olympics;
-use Illuminate\Support\Str;
+use App\Models\Schools;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DemoSeeder extends Seeder
 {
@@ -39,14 +41,27 @@ class DemoSeeder extends Seeder
             ]));
         }
 
-        // Aseguramos que existan al menos unas areas, categories y olympics
+
         $olympic = Olympics::firstOrCreate(
             ['title' => 'Olimpiadas 2025'],
             [
                 'description' => 'Competencia nacional de prueba',
-                'price' => 150,
+                'price' => 1500,
+                'status' => 'Publico',
                 'start_date' => Carbon::parse('2025-06-01'),
                 'end_date' => Carbon::parse('2025-06-07'),
+            ]
+        );
+
+        $school = Schools::firstOrCreate(
+            ['id' => 1],
+            [
+                'id' => 1,
+                'name' => 'BUENAS NUEVAS',
+                'department' => 'COCHABAMBA',
+                'province' => 'CERCADO',
+                'created_at' => Carbon::create('2025', '06', '01'),
+                'updated_at' => Carbon::create('2025', '06', '01'),
             ]
         );
 
@@ -54,8 +69,8 @@ class DemoSeeder extends Seeder
         $competitors = collect();
         foreach ($personalDatas as $index => $personalData) {
             $competitors->push(Competitors::create([
-                'course' => 'BEGINNER', // O como esté definido tu enum
-                'school_id' => 1, // Asegúrate que school_id 1 exista o cambia aquí
+                'course' => RangeCourse::C1P,
+                'school_id' => $school->id, // Asegúrate que school_id 1 exista o cambia aquí
                 'legal_tutor_id' => $legalTutors[$index]->id,
                 'personal_data_id' => $personalData->id,
             ]));
@@ -67,7 +82,7 @@ class DemoSeeder extends Seeder
                 'competitor_id' => $competitor->id,
                 'drive_url' => null,
                 'olympic_id' => $olympic->id,
-                'area_id' =>1,
+                'area_id' => 1,
                 'category_id' => 1,
                 'status' => 'Active', // o algún valor permitido por tu Enum
                 'paid_at' => Carbon::now(),

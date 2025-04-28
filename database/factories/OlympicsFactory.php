@@ -14,6 +14,8 @@ class OlympicsFactory extends Factory
         return [
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
+            'price' => 1500,
+            'status' => 'Publico',
             'start_date' => '2025-04-01',
             'end_date' => '2025-10-01',
         ];

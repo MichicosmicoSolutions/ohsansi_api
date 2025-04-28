@@ -37,6 +37,7 @@ class CreatePersonalDataTable extends Migration
             $table->foreignId('school_id')->constrained('schools')->onDelete('cascade');
             $table->foreignId('legal_tutor_id')->constrained('legal_tutors')->onDelete('cascade');
             $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');
+            $table->enum('course', RangeCourse::getValues());
             $table->timestamps();
         });
     }
@@ -47,10 +48,9 @@ class CreatePersonalDataTable extends Migration
      * @return void
      */
     public function down()
-{
-    Schema::dropIfExists('competitors');
-    Schema::dropIfExists('legal_tutors');
-    Schema::dropIfExists('personal_data');
-}
-
+    {
+        Schema::dropIfExists('competitors');
+        Schema::dropIfExists('legal_tutors');
+        Schema::dropIfExists('personal_data');
+    }
 }
