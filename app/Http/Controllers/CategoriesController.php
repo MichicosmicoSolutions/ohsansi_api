@@ -39,11 +39,9 @@ class CategoriesController extends Controller
                 'max:255',
                 function ($attribute, $value, $fail) use ($request) {
                     $normalizedInput = Str::ascii(strtolower($value));
-                    $areaId = $request->input('area_id');
-
 
                     $exists = DB::table('categories')
-                        ->where('area_id', $areaId)
+                        ->where('area_id', $request->area_id)
                         ->get()
                         ->some(function ($cat) use ($normalizedInput) {
                             $normalizedExisting = Str::ascii(strtolower($cat->name));
@@ -51,16 +49,7 @@ class CategoriesController extends Controller
                         });
 
                     if ($exists) {
-                        return $fail('Ya existe una categoría con ese nombre en esta área.');
-                    }
-
-
-                    $area = DB::table('areas')->where('id', $areaId)->first();
-                    if ($area) {
-                        $normalizedAreaName = Str::ascii(strtolower($area->name));
-                        if ($normalizedAreaName === $normalizedInput) {
-                            return $fail('El nombre de la categoría no puede ser igual al nombre del área.');
-                        }
+                        $fail('La categoría ya existe en esta área.');
                     }
                 }
             ],
@@ -97,5 +86,17 @@ class CategoriesController extends Controller
         return response()->json([
             'message' => 'Categoría creada con éxito'
         ], 201);
+    }
+    public function destroy($id)
+    {
+        $category = Categories::find($id);
+
+        if (!$category) {
+            return response()->json(['message' => 'Categoría no encontrada.'], 404);
+        }
+
+        $category->delete();
+
+        return response()->json(['message' => 'Categoría eliminada con éxito.'], 200);
     }
 }

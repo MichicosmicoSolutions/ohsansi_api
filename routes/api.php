@@ -42,7 +42,7 @@ Route::patch('/areas/{id}/pricing', [AreasController::class, 'updatePrice']);
 Route::get('/categories', [CategoriesController::class, 'index']);
 Route::post('/categories', [CategoriesController::class, 'store']);
 Route::get('/area/{area_id}/categories', [CategoriesController::class, 'getCategoriasPorArea']);
-
+Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
 
 // Rutas para inscripciones
 Route::get('/inscriptions', [InscriptionController::class, 'index']);
