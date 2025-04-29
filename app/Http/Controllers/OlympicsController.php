@@ -68,7 +68,7 @@ class OlympicsController extends Controller
         }
 
         $data = $request->all();
-        $data['status'] = 'No Publico';
+        $data['status'] = 'false';
 
         
         $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
@@ -162,7 +162,7 @@ class OlympicsController extends Controller
             'Contacts'
         ]);
     
-        $data['status'] = 'Publico';
+        $data['status'] = 'True';
     
         $olympic = $this->service->update($id, $data);
     
@@ -181,6 +181,7 @@ class OlympicsController extends Controller
         $olympic = Olympics::find($id, [
             'title',
             'description',
+            'price',
             'Presentation',
             'Requirements',
             'start_date',
@@ -196,6 +197,7 @@ class OlympicsController extends Controller
         return response()->json([
             'title' => $olympic->title,
             'description' => $olympic->description,
+            'price'=>$olympic->  price,
             'Presentation' => $olympic->Presentation,
             'Requirements' => $olympic->Requirements,
             'Start_date' => $olympic->start_date,
