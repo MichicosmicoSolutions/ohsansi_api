@@ -5,6 +5,8 @@ namespace App\Enums;
 
 class RangeCourse
 {
+    public const C1P = "1ro Primaria";
+    public const C2P = '2do Primaria';
     public const C3P = '3ro Primaria';
     public const C4P = '4to Primaria';
     public const C5P = '5to Primaria';
@@ -19,6 +21,8 @@ class RangeCourse
     public static function getValues(): array
     {
         return [
+            self::C1P,
+            self::C2P,
             self::C3P,
             self::C4P,
             self::C5P,

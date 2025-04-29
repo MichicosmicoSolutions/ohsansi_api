@@ -3,163 +3,185 @@
 namespace App\Services;
 
 use App\Enums\InscriptionStatus;
-use App\Models\AcademicTutors;
-use App\Models\Areas;
-use App\Models\Categories;
-use App\Models\Competitors;
-use App\Models\Inscriptions;
-use App\Models\LegalTutors;
-use App\Models\Olympics;
+use App\Models\{Competitors, Olympics, PersonalData, Schools, Areas, Categories, Inscriptions, LegalTutors, Responsables};
 use Illuminate\Support\Facades\DB;
-use App\Models\PersonalData;
-use App\Models\Schools;
+use Illuminate\Database\QueryException;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class InscriptionService
 {
-
-    public function getInscriptions()
+    public function getInscriptions($ci, $code)
     {
         return Inscriptions::with([
+            'competitor',
             'competitor.school',
-            'competitor.academicTutor.personalData',
+            'competitor.responsable.personalData',
             'competitor.legalTutor.personalData',
-        ])->get();
+            'olympic',
+            'area',
+            'category',
+        ])->whereHas('competitor.responsable.personalData', function ($query) use ($ci) {
+            $query->where('ci', $ci);
+        })->whereHas('competitor', function ($query) use ($code) {
+            $query->whereHas('responsable', function ($query) use ($code) {
+                $query->where('code', $code);
+            });
+        })->get();
+    }
+
+    public function getInscriptionById($id, $ci, $code)
+    {
+        return Inscriptions::with([
+            'competitor',
+            'competitor.school',
+            'competitor.responsable.personalData',
+            'competitor.legalTutor.personalData',
+            'olympic',
+            'area',
+            'category',
+        ])->whereHas('competitor.responsable.personalData', function ($query) use ($ci) {
+            $query->where('ci', $ci);
+        })->whereHas('competitor', function ($query) use ($code) {
+            $query->whereHas('responsable', function ($query) use ($code) {
+                $query->where('code', $code);
+            });
+        })->findOrFail($id);
     }
 
     public function createInscription($validatedData)
     {
         DB::beginTransaction();
 
-        $currentDate = now();
-        $olympic = Olympics::where('start_date', '<=', $currentDate)
-            ->where('end_date', '>=', $currentDate)
-            ->first();
-
-        if (!$olympic) {
-            return response()->json(['error' => 'No se encontró la olimpiada activa'], 404);
-        }
-
         try {
+            $olympic = Olympics::findOrFail($validatedData['olympic_id']);
 
-            $legalTutorData = PersonalData::where('ci', $validatedData['legal_tutor']['ci'])->first();
-            if (!$legalTutorData) {
-                $legalTutorData = PersonalData::create([
-                    'ci' => $validatedData['legal_tutor']['ci'],
-                    'ci_expedition' => $validatedData['legal_tutor']['ci_expedition'],
-                    'names' => $validatedData['legal_tutor']['names'],
-                    'last_names' => $validatedData['legal_tutor']['last_names'],
-                    'birthdate' => $validatedData['legal_tutor']['birthdate'],
-                    'email' => $validatedData['legal_tutor']['email'],
-                    'phone_number' => $validatedData['legal_tutor']['phone_number'],
+            if (!($olympic->status == "Publico")) {
+                return ['errors' => ['olympic_id' => ['This Olympic is not active.']]];
+            }
+
+            $responsableData = $this->getOrCreatePersonalData($validatedData['responsable'], 'ci');
+            $legalTutorData = $this->getOrCreatePersonalData($validatedData['legal_tutor'], 'ci');
+            $competitorData = $this->getOrCreatePersonalData($validatedData['competitor'], 'ci');
+
+            $school = Schools::create([
+                'name' => $validatedData['competitor']['school_data']['name'],
+                "department" => $validatedData['competitor']['school_data']['department'],
+                'province' => $validatedData['competitor']['school_data']['province'],
+            ]);
+
+            $selectedAreas = $validatedData['competitor']['selected_areas'];
+
+
+            $legalTutor = LegalTutors::firstOrCreate(
+                ['personal_data_id' => $legalTutorData->id],
+                [
+                    'personal_data_id' => $legalTutorData->id,
+                ]
+            );
+
+            $responsable = Responsables::firstOrCreate(
+                ['personal_data_id' => $responsableData->id],
+                [
+                    'personal_data_id' => $responsableData->id,
+                    'code' => $this->generateCode(),
+                ]
+            );
+
+            $competitor = Competitors::where('personal_data_id', $competitorData->id)->first();
+            if ($competitor) {
+                $totalAreas = $competitor->inscriptions()->count();
+                if ((2 - $totalAreas) == count($selectedAreas)) {
+                    return ['errors' => ['competitor' => ['El competidor ya no puede inscribir más áreas']]];
+                }
+            } else {
+                $competitor = Competitors::create([
+                    'school_id' => $school->id,
+                    'legal_tutor_id' => $legalTutor->id,
+                    'personal_data_id' => $competitorData->id,
+                    'responsable_id' => $responsable->id,
+                    "course" => $validatedData['competitor']['school_data']['course'],
                 ]);
             }
-            $legalTutor = LegalTutors::where('personal_data_id', $legalTutorData->id)->first();
-            if (!$legalTutor) {
-                $legalTutor = LegalTutors::create(['personal_data_id' => $legalTutorData->id]);
-            }
 
+            foreach ($selectedAreas as $index => $selectedArea) {
+                $area = Areas::find($selectedArea['area_id']);
+                $category = Categories::find($selectedArea['category_id']);
+                if (!$area) {
+                    $fieldName = "competitor.selected_areas.{$index}.area_id";
+                    return ['errors' => [$fieldName => ['Area no encontrada']]];
+                }
+                if (!$category) {
+                    $fieldName = "competitor.selected_areas.{$index}.category_id";
+                    return ['errors' => [$fieldName => ['Category no encontrada']]];
+                }
+                if (!in_array($competitor->course, $category->range_course)) {
+                    $fieldName = 'competitor.school_data.course';
+                    return ['errors' => [$fieldName => ['Course mismatch for category']]];
+                }
 
-            $academicTutorData = PersonalData::where('ci', $validatedData['academic_tutor']['ci'])->first();
-            if (!$academicTutorData) {
-                $academicTutorData = PersonalData::create([
-                    'ci' => $validatedData['academic_tutor']['ci'],
-                    'ci_expedition' => $validatedData['academic_tutor']['ci_expedition'],
-                    'names' => $validatedData['academic_tutor']['names'],
-                    'last_names' => $validatedData['academic_tutor']['last_names'],
-                    'birthdate' => $validatedData['academic_tutor']['birthdate'],
-                    'email' => $validatedData['academic_tutor']['email'],
-                    'phone_number' => $validatedData['academic_tutor']['phone_number'],
+                Inscriptions::create([
+                    'competitor_id' => $competitor->id,
+                    'olympic_id' => $olympic->id,
+                    'area_id' => $area->id,
+                    'category_id' => $category->id,
+                    'status' => InscriptionStatus::PENDING,
                 ]);
-            }
-            $academicTutor = AcademicTutors::where('personal_data_id', $academicTutorData->id)->first();
-            if (!$academicTutor) {
-                $academicTutor = AcademicTutors::create(['personal_data_id' => $academicTutorData->id]);
-            }
-
-            $inscriptions = [];
-            foreach ($validatedData['competitors'] as $competitorData) {
-
-                $school = Schools::create([
-                    'name' => $competitorData['school_data']['name'],
-                    "department" => $competitorData['school_data']['department'],
-                    'province' => $competitorData['school_data']['province'],
-                ]);
-
-                // Check if personal data already exists
-                $personalData = PersonalData::where('ci', $competitorData['ci'])->first();
-                if (!$personalData) {
-                    $personalData = PersonalData::create([
-                        "ci" => $competitorData['ci'],
-                        "ci_expedition" => $competitorData['ci_expedition'],
-                        "names" => $competitorData['names'],
-                        "last_names" => $competitorData['last_names'],
-                        "birthdate" => $competitorData['birthdate'],
-                        "email" => $competitorData['email'],
-                        "phone_number" => $competitorData['phone_number'],
-                    ]);
-                }
-
-                $competitor = Competitors::where('personal_data_id', $personalData->id)->first();
-                if (!$competitor) {
-                    $competitor = Competitors::create([
-                        "course" => $competitorData['school_data']['course'],
-                        'school_id' => $school->id,
-                        'legal_tutor_id' => $legalTutor->id,
-                        'academic_tutor_id' => $academicTutor->id,
-                        'personal_data_id' => $personalData->id,
-                    ]);
-                }
-
-                $selectedAreas = $competitorData['selected_areas'];
-                foreach ($selectedAreas as $areaId) {
-                    $area = Areas::where('id', $areaId)->first();
-                    $category = Categories::where('area_id', 6)
-                        ->whereRaw("range_course::jsonb @> ?", ['["3ro Secundaria"]'])
-                        ->first();
-
-
-                    $inscription = Inscriptions::create([
-                        'competitor_id' => $competitor->id,
-                        'olympic_id' => $olympic->id,
-                        'area_id' => $area->id,
-                        'category_id' => $category->id,
-                        'status' => InscriptionStatus::PENDING,
-                    ]);
-                }
-                $inscriptions[] = $inscription;
             }
 
             DB::commit();
-
-            return response()->json([
+            return ['data' => [
                 "message" => "Data validated successfully",
-            ], 201);
-        } catch (\Illuminate\Database\QueryException $e) {
-
+                "code" => $responsable->code
+            ]];
+        } catch (QueryException $e) {
             DB::rollBack();
-            if ($e->getCode() === '23505') {
-                // Assuming the unique constraint is on the email field
-                if (strpos($e->getMessage(), 'email') !== false) {
-                    // Use a regular expression to extract the email from the error message
-                    preg_match('/Key \((.*?)\)=\((.*?)\)/', $e->getMessage(), $matches);
-                    $email = isset($matches[2]) ? $matches[2] : 'desconocido';
-
-                    return response()->json([
-                        "error" => "El correo electrónico {$email} ya está en uso. Por favor, verifica tus datos e intenta nuevamente.",
-                    ], 400);
-                }
-            }
-
-            return response()->json([
-                "error" => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde. Error: " . $e->getMessage() . " Línea: " . $e->getLine(),
-            ], 500);
-        } catch (\Exception $e) {
+            return $this->handleDatabaseError($e);
+        } catch (Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                "error" => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde. Error: " . $e->getMessage() . " Línea: " . $e->getLine(),
-            ], 500);
+            return ['errors' => [
+                "error" => ["Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde. Error: " . $e->getMessage()],
+            ]];
         }
+    }
+
+    private function generateCode()
+    {
+        $code = '';
+        for ($i = 0; $i < 5; $i++) {
+            $code .= substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'), 0, 8) . ' ';
+        }
+        $code = rtrim($code); // Remove the trailing space
+        return $code;
+    }
+
+    private function getOrCreatePersonalData($data, $uniqueField = 'ci')
+    {
+        return PersonalData::firstOrCreate(
+            [$uniqueField => $data[$uniqueField]],
+            [
+                'ci' => $data['ci'],
+                'ci_expedition' => $data['ci_expedition'],
+                'names' => $data['names'],
+                'last_names' => $data['last_names'],
+                'birthdate' => $data['birthdate'],
+                'email' => $data['email'],
+                'phone_number' => $data['phone_number'],
+            ]
+        );
+    }
+
+    private function handleDatabaseError(QueryException $e)
+    {
+        if ($e->getCode() === '23505') {
+            preg_match('/Key \((.*?)\)=\((.*?)\)/', $e->getMessage(), $matches);
+            $email = isset($matches[2]) ? $matches[2] : 'desconocido';
+            return ['errors' => [
+                "error" => ["El correo electrónico {$email} ya está en uso. Por favor, verifica tus datos e intenta nuevamente."],
+            ]];
+        }
+        return ['errors' => [
+            "error" => ["Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde. Error: " . $e->getMessage()],
+        ]];
     }
 }

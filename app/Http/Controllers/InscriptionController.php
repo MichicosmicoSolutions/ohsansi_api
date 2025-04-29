@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\InscriptionService;
+use App\Services\ResponsableService;
+use Illuminate\Support\Facades\Validator;
 use App\Validators\InscriptionsValidator;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class InscriptionController
@@ -30,39 +33,293 @@ class InscriptionController extends Controller
         $this->inscriptionService = $inscriptionService;
     }
 
+
     /**
-     * Display a listing of the inscriptions.
+     * Get inscriptions for a user.
      *
-     * @return \Illuminate\Http\JsonResponse
      * @OA\Get(
-     *     path="/inscriptions",
+     *     path="/api/inscriptions",
+     *     summary="Get inscriptions for the authenticated user",
      *     tags={"Inscriptions"},
-     *     summary="Get all inscriptions",
-     *     description="Returns a list of all inscriptions",
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Successful response",
+     *         description="Successful operation",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="data", type="array", @OA\Items(
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Example"),
-     *                 @OA\Property(property="email", type="string", example="example@example.com"),
-     *             ))
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="competitor_id", type="integer"),
+     *                     @OA\Property(property="drive_url", type="string", nullable=true),
+     *                     @OA\Property(property="olympic_id", type="integer"),
+     *                     @OA\Property(property="area_id", type="integer"),
+     *                     @OA\Property(property="category_id", type="integer"),
+     *                     @OA\Property(property="status", type="string"),
+     *                     @OA\Property(property="paid_at", type="string", format="date-time", nullable=true),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                     @OA\Property(
+     *                         property="competitor",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="school_id", type="integer"),
+     *                         @OA\Property(property="legal_tutor_id", type="integer"),
+     *                         @OA\Property(property="responsable_id", type="integer"),
+     *                         @OA\Property(property="personal_data_id", type="integer"),
+     *                         @OA\Property(property="course", type="string"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                         @OA\Property(
+     *                             property="school",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="name", type="string"),
+     *                             @OA\Property(property="department", type="string"),
+     *                             @OA\Property(property="province", type="string"),
+     *                             @OA\Property(property="created_at", type="string", format="date-time"),
+     *                             @OA\Property(property="updated_at", type="string", format="date-time")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="responsable",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="personal_data_id", type="integer"),
+     *                         @OA\Property(property="code", type="string"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                         @OA\Property(
+     *                             property="personal_data",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="ci", type="integer"),
+     *                             @OA\Property(property="ci_expedition", type="string"),
+     *                             @OA\Property(property="names", type="string"),
+     *                             @OA\Property(property="last_names", type="string"),
+     *                             @OA\Property(property="birthdate", type="string", format="date"),
+     *                             @OA\Property(property="email", type="string"),
+     *                             @OA\Property(property="phone_number", type="string")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="legal_tutor",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="personal_data_id", type="integer"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                         @OA\Property(
+     *                             property="personal_data",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer"),
+     *                             @OA\Property(property="ci", type="integer"),
+     *                             @OA\Property(property="ci_expedition", type="string"),
+     *                             @OA\Property(property="names", type="string"),
+     *                             @OA\Property(property="last_names", type="string"),
+     *                             @OA\Property(property="birthdate", type="string", format="date"),
+     *                             @OA\Property(property="email", type="string"),
+     *                             @OA\Property(property="phone_number", type="string")
+     *                         )
+     *                     )
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error"
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Resource not found"
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $inscriptions = $this->inscriptionService->getInscriptions();
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json([
+                "error" => "Resource not found",
+            ], 404);
+        }
+
+        $result = ResponsableService::decodeJWT($token);
+
+        if ($result && isset($result['errors']) && !empty($result['errors'])) {
+            return response()->json([
+                'errors' => $result['errors'],
+            ], 401);
+        }
+
+        $payload = $result['payload'];
+
+        if (!$payload) {
+            return response()->json([
+                "error" => "Resource not found",
+            ], 404);
+        }
+
+        $inscriptions = $this->inscriptionService->getInscriptions($payload['sub'], $payload['code']);
+
         return response()->json([
             "data" => $inscriptions,
         ]);
+    }
+
+    /**
+     * Get a specific inscription by ID.
+     *
+     * @OA\Get(
+     *     path="/api/inscriptions/{id}",
+     *     summary="Get an inscription by ID",
+     *     tags={"Inscriptions"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Inscription ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer"),
+     *                 @OA\Property(property="competitor_id", type="integer"),
+     *                 @OA\Property(property="drive_url", type="string", nullable=true),
+     *                 @OA\Property(property="olympic_id", type="integer"),
+     *                 @OA\Property(property="area_id", type="integer"),
+     *                 @OA\Property(property="category_id", type="integer"),
+     *                 @OA\Property(property="status", type="string"),
+     *                 @OA\Property(property="paid_at", type="string", format="date-time", nullable=true),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                 @OA\Property(
+     *                     property="competitor",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="school_id", type="integer"),
+     *                     @OA\Property(property="legal_tutor_id", type="integer"),
+     *                     @OA\Property(property="responsable_id", type="integer"),
+     *                     @OA\Property(property="personal_data_id", type="integer"),
+     *                     @OA\Property(property="course", type="string"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                     @OA\Property(
+     *                         property="school",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="name", type="string"),
+     *                         @OA\Property(property="department", type="string"),
+     *                         @OA\Property(property="province", type="string"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="responsable",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="personal_data_id", type="integer"),
+     *                     @OA\Property(property="code", type="string"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                     @OA\Property(
+     *                         property="personal_data",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer"),
+     *                         @OA\Property(property="ci", type="integer"),
+     *                         @OA\Property(property="ci_expedition", type="string"),
+     *                         @OA\Property(property="names", type="string"),
+     *                         @OA\Property(property="last_names", type="string"),
+     *                         @OA\Property(property="birthdate", type="string", format="date"),
+     *                         @OA\Property(property="email", type="string"),
+     *                         @OA\Property(property="phone_number", type="string")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="olympic",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="title", type="string"),
+     *                     @OA\Property(property="description", type="string"),
+     *                     @OA\Property(property="price", type="number"),
+     *                     @OA\Property(property="status", type="string"),
+     *                     @OA\Property(property="start_date", type="string", format="date"),
+     *                     @OA\Property(property="end_date", type="string", format="date")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="area",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="name", type="string"),
+     *                     @OA\Property(property="description", type="string")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="category",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer"),
+     *                     @OA\Property(property="name", type="string"),
+     *                     @OA\Property(property="range_course", type="array", @OA\Items(type="string")),
+     *                     @OA\Property(property="area_id", type="integer")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Resource not found"
+     *     )
+     * )
+     */
+    public function show($id)
+    {
+        $token = request()->header('Authorization');
+        if (!$token) {
+            return response()->json([
+                "error" => "Resource not found",
+            ], 404);
+        }
+
+        $result = ResponsableService::decodeJWT($token);
+
+        if ($result && isset($result['errors']) && !empty($result['errors'])) {
+            return response()->json([
+                'errors' => $result['errors'],
+            ], 401);
+        }
+
+        $payload = $result['payload'];
+
+        if (!$payload) {
+            return response()->json([
+                "error" => "Resource not found",
+            ], 404);
+        }
+
+        try {
+            $inscription = $this->inscriptionService->getInscriptionById($id, $payload['sub'], $payload['code']);
+            return response()->json([
+                'data' => $inscription,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 404);
+        }
     }
 
     /**
@@ -81,7 +338,8 @@ class InscriptionController extends Controller
      *         description="Data for creating an inscription",
      *         @OA\JsonContent(
      *             type="object",
-     *             required={"legal_tutor", "responsable", "competitor"},
+     *             required={"olympic_id", "legal_tutor", "responsable", "competitor"},
+     *             @OA\Property(property="olympic_id", type="integer", description="The ID of the Olympic event", example=1),
      *             @OA\Property(property="legal_tutor", type="object",
      *                 description="Legal tutor information",
      *                 required={"ci", "ci_expedition", "names", "last_names", "birthdate", "email", "phone_number"},
@@ -125,7 +383,9 @@ class InscriptionController extends Controller
      *                 @OA\Property(property="selected_areas", type="array",
      *                     description="Selected areas information",
      *                     @OA\Items(
+     *                         required={"area_id", "category_id"},
      *                         @OA\Property(property="area_id", type="integer", example=1,),
+     *                         @OA\Property(property="category_id", type="integer", example=1,),
      *                         @OA\Property(property="academic_tutor", type="object",
      *                             description="Academic tutor information",
      *                             @OA\Property(property="ci", type="integer", example=4567890),
@@ -176,71 +436,39 @@ class InscriptionController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $validator = InscriptionsValidator::getValidator($request->all());
+
+        $validator = Validator::make(
+            $request->all(),
+            InscriptionsValidator::rules(),
+            InscriptionsValidator::messages()
+        );
+
 
         if ($validator->fails()) {
+            Log::error($validator->errors());
             return response()->json([
                 "errors" => $validator->errors(),
             ], 422);
         }
 
-        $validatedData = $validator->validated();
+        $body = $validator->validated();
 
-        $errors = InscriptionsValidator::validateInscriptions($validatedData);
 
-        if ($errors) {
+
+        $result = $this->inscriptionService->createInscription($body);
+
+        if ($result && isset($result['errors']) && !empty($result['errors'])) {
             return response()->json([
-                "errors" => $errors,
-            ], 422);
+                'errors' => $result['errors'],
+            ], 409);
         }
 
-        return $this->inscriptionService->createInscription($validatedData);
+        return response()->json([
+            "data" => $result['data'] + ['body' => $body],
+        ], 201);
     }
 
-    /**
-     * Display the specified inscription.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     * @OA\Get(
-     *     path="/inscriptions/{id}",
-     *     tags={"Inscriptions"},
-     *     summary="Get an inscription by ID",
-     *     description="Returns an inscription by ID",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Example"),
-     *                 @OA\Property(property="email", type="string", example="example@example.com")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Inscription not found"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error"
-     *     )
-     * )
-     */
-    public function show($id)
-    {
-        return response()->json([
-            "message" => "Not Implemented"
-        ]);
-    }
+
 
     /**
      * Update the specified inscription in storage.
