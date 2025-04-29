@@ -147,6 +147,9 @@ class OlympicsController extends Controller
     public function publish(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
+            'title' => 'nullable|string',
+            'description' => 'nullable|string',
+            'price' => 'nullable|integer|min:0',
             'Presentation' => 'nullable|string',
             'Requirements' => 'nullable|string',
             'awards' => 'nullable|string',
