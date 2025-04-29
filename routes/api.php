@@ -95,3 +95,6 @@ Route::post('/olimpiadas-categorias', [OlimpiadasCategoriController::class, 'sto
 Route::get('/olimpiadas-categorias/{olympic_id}/areas/{area_id}/categories', [OlimpiadasCategoriController::class, 'getCategoriesByOlympicAndArea']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas', [OlimpiadasCategoriController::class, 'getAreasByOlympic']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlimpiadasCategoriController::class, 'getAreasWithCategoriesByOlympic']);
+
+
+Route::delete('/olympics/{id}', [OlympicsController::class, 'destroy']);

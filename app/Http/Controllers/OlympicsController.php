@@ -197,4 +197,17 @@ class OlympicsController extends Controller
             'Contacts' => $olympic->Contacts,
         ], 200);
     }
+
+    public function destroy($id)
+    {
+        $category = Olympics::find($id);
+
+        if (!$category) {
+            return response()->json(['message' => 'Olimpiada no encontrada.'], 404);
+        }
+
+        $category->delete();
+
+        return response()->json(['message' => 'Olimpiada eliminada con éxito.'], 200);
+    }
 }
