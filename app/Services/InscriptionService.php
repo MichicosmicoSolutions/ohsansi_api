@@ -11,9 +11,42 @@ use Illuminate\Support\Facades\Log;
 
 class InscriptionService
 {
-    public function getInscriptions()
+    public function getInscriptions($ci, $code)
     {
-        return Competitors::with(['school', 'academicTutor.personalData', 'legalTutor.personalData'])->get();
+        return Inscriptions::with([
+            'competitor',
+            'competitor.school',
+            'competitor.responsable.personalData',
+            'competitor.legalTutor.personalData',
+            'olympic',
+            'area',
+            'category',
+        ])->whereHas('competitor.responsable.personalData', function ($query) use ($ci) {
+            $query->where('ci', $ci);
+        })->whereHas('competitor', function ($query) use ($code) {
+            $query->whereHas('responsable', function ($query) use ($code) {
+                $query->where('code', $code);
+            });
+        })->get();
+    }
+
+    public function getInscriptionById($id, $ci, $code)
+    {
+        return Inscriptions::with([
+            'competitor',
+            'competitor.school',
+            'competitor.responsable.personalData',
+            'competitor.legalTutor.personalData',
+            'olympic',
+            'area',
+            'category',
+        ])->whereHas('competitor.responsable.personalData', function ($query) use ($ci) {
+            $query->where('ci', $ci);
+        })->whereHas('competitor', function ($query) use ($code) {
+            $query->whereHas('responsable', function ($query) use ($code) {
+                $query->where('code', $code);
+            });
+        })->findOrFail($id);
     }
 
     public function createInscription($validatedData)
@@ -97,7 +130,10 @@ class InscriptionService
             }
 
             DB::commit();
-            return ['data' => ["message" => "Data validated successfully"]];
+            return ['data' => [
+                "message" => "Data validated successfully",
+                "code" => $responsable->code
+            ]];
         } catch (QueryException $e) {
             DB::rollBack();
             return $this->handleDatabaseError($e);

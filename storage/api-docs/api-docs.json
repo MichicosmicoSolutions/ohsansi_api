@@ -9,17 +9,17 @@
         "version": "1.0"
     },
     "paths": {
-        "/inscriptions": {
+        "/api/inscriptions": {
             "get": {
                 "tags": [
                     "Inscriptions"
                 ],
-                "summary": "Get all inscriptions",
-                "description": "Returns a list of all inscriptions",
-                "operationId": "d551b7def953fb88c9245569c5762b7d",
+                "summary": "Get inscriptions for the authenticated user",
+                "description": "Get inscriptions for a user.",
+                "operationId": "d123015c8ce6c4531825ea136f17f2b9",
                 "responses": {
                     "200": {
-                        "description": "Successful response",
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -29,16 +29,196 @@
                                             "items": {
                                                 "properties": {
                                                     "id": {
-                                                        "type": "integer",
-                                                        "example": 1
+                                                        "type": "integer"
                                                     },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Example"
+                                                    "competitor_id": {
+                                                        "type": "integer"
                                                     },
-                                                    "email": {
+                                                    "drive_url": {
                                                         "type": "string",
-                                                        "example": "example@example.com"
+                                                        "nullable": true
+                                                    },
+                                                    "olympic_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "area_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "category_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "paid_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "competitor": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "school_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "legal_tutor_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "responsable_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "personal_data_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "course": {
+                                                                "type": "string"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "school": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "department": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "province": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "created_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time"
+                                                                    },
+                                                                    "updated_at": {
+                                                                        "type": "string",
+                                                                        "format": "date-time"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "responsable": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "personal_data_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "personal_data": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "ci": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "ci_expedition": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "names": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "last_names": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "birthdate": {
+                                                                        "type": "string",
+                                                                        "format": "date"
+                                                                    },
+                                                                    "email": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "phone_number": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "legal_tutor": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "personal_data_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "personal_data": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "ci": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "ci_expedition": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "names": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "last_names": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "birthdate": {
+                                                                        "type": "string",
+                                                                        "format": "date"
+                                                                    },
+                                                                    "email": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "phone_number": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
                                                 "type": "object"
@@ -50,11 +230,277 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal server error"
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource not found"
                     }
-                }
-            },
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/inscriptions/{id}": {
+            "get": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Get an inscription by ID",
+                "description": "Get a specific inscription by ID.",
+                "operationId": "ae55ef3e676d314b67e91171cd2d747c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Inscription ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "competitor_id": {
+                                                    "type": "integer"
+                                                },
+                                                "drive_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "olympic_id": {
+                                                    "type": "integer"
+                                                },
+                                                "area_id": {
+                                                    "type": "integer"
+                                                },
+                                                "category_id": {
+                                                    "type": "integer"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "paid_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "competitor": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "school_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "legal_tutor_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "responsable_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "personal_data_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "course": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "school": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "department": {
+                                                                    "type": "string"
+                                                                },
+                                                                "province": {
+                                                                    "type": "string"
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "responsable": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "personal_data_id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "code": {
+                                                            "type": "string"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "personal_data": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "ci": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "ci_expedition": {
+                                                                    "type": "string"
+                                                                },
+                                                                "names": {
+                                                                    "type": "string"
+                                                                },
+                                                                "last_names": {
+                                                                    "type": "string"
+                                                                },
+                                                                "birthdate": {
+                                                                    "type": "string",
+                                                                    "format": "date"
+                                                                },
+                                                                "email": {
+                                                                    "type": "string"
+                                                                },
+                                                                "phone_number": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "olympic": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "title": {
+                                                            "type": "string"
+                                                        },
+                                                        "description": {
+                                                            "type": "string"
+                                                        },
+                                                        "price": {
+                                                            "type": "number"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "start_date": {
+                                                            "type": "string",
+                                                            "format": "date"
+                                                        },
+                                                        "end_date": {
+                                                            "type": "string",
+                                                            "format": "date"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "area": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "description": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "category": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "range_course": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "area_id": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Resource not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/inscriptions": {
             "post": {
                 "tags": [
                     "Inscriptions"
@@ -387,61 +833,6 @@
             }
         },
         "/inscriptions/{id}": {
-            "get": {
-                "tags": [
-                    "Inscriptions"
-                ],
-                "summary": "Get an inscription by ID",
-                "description": "Returns an inscription by ID",
-                "operationId": "7aab9006b3f0b2e904297eef86fb9fb6",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Example"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "example@example.com"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Inscription not found"
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                }
-            },
             "put": {
                 "tags": [
                     "Inscriptions"
@@ -557,12 +948,123 @@
                     }
                 }
             }
+        },
+        "/api/responsable/access": {
+            "post": {
+                "tags": [
+                    "Responsable"
+                ],
+                "summary": "Access to responsable data with JWT token",
+                "description": "Authenticate a responsable by CI and code, then generate a JWT token.",
+                "operationId": "access",
+                "requestBody": {
+                    "description": "Credentials to access responsable data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "ci",
+                                    "code"
+                                ],
+                                "properties": {
+                                    "ci": {
+                                        "type": "integer",
+                                        "example": 12345678
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "example": "NFvyeVUh fEChWv2q J2zu3xYd RfVYrsGB njvFM92m"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "generated.jwt.token"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid code",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Invalid code"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Responsable not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Responsable not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "Error message"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
             "name": "Inscriptions",
             "description": "Inscriptions"
+        },
+        {
+            "name": "Responsable",
+            "description": "Responsable"
         }
     ]
 }

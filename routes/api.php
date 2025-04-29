@@ -10,6 +10,7 @@ use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\OlimpiadasCategoriController;
 use App\Http\Controllers\OlympicsController;
 use App\Http\Controllers\PersonSearchController;
+use App\Http\Controllers\ResponsableController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+Route::post('/responsable/access', [ResponsableController::class, 'access']);
+
 // Rutas para areas
 Route::get('/areas', [AreasController::class, 'index']);
 Route::post('/areas', [AreasController::class, 'store']);
@@ -46,6 +49,7 @@ Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
 
 // Rutas para inscripciones
 Route::get('/inscriptions', [InscriptionController::class, 'index']);
+Route::get('/inscriptions/{id}', [InscriptionController::class, 'show']);
 Route::post('/inscriptions', [InscriptionController::class, 'store']);
 
 
