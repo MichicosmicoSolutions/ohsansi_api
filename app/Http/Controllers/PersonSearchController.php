@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\AcademicTutors;
+
 use App\Models\PersonalData;
 use App\Models\Inscriptions;
+use Illuminate\Http\Request;
 
 class PersonSearchController extends Controller
 {

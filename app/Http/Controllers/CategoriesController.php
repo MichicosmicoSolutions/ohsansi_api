@@ -11,9 +11,14 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoriesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(['categorias' => Categories::all()]);
+        $query = Categories::query();
+
+        if ($request->has('area_id')) {
+            $query->where('area_id', $request->input('area_id'));
+        }
+        return response()->json(['categorias' => $query->get()]);
     }
 
     public function getCategoriasPorArea($area_id)
@@ -34,7 +39,7 @@ class CategoriesController extends Controller
                 'max:255',
                 function ($attribute, $value, $fail) use ($request) {
                     $normalizedInput = Str::ascii(strtolower($value));
-    
+
                     $exists = DB::table('categories')
                         ->where('area_id', $request->area_id)
                         ->get()
@@ -42,7 +47,7 @@ class CategoriesController extends Controller
                             $normalizedExisting = Str::ascii(strtolower($cat->name));
                             return $normalizedExisting === $normalizedInput;
                         });
-    
+
                     if ($exists) {
                         $fail('La categoría ya existe en esta área.');
                     }
@@ -67,31 +72,31 @@ class CategoriesController extends Controller
             'area_id.required' => 'El campo area_id es obligatorio.',
             'range_course.array' => 'El campo range_course debe ser un array.',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-    
+
         $categories = new Categories;
         $categories->name = $request->name;
-        $categories->range_course = $request->range_course; 
+        $categories->range_course = $request->range_course;
         $categories->area_id = $request->area_id;
         $categories->save();
-    
+
         return response()->json([
             'message' => 'Categoría creada con éxito'
         ], 201);
     }
     public function destroy($id)
-{
-    $category = Categories::find($id);
+    {
+        $category = Categories::find($id);
 
-    if (!$category) {
-        return response()->json(['message' => 'Categoría no encontrada.'], 404);
+        if (!$category) {
+            return response()->json(['message' => 'Categoría no encontrada.'], 404);
+        }
+
+        $category->delete();
+
+        return response()->json(['message' => 'Categoría eliminada con éxito.'], 200);
     }
-
-    $category->delete();
-
-    return response()->json(['message' => 'Categoría eliminada con éxito.'], 200);
-}
 }

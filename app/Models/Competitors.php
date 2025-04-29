@@ -13,6 +13,7 @@ class Competitors extends Model
         'course',
         'school_id',
         'legal_tutor_id',
+        'responsable_id',
         'personal_data_id',
     ];
     public function school()
@@ -23,9 +24,9 @@ class Competitors extends Model
     {
         return $this->belongsTo(LegalTutors::class, 'legal_tutor_id');
     }
-    public function academicTutor()
+    public function Responsable()
     {
-        return $this->belongsTo(AcademicTutors::class, 'academic_tutor_id');
+        return $this->belongsTo(Responsables::class, 'responsable_id');
     }
     public function personalData()
     {
@@ -36,4 +37,3 @@ class Competitors extends Model
         return $this->hasMany(Inscriptions::class, 'competitor_id');
     }
 }
-
