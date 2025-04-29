@@ -21,8 +21,16 @@ class OlympicsController extends Controller
 
     private function normalizeTitle($title)
     {
-        $normalized = Str::ascii(Str::lower($title)); // quita acentos y convierte a minúsculas
-        $normalized = preg_replace("/[^a-z0-9]/", '', $normalized); // elimina todo lo que no sea letra o número
+        // Convertir a minúsculas
+        $normalized = mb_strtolower($title, 'UTF-8');
+    
+        // Eliminar signos de puntuación y caracteres especiales
+        $normalized = preg_replace('/[^\p{L}\p{N}]+/u', '', $normalized);
+    
+        // Opcional: eliminar tildes
+        $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
+        $normalized = preg_replace('/[^a-zA-Z0-9]/', '', $normalized);
+    
         return $normalized;
     }
 
