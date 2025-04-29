@@ -10,6 +10,7 @@ use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\OlimpiadasCategoriController;
 use App\Http\Controllers\OlympicsController;
 use App\Http\Controllers\PersonSearchController;
+use App\Models\OlimpycAndCategorias;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,7 +68,7 @@ Route::patch('/olympics/{id}/publish', [OlympicsController::class, 'publish']);
 
 Route::get('/olympics/getOlympicInfo/{id}', [OlympicsController::class, 'getOlympicInfo']);
 
-
+Route::get('/olympics/getAreasByOlympic/{id}', [OlimpycAndCategorias::class, 'getAreasByOlympic']);
 
 
 // Rutas para   Buscar
@@ -83,5 +84,9 @@ Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::cl
 Route::get('/search-inscriptions', [PersonSearchController::class, 'index']);
 
 // Rutas para  Asociar Olimpiadas y categorias 
-//PB 15
+
+
 Route::post('/olimpiadas-categorias', [OlimpiadasCategoriController::class, 'store']);
+Route::get('/olimpiadas-categorias/{olympic_id}/areas/{area_id}/categories', [OlimpiadasCategoriController::class, 'getCategoriesByOlympicAndArea']);
+Route::get('/olimpiadas-categorias/{olympic_id}/areas', [OlimpiadasCategoriController::class, 'getAreasByOlympic']);
+Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlimpiadasCategoriController::class, 'getAreasWithCategoriesByOlympic']);
