@@ -86,7 +86,8 @@ Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::cl
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 //PB 12
 Route::get('/search-inscriptions', [PersonSearchController::class, 'index']);
-
+Route::post('/personal-data', [PersonSearchController::class, 'storePersonalData']);
+Route::post('/legal-tutor', [PersonSearchController::class, 'storeLegalTutor']);
 // Rutas para  Asociar Olimpiadas y categorias 
 
 
