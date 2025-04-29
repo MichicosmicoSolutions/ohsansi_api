@@ -92,4 +92,37 @@ class PersonSearchController extends Controller
         'personal_data' => $legalTutor->personalData
     ]);
 }
+
+public function storePersonalData(Request $request)
+{
+    $validatedData = $request->validate([
+        'ci' => 'required|integer|unique:personal_data,ci',
+        'ci_expedition' => 'required|string',
+        'names' => 'required|string',
+        'last_names' => 'required|string',
+        'birthdate' => 'required|date',
+        'email' => 'required|email|unique:personal_data,email',
+        'phone_number' => 'required|string',
+    ]);
+
+    $personalData = PersonalData::create($validatedData);
+
+    return response()->json([
+        'message' => 'PersonalData creado exitosamente',
+        'data' => $personalData
+    ], 201);
+}
+public function storeLegalTutor(Request $request)
+{
+    $validatedData = $request->validate([
+        'personal_data_id' => 'required|exists:personal_data,id|unique:legal_tutors,personal_data_id',
+    ]);
+
+    $legalTutor = LegalTutors::create($validatedData);
+
+    return response()->json([
+        'message' => 'LegalTutor creado exitosamente',
+        'data' => $legalTutor
+    ], 201);
+}
 }
