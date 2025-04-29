@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PersonalData;
 use App\Models\Inscriptions;
+use App\Models\LegalTutors;
 use Illuminate\Http\Request;
 
 class PersonSearchController extends Controller
@@ -72,4 +73,23 @@ class PersonSearchController extends Controller
 
         return response()->json($inscriptions);
     }
+    public function searchLegalTutor($ci)
+{
+    $personalData = PersonalData::where('ci', $ci)->first();
+
+    if (!$personalData) {
+        return response()->json(['message' => 'CI no encontrado'], 404);
+    }
+
+    $legalTutor = LegalTutors::with('personalData')->where('personal_data_id', $personalData->id)->first();
+
+    if (!$legalTutor) {
+        return response()->json(['message' => 'El CI no pertenece a un tutor legal'], 404);
+    }
+
+    return response()->json([
+        'tutor_id' => $legalTutor->id,
+        'personal_data' => $legalTutor->personalData
+    ]);
+}
 }

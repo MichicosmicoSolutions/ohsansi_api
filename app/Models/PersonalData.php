@@ -19,4 +19,13 @@ class PersonalData extends Model
         "email",
         "phone_number",
     ];
+    public function legalTutor()
+    {
+        return $this->hasOne(LegalTutors::class);
+    }
+
+    public function competitor()
+    {
+        return $this->hasOne(Competitors::class);
+    }
 }

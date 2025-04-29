@@ -73,7 +73,7 @@ Route::patch('/olympics/{id}/publish', [OlympicsController::class, 'publish']);
 Route::get('/olympics/getOlympicInfo/{id}', [OlympicsController::class, 'getOlympicInfo']);
 
 Route::get('/olympics/getAreasByOlympic/{id}', [OlimpycAndCategorias::class, 'getAreasByOlympic']);
-
+Route::get('/legal-tutor/{ci}', [PersonSearchController::class, 'searchLegalTutor']);
 
 // Rutas para   Buscar
 Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStudent']);
