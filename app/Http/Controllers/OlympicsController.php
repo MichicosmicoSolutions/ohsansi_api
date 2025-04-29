@@ -19,6 +19,13 @@ class OlympicsController extends Controller
         $this->service = $service;
     }
 
+    private function normalizeTitle($title)
+    {
+        $normalized = Str::ascii(Str::lower($title)); // quita acentos y convierte a minúsculas
+        $normalized = preg_replace("/[^a-z0-9]/", '', $normalized); // elimina todo lo que no sea letra o número
+        return $normalized;
+    }
+
     public function index()
     {
         return response()->json(['Olympics' => Olympics::all()]);
@@ -32,15 +39,15 @@ class OlympicsController extends Controller
                 'string',
                 'max:255',
                 function ($attribute, $value, $fail) {
-                    $normalizedTitle = Str::ascii(strtolower($value));
-                    $exists = DB::table('olympics')
-                        ->get()
-                        ->some(function ($olympic) use ($normalizedTitle) {
-                            return Str::ascii(strtolower($olympic->title)) === $normalizedTitle;
-                        });
+                    $normalizedInput = $this->normalizeTitle($value);
+
+                    $exists = Olympics::all()->some(function ($olympic) use ($normalizedInput) {
+                        $existingNormalized = $this->normalizeTitle($olympic->title);
+                        return $existingNormalized === $normalizedInput;
+                    });
 
                     if ($exists) {
-                        $fail('Ya existe una olimpiada con ese título.');
+                        $fail('Ya existe una olimpiada');
                     }
                 }
             ],
@@ -63,7 +70,7 @@ class OlympicsController extends Controller
         $data = $request->all();
         $data['status'] = 'No Publico';
 
-        // Asignar "No especificado" si algún campo opcional viene vacío
+        
         $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
         $data['Requirements'] = $data['Requirements'] ?? 'No especificado';
         $data['start_date'] = $data['start_date'] ?? null;
@@ -187,8 +194,8 @@ class OlympicsController extends Controller
         }
 
         return response()->json([
-            'title'=>$olympic-> title,
-            'description'=>$olympic->description,
+            'title' => $olympic->title,
+            'description' => $olympic->description,
             'Presentation' => $olympic->Presentation,
             'Requirements' => $olympic->Requirements,
             'Start_date' => $olympic->start_date,
@@ -196,5 +203,18 @@ class OlympicsController extends Controller
             'Awards' => $olympic->awards,
             'Contacts' => $olympic->Contacts,
         ], 200);
+    }
+
+    public function destroy($id)
+    {
+        $category = Olympics::find($id);
+
+        if (!$category) {
+            return response()->json(['message' => 'Olimpiada no encontrada.'], 404);
+        }
+
+        $category->delete();
+
+        return response()->json(['message' => 'Olimpiada eliminada con éxito.'], 200);
     }
 }
