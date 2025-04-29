@@ -19,22 +19,23 @@ class CreateOlympicsTable extends Migration
             $table->text('description')->nullable();
             $table->integer('price')->nullable();
             $table->string('status');
-            $table->string('Presentation')->nullable();
-            $table->string('Requirements')->nullable();
-            $table->string('awards')->nullable();
+            $table->text('Presentation')->nullable();
+            $table->text('Requirements')->nullable();
+            $table->text('awards')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->string('Contacts')->nullable();
+           
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('olympics');
+        *
+        * @return void
+        */
+        public function down()
+        {
+            Schema::dropIfExists('olympics');
+        }
     }
-}

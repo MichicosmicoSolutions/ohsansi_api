@@ -99,5 +99,4 @@ class CategoriesController extends Controller
 
         return response()->json(['message' => 'Categoría eliminada con éxito.'], 200);
     }
-    
 }

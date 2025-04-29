@@ -68,7 +68,7 @@ class OlympicsController extends Controller
         }
 
         $data = $request->all();
-        $data['status'] = 'No Publico';
+        $data['status'] = 'false';
 
         
         $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
@@ -145,6 +145,7 @@ class OlympicsController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'Contacts' => 'nullable|string',
+            'status' => 'required|boolean', // se espera booleano desde el frontend
         ]);
     
         if ($validator->fails()) {
@@ -159,10 +160,12 @@ class OlympicsController extends Controller
             'awards',
             'start_date',
             'end_date',
-            'Contacts'
+            'Contacts',
+            'status',
         ]);
     
-        $data['status'] = 'Publico';
+        
+        $data['status'] = $request->boolean('status') ? 'true' : 'false';
     
         $olympic = $this->service->update($id, $data);
     
@@ -171,7 +174,7 @@ class OlympicsController extends Controller
         }
     
         return response()->json([
-            'message' => 'Olimpiada publicada exitosamente y datos actualizados',
+            'message' => 'Olimpiada actualizada correctamente',
             'data' => $olympic
         ], 200);
     }
@@ -181,6 +184,8 @@ class OlympicsController extends Controller
         $olympic = Olympics::find($id, [
             'title',
             'description',
+            'price',
+            'status',
             'Presentation',
             'Requirements',
             'start_date',
@@ -196,6 +201,8 @@ class OlympicsController extends Controller
         return response()->json([
             'title' => $olympic->title,
             'description' => $olympic->description,
+            'price'=>$olympic->  price,
+            'status'=>$olympic->status,
             'Presentation' => $olympic->Presentation,
             'Requirements' => $olympic->Requirements,
             'Start_date' => $olympic->start_date,

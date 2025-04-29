@@ -7,11 +7,6 @@ use Illuminate\Support\Facades\Schema;
 
 class CreatePersonalDataTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('personal_data', function (Blueprint $table) {
@@ -27,7 +22,7 @@ class CreatePersonalDataTable extends Migration
 
         Schema::create('responsables', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');
+            $table->foreignId('personal_data_id')->constrained('personal_data')->onDelete('cascade');
             $table->string('code');
             $table->timestamps();
         });
@@ -49,15 +44,12 @@ class CreatePersonalDataTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
+        // Eliminar primero las tablas con dependencias
         Schema::dropIfExists('competitors');
         Schema::dropIfExists('legal_tutors');
+        Schema::dropIfExists('responsables');
         Schema::dropIfExists('personal_data');
     }
 }
