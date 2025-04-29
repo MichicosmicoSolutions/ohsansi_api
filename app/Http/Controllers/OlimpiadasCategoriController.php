@@ -26,4 +26,60 @@ class OlimpiadasCategoriController extends Controller
             'message' => 'Olimpiada creada exitosamente'
         ], 201);
     }
+
+    public function getCategoriesByOlympicAndArea($olympic_id, $area_id)
+    {
+        $categories = OlimpycAndCategorias::where('olympic_id', $olympic_id)
+            ->where('area_id', $area_id)
+            ->with('category') // traer relación category
+            ->get()
+            ->pluck('category') // solo categorías
+            ->filter() // elimina nulos
+            ->values(); // reindexar
+
+        return response()->json([
+        
+            'categories' => $categories
+        ]);
+    }
+
+    
+    public function getAreasByOlympic($olympic_id)
+    {
+        $areas = OlimpycAndCategorias::where('olympic_id', $olympic_id)
+            ->with('area') // traer relación area
+            ->get()
+            ->pluck('area') // solo áreas
+            ->unique('id') // evita duplicados
+            ->filter()
+            ->values();
+
+        return response()->json([
+          
+            'areas' => $areas
+        ]);
+    }
+
+
+    public function getAreasWithCategoriesByOlympic($olympic_id)
+    {
+        $data = OlimpycAndCategorias::where('olympic_id', $olympic_id)
+            ->with(['area', 'category']) // traer area y category
+            ->get()
+            ->groupBy('area.id') // agrupar por área
+            ->map(function ($group) {
+                $area = $group->first()->area;
+                $categories = $group->pluck('category')->filter()->values();
+                return [
+                    'area' => $area,
+                    'categories' => $categories
+                ];
+            })
+            ->values();
+
+        return response()->json([
+        
+            'areas' => $data
+        ]);
+    }   
 }
