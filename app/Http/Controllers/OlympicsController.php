@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RangeCourse;
+use App\Models\Areas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\OlympicsService;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 use App\Models\Olympics;
+use Illuminate\Support\Facades\Log;
 
 class OlympicsController extends Controller
 {
@@ -23,20 +24,94 @@ class OlympicsController extends Controller
     {
         // Convertir a minúsculas
         $normalized = mb_strtolower($title, 'UTF-8');
-    
+
         // Eliminar signos de puntuación y caracteres especiales
         $normalized = preg_replace('/[^\p{L}\p{N}]+/u', '', $normalized);
-    
+
         // Opcional: eliminar tildes
         $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
         $normalized = preg_replace('/[^a-zA-Z0-9]/', '', $normalized);
-    
+
         return $normalized;
     }
 
     public function index()
     {
         return response()->json(['Olympics' => Olympics::all()]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/olympics/{id}/areas",
+     *      operationId="getOlympicsAreas",
+     *      tags={"Olympics"},
+     *      summary="Get areas for a specific olympic",
+     *      description="Returns the list of areas with their categories based on the olympic ID.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="Olympic ID",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Parameter(
+     *          name="course",
+     *          in="query",
+     *          required=false,
+     *          description="Filter by course range (e.g., 4to Secundaria, 5to Secundaria)",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="data", type="array", items=@OA\Items(ref="#/components/schemas/Area"))
+     *          )
+     *      ),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="errors", type="object", description="Detailed error message for bad requests.",
+     *                 @OA\Property(property="param_name", type="string", example="Algo salió mal") 
+     *             )
+     *          )
+     *      )
+     * )
+     */
+    public function showAreas(Request $request)
+    {
+        $olympicId  = $request->route('id');
+        $queryParams = $request->all();
+        $validator = Validator::make($queryParams, [
+            'course' => ['sometimes', 'string', Rule::in(RangeCourse::getValues())],
+        ], [
+            'course.sometimes' => 'The course is not valid.',
+            'course.string' => 'The course must be a string.',
+            'course.in' => 'The course is not valid value.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $areas = Areas::with(['categories'])->whereHas('olympics', function ($query) use ($olympicId) {
+            $query->where('olympics.id', $olympicId);
+        })->get();
+
+        if (isset($queryParams['course'])) {
+            $areas = Areas::with([
+                'categories' => function ($query) use ($queryParams) {
+                    $query->where('range_course', 'like', '%' . $queryParams['course'] . '%');
+                },
+            ])->whereHas('olympics', function ($query) use ($olympicId) {
+                $query->where('olympics.id', $olympicId);
+            })->get();
+        }
+        return response()->json(['data' => $areas]);
     }
 
     public function store(Request $request)
@@ -78,7 +153,7 @@ class OlympicsController extends Controller
         $data = $request->all();
         $data['status'] = 'false';
 
-        
+
         $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
         $data['Requirements'] = $data['Requirements'] ?? 'No especificado';
         $data['start_date'] = $data['start_date'] ?? null;
@@ -158,13 +233,13 @@ class OlympicsController extends Controller
             'Contacts' => 'nullable|string',
             'status' => 'required|boolean', // se espera booleano desde el frontend
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors()->toArray()
             ], 422);
         }
-    
+
         $data = $request->only([
             'Presentation',
             'Requirements',
@@ -174,22 +249,22 @@ class OlympicsController extends Controller
             'Contacts',
             'status',
         ]);
-    
-        
+
+
         $data['status'] = $request->boolean('status') ? 'true' : 'false';
-    
+
         $olympic = $this->service->update($id, $data);
-    
+
         if (!$olympic) {
             return response()->json(['message' => 'Olympic not found'], 404);
         }
-    
+
         return response()->json([
             'message' => 'Olimpiada actualizada correctamente',
             'data' => $olympic
         ], 200);
     }
-    
+
     public function getOlympicInfo($id)
     {
         $olympic = Olympics::find($id, [
@@ -212,8 +287,8 @@ class OlympicsController extends Controller
         return response()->json([
             'title' => $olympic->title,
             'description' => $olympic->description,
-            'price'=>$olympic->  price,
-            'status'=>$olympic->status,
+            'price' => $olympic->price,
+            'status' => $olympic->status,
             'Presentation' => $olympic->Presentation,
             'Requirements' => $olympic->Requirements,
             'Start_date' => $olympic->start_date,
