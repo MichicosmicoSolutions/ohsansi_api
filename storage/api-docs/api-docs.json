@@ -1158,6 +1158,26 @@
     },
     "components": {
         "schemas": {
+            "AcademicTutors": {
+                "title": "Academic Tutors Model",
+                "description": "This model represents the academic tutors in the system.",
+                "required": [
+                    "personal_data_id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier for the academic tutor.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "personal_data_id": {
+                        "description": "The ID of the personal data associated with this academic tutor.",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
+            },
             "Area": {
                 "title": "Area",
                 "required": [
@@ -1243,6 +1263,332 @@
                     },
                     "updated_at": {
                         "description": "The timestamp when the category was last updated.",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Competitors": {
+                "title": "Competitors Model",
+                "description": "Represents a Competitor in the system.",
+                "required": [
+                    "course",
+                    "school_id",
+                    "legal_tutor_id",
+                    "responsable_id",
+                    "personal_data_id"
+                ],
+                "properties": {
+                    "course": {
+                        "type": "string",
+                        "example": "Computer Science"
+                    },
+                    "school_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "legal_tutor_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "responsable_id": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "personal_data_id": {
+                        "type": "integer",
+                        "example": 4
+                    }
+                },
+                "type": "object"
+            },
+            "Inscriptions": {
+                "title": "Inscriptions Model",
+                "description": "Represents an inscription in the system.",
+                "required": [
+                    "competitor_id",
+                    "olympic_id",
+                    "area_id",
+                    "category_id",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier for the inscription.",
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true
+                    },
+                    "competitor_id": {
+                        "description": "The ID of the competitor associated with the inscription.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "olympic_id": {
+                        "description": "The ID of the Olympic event associated with the inscription.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "area_id": {
+                        "description": "The ID of the area associated with the inscription.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "category_id": {
+                        "description": "The ID of the category associated with the inscription.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "status": {
+                        "description": "The status of the inscription.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "LegalTutors": {
+                "title": "Legal Tutors Model",
+                "description": "This model represents the Legal Tutors entity in the application.",
+                "required": [
+                    "personal_data_id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier for the legal tutor.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "personal_data_id": {
+                        "description": "The ID of the associated personal data.",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
+            },
+            "OlimpycAndCategorias": {
+                "title": "OlimpycAndCategorias Model",
+                "description": "This model represents the relationship between Olympics, Areas, and Categories.",
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier for the OlimpycAndCategorias.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "area_id": {
+                        "description": "The area associated with this OlimpycAndCategorias.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "category_id": {
+                        "description": "The category associated with this OlimpycAndCategorias.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "olympic_id": {
+                        "description": "The olympic associated with this OlimpycAndCategorias.",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
+            },
+            "Olympics": {
+                "title": "Olympics Model",
+                "description": "A model representing an Olympics event.",
+                "required": [
+                    "title",
+                    "description",
+                    "price",
+                    "status",
+                    "Presentation",
+                    "Requirements",
+                    "start_date",
+                    "end_date",
+                    "Contactos",
+                    "awards"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier of the Olympics event.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "The title of the Olympics event.",
+                        "type": "string",
+                        "example": "Olympics Event Title"
+                    },
+                    "description": {
+                        "description": "A brief description of the Olympics event.",
+                        "type": "string",
+                        "example": "This is a description of the Olympics event."
+                    },
+                    "price": {
+                        "description": "The price associated with the Olympics event.",
+                        "type": "number",
+                        "format": "float",
+                        "example": 10.99
+                    },
+                    "status": {
+                        "description": "The status of the Olympics event (e.g., 'active', 'inactive').",
+                        "type": "string",
+                        "example": "active"
+                    },
+                    "Presentation": {
+                        "description": "Details about the presentation of the Olympics event.",
+                        "type": "string",
+                        "example": "Presentation details."
+                    },
+                    "Requirements": {
+                        "description": "The requirements for participating in the Olympics event.",
+                        "type": "string",
+                        "example": "Participants must meet certain requirements."
+                    },
+                    "start_date": {
+                        "description": "The start date of the Olympics event.",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-01-01"
+                    },
+                    "end_date": {
+                        "description": "The end date of the Olympics event.",
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-01-07"
+                    },
+                    "Contactos": {
+                        "description": "Contact information for the Olympics event.",
+                        "type": "string",
+                        "example": "contact@olympics.com"
+                    },
+                    "awards": {
+                        "description": "Details about the awards available in the Olympics event.",
+                        "type": "string",
+                        "example": "Gold, Silver, Bronze"
+                    }
+                },
+                "type": "object"
+            },
+            "PersonalData": {
+                "title": "Personal Data Model",
+                "description": "A model representing personal data of an individual.",
+                "required": [
+                    "ci",
+                    "names",
+                    "last_names",
+                    "birthdate",
+                    "email",
+                    "phone_number"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier for the personal data record.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "ci": {
+                        "description": "The identity card number of the individual.",
+                        "type": "string",
+                        "maxLength": 10
+                    },
+                    "ci_expedition": {
+                        "description": "The date when the identity card was issued.",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "names": {
+                        "description": "The first names of the individual.",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "last_names": {
+                        "description": "The last names of the individual.",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "birthdate": {
+                        "description": "The birthdate of the individual.",
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "email": {
+                        "description": "The email address of the individual.",
+                        "type": "string",
+                        "format": "email",
+                        "maxLength": 255
+                    },
+                    "phone_number": {
+                        "description": "The phone number of the individual.",
+                        "type": "string",
+                        "pattern": "[0-9]{10}"
+                    }
+                },
+                "type": "object"
+            },
+            "Responsables": {
+                "title": "Responsables Model",
+                "description": "This model represents the Responsables table in the database.",
+                "required": [
+                    "personal_data_id",
+                    "code"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier of the responsable",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "personal_data_id": {
+                        "description": "The ID of the personal data associated with this responsable",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "code": {
+                        "description": "A code or identifier for the responsable",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Schools": {
+                "title": "Schools Model",
+                "description": "A model representing a school with name, department, and province.",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier of the school",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "description": "The name of the school",
+                        "type": "string",
+                        "example": "Example University"
+                    },
+                    "department": {
+                        "description": "The department of the school",
+                        "type": "string",
+                        "example": "Computer Science"
+                    },
+                    "province": {
+                        "description": "The province where the school is located",
+                        "type": "string",
+                        "example": "Ontario"
+                    },
+                    "created_at": {
+                        "description": "The timestamp when the school was created",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "The timestamp when the school was last updated",
                         "type": "string",
                         "format": "date-time"
                     }
