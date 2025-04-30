@@ -65,6 +65,8 @@ Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTem
 Route::get('/olympics', [OlympicsController::class, 'index']);
 Route::post('/olympics', [OlympicsController::class, 'store']);
 Route::put('/olympics/{id}', [OlympicsController::class, 'update']);
+Route::get('/olympics/{id}/areas', [OlympicsController::class, 'showAreas']);
+
 // PB 02
 Route::patch('/olympics/{id}/price', [OlympicsController::class, 'updatePrice']);
 //PB 16
