@@ -15,6 +15,7 @@ class Olympics extends Model
         'description',
         'price',
         'status',
+        'publish',
         'Presentation',
         'Requirements',
         'start_date',

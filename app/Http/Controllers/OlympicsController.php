@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Publish;
+use App\Models\OlimpycAndCategoria;
+use App\Models\OlimpycAndCategorias;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\OlympicsService;
@@ -76,18 +79,20 @@ class OlympicsController extends Controller
         }
 
         $data = $request->all();
-        $data['status'] = 'false';
 
-        
+        $data['status'] = 'false';
+        $data['publish'] = Publish::Borrador;
+    
+        // Campos por defecto
         $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
         $data['Requirements'] = $data['Requirements'] ?? 'No especificado';
         $data['start_date'] = $data['start_date'] ?? null;
         $data['end_date'] = $data['end_date'] ?? null;
         $data['Contacts'] = $data['Contacts'] ?? 'No especificado';
         $data['awards'] = $data['awards'] ?? 'No especificado';
-
+    
         $olympic = $this->service->create($data);
-
+    
         return response()->json($olympic, 201);
     }
 
@@ -144,8 +149,10 @@ class OlympicsController extends Controller
         ], 200);
     }
 
+
     public function publish(Request $request, $id)
     {
+        // Validación de la solicitud
         $validator = Validator::make($request->all(), [
             'title' => 'nullable|string',
             'description' => 'nullable|string',
@@ -165,6 +172,7 @@ class OlympicsController extends Controller
             ], 422);
         }
     
+        // Obtener los datos de la solicitud
         $data = $request->only([
             'Presentation',
             'Requirements',
@@ -175,9 +183,27 @@ class OlympicsController extends Controller
             'status',
         ]);
     
-        
+        // Comprobar si la olimpiada tiene áreas asociadas
+        $hasAreas = OlimpycAndCategorias::where('olympic_id', $id)->exists();
+    
+        if (!$hasAreas) {
+            return response()->json([
+                'message' => 'No se puede publicar la olimpiada sin áreas asociadas.',
+            ], 400);
+        }
+    
+        // Comprobar si la fecha de finalización ya pasó
+        if (isset($data['end_date']) && Carbon::parse($data['end_date'])->isPast()) {
+            $data['publish'] = Publish::Cerrado; // Establecer "cerrado" si ya pasó la fecha
+        } else {
+            // Si no se está actualizando el estado de publish, lo dejamos como estaba o lo ponemos a "inscripción"
+            $data['publish'] = $data['publish'] ?? Publish::Inscripcion;
+        }
+    
+        // Convertir el estado en booleano y actualizar
         $data['status'] = $request->boolean('status') ? 'true' : 'false';
     
+        // Actualizar la olimpiada con los nuevos datos
         $olympic = $this->service->update($id, $data);
     
         if (!$olympic) {
@@ -187,39 +213,6 @@ class OlympicsController extends Controller
         return response()->json([
             'message' => 'Olimpiada actualizada correctamente',
             'data' => $olympic
-        ], 200);
-    }
-    
-    public function getOlympicInfo($id)
-    {
-        $olympic = Olympics::find($id, [
-            'title',
-            'description',
-            'price',
-            'status',
-            'Presentation',
-            'Requirements',
-            'start_date',
-            'end_date',
-            'awards',
-            'Contacts'
-        ]);
-
-        if (!$olympic) {
-            return response()->json(['message' => 'Olympic not found'], 404);
-        }
-
-        return response()->json([
-            'title' => $olympic->title,
-            'description' => $olympic->description,
-            'price'=>$olympic->  price,
-            'status'=>$olympic->status,
-            'Presentation' => $olympic->Presentation,
-            'Requirements' => $olympic->Requirements,
-            'Start_date' => $olympic->start_date,
-            'End_date' => $olympic->end_date,
-            'Awards' => $olympic->awards,
-            'Contacts' => $olympic->Contacts,
         ], 200);
     }
 
