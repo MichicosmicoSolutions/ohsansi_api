@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Publish;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,6 +18,7 @@ class CreateOlympiadTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('status');
+            $table->enum('publish', Publish::getValues())->nullable();
             $table->text('description')->nullable();
             $table->integer('price')->nullable();
             $table->text('presentation')->nullable();

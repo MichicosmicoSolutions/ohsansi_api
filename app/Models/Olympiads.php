@@ -10,17 +10,18 @@ use Illuminate\Database\Eloquent\Model;
  *     schema="Olympiads",
  *     title="Olympiads Model",
  *     description="A model representing an Olympiads event.",
- *     required={"title", "description", "price", "status", "Presentation", "Requirements", "start_date", "end_date", "Contactos", "awards"},
+ *     required={"title", "description", "price", "status", "presentation", "requirements", "start_date", "end_date", "contacts", "awards"},
  *     @OA\Property(property="id", type="integer", description="The unique identifier of the Olympiads event.", example=1),
  *     @OA\Property(property="title", type="string", description="The title of the Olympiads event.", example="Olympiads Event Title"),
  *     @OA\Property(property="description", type="string", description="A brief description of the Olympiads event.", example="This is a description of the Olympiads event."),
  *     @OA\Property(property="price", type="number", format="float", description="The price associated with the Olympiads event.", example=10.99),
  *     @OA\Property(property="status", type="string", description="The status of the Olympiads event (e.g., 'active', 'inactive').", example="active"),
- *     @OA\Property(property="Presentation", type="string", description="Details about the presentation of the Olympiads event.", example="Presentation details."),
- *     @OA\Property(property="Requirements", type="string", description="The requirements for participating in the Olympiads event.", example="Participants must meet certain requirements."),
+ *     @OA\Property(property="publish", type="string", enum={"borrador", "inscripción", "cerrado"}, description="The publication status of the Olympiads event.", example="inscripción"),
+ *     @OA\Property(property="presentation", type="string", description="Details about the presentation of the Olympiads event.", example="Presentation details."),
+ *     @OA\Property(property="requirements", type="string", description="The requirements for participating in the Olympiads event.", example="Participants must meet certain requirements."),
  *     @OA\Property(property="start_date", type="string", format="date", description="The start date of the Olympiads event.", example="2023-01-01"),
  *     @OA\Property(property="end_date", type="string", format="date", description="The end date of the Olympiads event.", example="2023-01-07"),
- *     @OA\Property(property="Contactos", type="string", description="Contact information for the Olympiads event.", example="contact@olympiads.com"),
+ *     @OA\Property(property="contacts", type="string", description="Contact information for the Olympiads event.", example="contact@olympiads.com"),
  *     @OA\Property(property="awards", type="string", description="Details about the awards available in the Olympiads event.", example="Gold, Silver, Bronze")
  * )
  */
@@ -31,6 +32,7 @@ class Olympiads extends Model
     protected $fillable = [
         'title',
         'status',
+        'publish',
         'description',
         'price',
         'presentation',

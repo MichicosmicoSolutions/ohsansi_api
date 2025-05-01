@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Publish;
 use App\Enums\RangeCourse;
 use App\Models\Areas;
+use App\Models\OlympiadAreas;
 use App\Models\Olympiads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\OlympiadsService;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
 
@@ -46,13 +49,13 @@ class OlympiadsController extends Controller
      *      path="/olympiads/{id}/areas",
      *      operationId="OlympiadsGetAreas",
      *      tags={"Olympiads"},
-     *      summary="Get areas for a specific olympic",
-     *      description="Returns the list of areas with their categories based on the olympic ID.",
+     *      summary="Get areas for a specific olympiad",
+     *      description="Returns the list of areas with their categories based on the olympiad ID.",
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
      *          required=true,
-     *          description="Olympic ID",
+     *          description="Olympiad ID",
      *          @OA\Schema(type="integer")
      *      ),
      *      @OA\Parameter(
@@ -127,8 +130,8 @@ class OlympiadsController extends Controller
                 function ($attribute, $value, $fail) {
                     $normalizedInput = $this->normalizeTitle($value);
 
-                    $exists = Olympiads::all()->some(function ($olympic) use ($normalizedInput) {
-                        $existingNormalized = $this->normalizeTitle($olympic->title);
+                    $exists = Olympiads::all()->some(function ($olympiad) use ($normalizedInput) {
+                        $existingNormalized = $this->normalizeTitle($olympiad->title);
                         return $existingNormalized === $normalizedInput;
                     });
 
@@ -154,9 +157,11 @@ class OlympiadsController extends Controller
         }
 
         $data = $request->all();
+
         $data['status'] = 'false';
+        $data['publish'] = Publish::Borrador;
 
-
+        // Campos por defecto
         $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
         $data['Requirements'] = $data['Requirements'] ?? 'No especificado';
         $data['start_date'] = $data['start_date'] ?? null;
@@ -164,9 +169,9 @@ class OlympiadsController extends Controller
         $data['Contacts'] = $data['Contacts'] ?? 'No especificado';
         $data['awards'] = $data['awards'] ?? 'No especificado';
 
-        $olympic = $this->service->create($data);
+        $olympiad = $this->service->create($data);
 
-        return response()->json($olympic, 201);
+        return response()->json($olympiad, 201);
     }
 
     public function update(Request $request, $id)
@@ -189,13 +194,13 @@ class OlympiadsController extends Controller
             ], 422);
         }
 
-        $olympic = $this->service->update($id, $request->all());
+        $olympiad = $this->service->update($id, $request->all());
 
-        if (!$olympic) {
-            return response()->json(['message' => 'Olympic not found'], 404);
+        if (!$olympiad) {
+            return response()->json(['message' => 'Olympiad not found'], 404);
         }
 
-        return response()->json($olympic, 200);
+        return response()->json($olympiad, 200);
     }
 
     public function updatePrice(Request $request, $id)
@@ -210,20 +215,22 @@ class OlympiadsController extends Controller
             ], 422);
         }
 
-        $olympic = $this->service->update($id, ['price' => $request->price]);
+        $olympiad = $this->service->update($id, ['price' => $request->price]);
 
-        if (!$olympic) {
-            return response()->json(['message' => 'Olympic not found'], 404);
+        if (!$olympiad) {
+            return response()->json(['message' => 'Olympiad not found'], 404);
         }
 
         return response()->json([
             'message' => 'Precio actualizado exitosamente',
-            'data' => $olympic
+            'data' => $olympiad
         ], 200);
     }
 
+
     public function publish(Request $request, $id)
     {
+        // Validación de la solicitud
         $validator = Validator::make($request->all(), [
             'title' => 'nullable|string',
             'description' => 'nullable|string',
@@ -243,6 +250,7 @@ class OlympiadsController extends Controller
             ], 422);
         }
 
+        // Obtener los datos de la solicitud
         $data = $request->only([
             'Presentation',
             'Requirements',
@@ -253,24 +261,42 @@ class OlympiadsController extends Controller
             'status',
         ]);
 
+        // Comprobar si la olimpiada tiene áreas asociadas
+        $hasAreas = OlympiadAreas::where('olympiad_id', $id)->exists();
 
+        if (!$hasAreas) {
+            return response()->json([
+                'message' => 'No se puede publicar la olimpiada sin áreas asociadas.',
+            ], 400);
+        }
+
+        // Comprobar si la fecha de finalización ya pasó
+        if (isset($data['end_date']) && Carbon::parse($data['end_date'])->isPast()) {
+            $data['publish'] = Publish::Cerrado; // Establecer "cerrado" si ya pasó la fecha
+        } else {
+            // Si no se está actualizando el estado de publish, lo dejamos como estaba o lo ponemos a "inscripción"
+            $data['publish'] = $data['publish'] ?? Publish::Inscripcion;
+        }
+
+        // Convertir el estado en booleano y actualizar
         $data['status'] = $request->boolean('status') ? 'true' : 'false';
 
-        $olympic = $this->service->update($id, $data);
+        // Actualizar la olimpiada con los nuevos datos
+        $olympiad = $this->service->update($id, $data);
 
-        if (!$olympic) {
-            return response()->json(['message' => 'Olympic not found'], 404);
+        if (!$olympiad) {
+            return response()->json(['message' => 'Olympiad not found'], 404);
         }
 
         return response()->json([
             'message' => 'Olimpiada actualizada correctamente',
-            'data' => $olympic
+            'data' => $olympiad
         ], 200);
     }
 
     public function getOlympicInfo($id)
     {
-        $olympic = Olympiads::find($id, [
+        $olympiad = Olympiads::find($id, [
             'title',
             'description',
             'price',
@@ -283,21 +309,21 @@ class OlympiadsController extends Controller
             'Contacts'
         ]);
 
-        if (!$olympic) {
-            return response()->json(['message' => 'Olympic not found'], 404);
+        if (!$olympiad) {
+            return response()->json(['message' => 'Olympiad not found'], 404);
         }
 
         return response()->json([
-            'title' => $olympic->title,
-            'description' => $olympic->description,
-            'price' => $olympic->price,
-            'status' => $olympic->status,
-            'Presentation' => $olympic->Presentation,
-            'Requirements' => $olympic->Requirements,
-            'Start_date' => $olympic->start_date,
-            'End_date' => $olympic->end_date,
-            'Awards' => $olympic->awards,
-            'Contacts' => $olympic->Contacts,
+            'title' => $olympiad->title,
+            'description' => $olympiad->description,
+            'price' => $olympiad->price,
+            'status' => $olympiad->status,
+            'Presentation' => $olympiad->Presentation,
+            'Requirements' => $olympiad->Requirements,
+            'Start_date' => $olympiad->start_date,
+            'End_date' => $olympiad->end_date,
+            'Awards' => $olympiad->awards,
+            'Contacts' => $olympiad->Contacts,
         ], 200);
     }
 

@@ -973,19 +973,19 @@
                 }
             }
         },
-        "/olympics/{id}/areas": {
+        "/olympiads/{id}/areas": {
             "get": {
                 "tags": [
-                    "Olympics"
+                    "Olympiads"
                 ],
-                "summary": "Get areas for a specific olympic",
-                "description": "Returns the list of areas with their categories based on the olympic ID.",
-                "operationId": "getOlympicsAreas",
+                "summary": "Get areas for a specific olympiad",
+                "description": "Returns the list of areas with their categories based on the olympiad ID.",
+                "operationId": "OlympiadsGetAreas",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "Olympic ID",
+                        "description": "Olympiad ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -1069,11 +1069,13 @@
                                 "properties": {
                                     "ci": {
                                         "type": "integer",
-                                        "example": 12345678
+                                        "example": 12345678,
+                                        "deprecated": true
                                     },
                                     "code": {
                                         "type": "string",
-                                        "example": "NFvyeVUh fEChWv2q J2zu3xYd RfVYrsGB njvFM92m"
+                                        "example": "NFvyeVUh fEChWv2q J2zu3xYd RfVYrsGB njvFM92m",
+                                        "deprecated": true
                                     }
                                 },
                                 "type": "object"
@@ -1090,7 +1092,8 @@
                                     "properties": {
                                         "token": {
                                             "type": "string",
-                                            "example": "generated.jwt.token"
+                                            "example": "generated.jwt.token",
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -1106,7 +1109,8 @@
                                     "properties": {
                                         "error": {
                                             "type": "string",
-                                            "example": "Invalid code"
+                                            "example": "Invalid code",
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -1122,7 +1126,8 @@
                                     "properties": {
                                         "error": {
                                             "type": "string",
-                                            "example": "Responsable not found"
+                                            "example": "Responsable not found",
+                                            "deprecated": true
                                         }
                                     },
                                     "type": "object"
@@ -1138,6 +1143,7 @@
                                     "properties": {
                                         "errors": {
                                             "type": "object",
+                                            "deprecated": true,
                                             "additionalProperties": {
                                                 "type": "array",
                                                 "items": {
@@ -1158,26 +1164,6 @@
     },
     "components": {
         "schemas": {
-            "AcademicTutors": {
-                "title": "Academic Tutors Model",
-                "description": "This model represents the academic tutors in the system.",
-                "required": [
-                    "personal_data_id"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier for the academic tutor.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "personal_data_id": {
-                        "description": "The ID of the personal data associated with this academic tutor.",
-                        "type": "integer",
-                        "format": "int64"
-                    }
-                },
-                "type": "object"
-            },
             "Area": {
                 "title": "Area",
                 "required": [
@@ -1308,7 +1294,7 @@
                 "description": "Represents an inscription in the system.",
                 "required": [
                     "competitor_id",
-                    "olympic_id",
+                    "olympiad_id",
                     "area_id",
                     "category_id",
                     "status"
@@ -1325,8 +1311,8 @@
                         "type": "integer",
                         "format": "int64"
                     },
-                    "olympic_id": {
-                        "description": "The ID of the Olympic event associated with the inscription.",
+                    "olympiad_id": {
+                        "description": "The ID of the Olympiad event associated with the inscription.",
                         "type": "integer",
                         "format": "int64"
                     },
@@ -1367,107 +1353,117 @@
                 },
                 "type": "object"
             },
-            "OlimpycAndCategorias": {
-                "title": "OlimpycAndCategorias Model",
+            "OlympiadAreas": {
+                "title": "OlympiadAreas Model",
                 "description": "This model represents the relationship between Olympics, Areas, and Categories.",
                 "required": [
                     "id"
                 ],
                 "properties": {
                     "id": {
-                        "description": "The unique identifier for the OlimpycAndCategorias.",
+                        "description": "The unique identifier for the OlympiadAreas.",
                         "type": "integer",
                         "format": "int64"
                     },
                     "area_id": {
-                        "description": "The area associated with this OlimpycAndCategorias.",
+                        "description": "The area associated with this OlympiadAreas.",
                         "type": "integer",
                         "format": "int64"
                     },
                     "category_id": {
-                        "description": "The category associated with this OlimpycAndCategorias.",
+                        "description": "The category associated with this OlympiadAreas.",
                         "type": "integer",
                         "format": "int64"
                     },
                     "olympic_id": {
-                        "description": "The olympic associated with this OlimpycAndCategorias.",
+                        "description": "The olympic associated with this OlympiadAreas.",
                         "type": "integer",
                         "format": "int64"
                     }
                 },
                 "type": "object"
             },
-            "Olympics": {
-                "title": "Olympics Model",
-                "description": "A model representing an Olympics event.",
+            "Olympiads": {
+                "title": "Olympiads Model",
+                "description": "A model representing an Olympiads event.",
                 "required": [
                     "title",
                     "description",
                     "price",
                     "status",
-                    "Presentation",
-                    "Requirements",
+                    "presentation",
+                    "requirements",
                     "start_date",
                     "end_date",
-                    "Contactos",
+                    "contacts",
                     "awards"
                 ],
                 "properties": {
                     "id": {
-                        "description": "The unique identifier of the Olympics event.",
+                        "description": "The unique identifier of the Olympiads event.",
                         "type": "integer",
                         "example": 1
                     },
                     "title": {
-                        "description": "The title of the Olympics event.",
+                        "description": "The title of the Olympiads event.",
                         "type": "string",
-                        "example": "Olympics Event Title"
+                        "example": "Olympiads Event Title"
                     },
                     "description": {
-                        "description": "A brief description of the Olympics event.",
+                        "description": "A brief description of the Olympiads event.",
                         "type": "string",
-                        "example": "This is a description of the Olympics event."
+                        "example": "This is a description of the Olympiads event."
                     },
                     "price": {
-                        "description": "The price associated with the Olympics event.",
+                        "description": "The price associated with the Olympiads event.",
                         "type": "number",
                         "format": "float",
                         "example": 10.99
                     },
                     "status": {
-                        "description": "The status of the Olympics event (e.g., 'active', 'inactive').",
+                        "description": "The status of the Olympiads event (e.g., 'active', 'inactive').",
                         "type": "string",
                         "example": "active"
                     },
-                    "Presentation": {
-                        "description": "Details about the presentation of the Olympics event.",
+                    "publish": {
+                        "description": "The publication status of the Olympiads event.",
+                        "type": "string",
+                        "enum": [
+                            "borrador",
+                            "inscripción",
+                            "cerrado"
+                        ],
+                        "example": "inscripción"
+                    },
+                    "presentation": {
+                        "description": "Details about the presentation of the Olympiads event.",
                         "type": "string",
                         "example": "Presentation details."
                     },
-                    "Requirements": {
-                        "description": "The requirements for participating in the Olympics event.",
+                    "requirements": {
+                        "description": "The requirements for participating in the Olympiads event.",
                         "type": "string",
                         "example": "Participants must meet certain requirements."
                     },
                     "start_date": {
-                        "description": "The start date of the Olympics event.",
+                        "description": "The start date of the Olympiads event.",
                         "type": "string",
                         "format": "date",
                         "example": "2023-01-01"
                     },
                     "end_date": {
-                        "description": "The end date of the Olympics event.",
+                        "description": "The end date of the Olympiads event.",
                         "type": "string",
                         "format": "date",
                         "example": "2023-01-07"
                     },
-                    "Contactos": {
-                        "description": "Contact information for the Olympics event.",
+                    "contacts": {
+                        "description": "Contact information for the Olympiads event.",
                         "type": "string",
-                        "example": "contact@olympics.com"
+                        "example": "contact@olympiads.com"
                     },
                     "awards": {
-                        "description": "Details about the awards available in the Olympics event.",
+                        "description": "Details about the awards available in the Olympiads event.",
                         "type": "string",
                         "example": "Gold, Silver, Bronze"
                     }
@@ -1594,6 +1590,26 @@
                     }
                 },
                 "type": "object"
+            },
+            "Teachers": {
+                "title": "Teachers Model",
+                "description": "This model represents the teachers in the system.",
+                "required": [
+                    "personal_data_id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier for the teacher.",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "personal_data_id": {
+                        "description": "The ID of the personal data associated with this teacher.",
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
             }
         }
     },
@@ -1607,8 +1623,8 @@
             "description": "Inscriptions"
         },
         {
-            "name": "Olympics",
-            "description": "Olympics"
+            "name": "Olympiads",
+            "description": "Olympiads"
         },
         {
             "name": "Responsable",
