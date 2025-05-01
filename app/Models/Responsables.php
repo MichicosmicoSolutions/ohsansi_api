@@ -27,7 +27,6 @@ class Responsables extends Model
      */
     protected $fillable = [
         'personal_data_id',
-        'code'
     ];
 
     /**
@@ -37,6 +36,10 @@ class Responsables extends Model
      */
     public function personalData()
     {
-        return $this->belongsTo(PersonalData::class, 'personal_data_id', 'id');
+        return $this->belongsTo(
+            PersonalData::class,
+            'personal_data_id',
+            'id'
+        );
     }
 }

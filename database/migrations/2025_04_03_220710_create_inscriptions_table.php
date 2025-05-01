@@ -16,14 +16,23 @@ class CreateInscriptionsTable extends Migration
     {
         Schema::create('inscriptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('competitor_id')->constrained('competitors')->onDelete('cascade');
+            $table->enum('status', InscriptionStatus::getValues());
+            $table->dateTime('paid_at')->nullable();
             $table->string('drive_url')->nullable();
-            $table->foreignId('olympic_id')->constrained('olympics')->onDelete('cascade');
+            $table->foreignId('school_id')->constrained('schools')->onDelete('cascade');
+            $table->foreignId('competitor_data_id')->constrained('personal_data', 'id')->onDelete('cascade');
+            $table->foreignId('responsable_id')->constrained('responsables', 'personal_data_id')->onDelete('cascade');
+            $table->foreignId('legal_tutor_id')->nullable()->constrained('legal_tutors', 'personal_data_id')->onDelete('cascade');
+            $table->foreignId('olympiad_id')->constrained('olympiads')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        Schema::create('selected_areas', function (Blueprint $table) {
+            $table->foreignId('inscription_id')->constrained('inscriptions')->onDelete('cascade');
             $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->string('status');
-            $table->dateTime('paid_at')->nullable();
-            $table->timestamps();
+            $table->foreignId('teacher_id')->constrained('teachers', 'personal_data_id')->onDelete('cascade');
+            $table->primary(['inscription_id', 'area_id']);
         });
     }
 
@@ -35,5 +44,6 @@ class CreateInscriptionsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('inscriptions');
+        Schema::dropIfExists('selected_areas');
     }
 }

@@ -39,16 +39,24 @@ class Areas extends Model
      */
     public function categories()
     {
-        return $this->hasMany(Categories::class, 'area_id');
+        return $this->hasMany(
+            Categories::class,
+            'area_id'
+        );
     }
 
     /**
-     * Get the olympics associated with this area.
+     * Get the olympiads associated with this area.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function olympics()
+    public function olympiads()
     {
-        return $this->belongsToMany(Olympics::class, 'olimpyc_and_categorias', 'area_id', 'olympic_id');
+        return $this->belongsToMany(
+            Olympiads::class,
+            'olympiad_areas',
+            'area_id',
+            'olympiad_id'
+        );
     }
 }

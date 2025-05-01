@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Model;
  *     schema="Inscriptions",
  *     title="Inscriptions Model",
  *     description="Represents an inscription in the system.",
- *     required={"competitor_id", "olympic_id", "area_id", "category_id", "status"},
+ *     required={"competitor_id", "olympiad_id", "area_id", "category_id", "status"},
  *     @OA\Property(property="id", type="integer", format="int64", readOnly=true, description="The unique identifier for the inscription."),
  *     @OA\Property(property="competitor_id", type="integer", format="int64", description="The ID of the competitor associated with the inscription."),
- *     @OA\Property(property="olympic_id", type="integer", format="int64", description="The ID of the Olympic event associated with the inscription."),
+ *     @OA\Property(property="olympiad_id", type="integer", format="int64", description="The ID of the Olympiad event associated with the inscription."),
  *     @OA\Property(property="area_id", type="integer", format="int64", description="The ID of the area associated with the inscription."),
  *     @OA\Property(property="category_id", type="integer", format="int64", description="The ID of the category associated with the inscription."),
  *     @OA\Property(property="status", type="string", description="The status of the inscription.")
@@ -29,11 +29,14 @@ class Inscriptions extends Model
      * @var array
      */
     protected $fillable = [
-        'competitor_id',
-        'olympic_id',
-        'area_id',
-        'category_id',
         'status',
+        'paid_at',
+        'drive_url',
+        'school_id',
+        'competitor_data_id',
+        'responsable_id',
+        'legal_tutor_id',
+        'olympiad_id'
     ];
 
     /**
@@ -41,38 +44,42 @@ class Inscriptions extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function competitor()
+    public function competitor_data()
     {
-        return $this->belongsTo(Competitors::class, 'competitor_id');
+        return $this->belongsTo(
+            PersonalData::class,
+            'competitor_data_id'
+        );
+    }
+
+    public function responsable()
+    {
+        return $this->belongsTo(
+            Responsables::class,
+            'responsable_id',
+            'personal_data_id'
+        );
+    }
+
+    public function legalTutor()
+    {
+        return $this->belongsTo(
+            LegalTutors::class,
+            'legal_tutor_id',
+            'personal_data_id'
+        );
     }
 
     /**
-     * Get the Olympic event associated with the inscription.
+     * Get the Olympiads event associated with the inscription.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function olympic()
+    public function olympiad()
     {
-        return $this->belongsTo(Olympics::class, 'olympic_id');
-    }
-
-    /**
-     * Get the area associated with the inscription.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function area()
-    {
-        return $this->belongsTo(Areas::class, 'area_id');
-    }
-
-    /**
-     * Get the category associated with the inscription.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function category()
-    {
-        return $this->belongsTo(Categories::class, 'category_id');
+        return $this->belongsTo(
+            Olympiads::class,
+            'olympiad_id'
+        );
     }
 }

@@ -75,8 +75,8 @@ class PersonalData extends Model
      * Get the academic tutor associated with this personal data.
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function academic_tutor()
+    public function teacher()
     {
-        return $this->hasOne(AcademicTutors::class);
+        return $this->hasOne(Teachers::class);
     }
 }
