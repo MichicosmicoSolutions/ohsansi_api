@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Publish;
-use App\Models\OlimpycAndCategoria;
 use App\Models\OlimpycAndCategorias;
+use App\Enums\RangeCourse;
+use App\Models\Areas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\OlympicsService;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 use App\Models\Olympics;
+use Carbon\Carbon;
 
 class OlympicsController extends Controller
 {
@@ -26,20 +26,94 @@ class OlympicsController extends Controller
     {
         // Convertir a minúsculas
         $normalized = mb_strtolower($title, 'UTF-8');
-    
+
         // Eliminar signos de puntuación y caracteres especiales
         $normalized = preg_replace('/[^\p{L}\p{N}]+/u', '', $normalized);
-    
+
         // Opcional: eliminar tildes
         $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
         $normalized = preg_replace('/[^a-zA-Z0-9]/', '', $normalized);
-    
+
         return $normalized;
     }
 
     public function index()
     {
         return response()->json(['Olympics' => Olympics::all()]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/olympics/{id}/areas",
+     *      operationId="getOlympicsAreas",
+     *      tags={"Olympics"},
+     *      summary="Get areas for a specific olympic",
+     *      description="Returns the list of areas with their categories based on the olympic ID.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="Olympic ID",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Parameter(
+     *          name="course",
+     *          in="query",
+     *          required=false,
+     *          description="Filter by course range (e.g., 4to Secundaria, 5to Secundaria)",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="data", type="array", items=@OA\Items(ref="#/components/schemas/Area"))
+     *          )
+     *      ),
+     *      @OA\Response(response=404, description="Resource Not Found"),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request",
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(property="errors", type="object", description="Detailed error message for bad requests.",
+     *                 @OA\Property(property="param_name", type="string", example="Algo salió mal") 
+     *             )
+     *          )
+     *      )
+     * )
+     */
+    public function showAreas(Request $request)
+    {
+        $olympicId  = $request->route('id');
+        $queryParams = $request->all();
+        $validator = Validator::make($queryParams, [
+            'course' => ['sometimes', 'string', Rule::in(RangeCourse::getValues())],
+        ], [
+            'course.sometimes' => 'The course is not valid.',
+            'course.string' => 'The course must be a string.',
+            'course.in' => 'The course is not valid value.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $areas = Areas::with(['categories'])->whereHas('olympics', function ($query) use ($olympicId) {
+            $query->where('olympics.id', $olympicId);
+        })->get();
+
+        if (isset($queryParams['course'])) {
+            $areas = Areas::with([
+                'categories' => function ($query) use ($queryParams) {
+                    $query->where('range_course', 'like', '%' . $queryParams['course'] . '%');
+                },
+            ])->whereHas('olympics', function ($query) use ($olympicId) {
+                $query->where('olympics.id', $olympicId);
+            })->get();
+        }
+        return response()->json(['data' => $areas]);
     }
 
     public function store(Request $request)
@@ -82,7 +156,7 @@ class OlympicsController extends Controller
 
         $data['status'] = 'false';
         $data['publish'] = Publish::Borrador;
-    
+
         // Campos por defecto
         $data['Presentation'] = $data['Presentation'] ?? 'No especificado';
         $data['Requirements'] = $data['Requirements'] ?? 'No especificado';
@@ -90,9 +164,9 @@ class OlympicsController extends Controller
         $data['end_date'] = $data['end_date'] ?? null;
         $data['Contacts'] = $data['Contacts'] ?? 'No especificado';
         $data['awards'] = $data['awards'] ?? 'No especificado';
-    
+
         $olympic = $this->service->create($data);
-    
+
         return response()->json($olympic, 201);
     }
 
@@ -165,13 +239,13 @@ class OlympicsController extends Controller
             'Contacts' => 'nullable|string',
             'status' => 'required|boolean', // se espera booleano desde el frontend
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'errors' => $validator->errors()->toArray()
             ], 422);
         }
-    
+
         // Obtener los datos de la solicitud
         $data = $request->only([
             'Presentation',
@@ -182,16 +256,16 @@ class OlympicsController extends Controller
             'Contacts',
             'status',
         ]);
-    
+
         // Comprobar si la olimpiada tiene áreas asociadas
         $hasAreas = OlimpycAndCategorias::where('olympic_id', $id)->exists();
-    
+
         if (!$hasAreas) {
             return response()->json([
                 'message' => 'No se puede publicar la olimpiada sin áreas asociadas.',
             ], 400);
         }
-    
+
         // Comprobar si la fecha de finalización ya pasó
         if (isset($data['end_date']) && Carbon::parse($data['end_date'])->isPast()) {
             $data['publish'] = Publish::Cerrado; // Establecer "cerrado" si ya pasó la fecha
@@ -199,17 +273,17 @@ class OlympicsController extends Controller
             // Si no se está actualizando el estado de publish, lo dejamos como estaba o lo ponemos a "inscripción"
             $data['publish'] = $data['publish'] ?? Publish::Inscripcion;
         }
-    
+
         // Convertir el estado en booleano y actualizar
         $data['status'] = $request->boolean('status') ? 'true' : 'false';
-    
+
         // Actualizar la olimpiada con los nuevos datos
         $olympic = $this->service->update($id, $data);
-    
+
         if (!$olympic) {
             return response()->json(['message' => 'Olympic not found'], 404);
         }
-    
+
         return response()->json([
             'message' => 'Olimpiada actualizada correctamente',
             'data' => $olympic

@@ -10,9 +10,24 @@ use Illuminate\Support\Facades\Validator;
 
 class AreasController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/areas",
+     *     summary="List all areas with categories",
+     *     tags={"Areas"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="A list of areas with their associated categories",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Area")
+     *         )
+     *     )
+     * )
+     */
     public function index()
     {
-        return response()->json(['areas' => Areas::all()]);
+        return response()->json(['areas' => Areas::with('categories')->get()]);
     }
 
     public function store(Request $request)
@@ -51,7 +66,7 @@ class AreasController extends Controller
             ], 409);
         }
 
-    
+
         $area = new Areas;
         $area->name = $request->name;
         $area->description = $request->description;
@@ -62,6 +77,4 @@ class AreasController extends Controller
             'message' => 'Área creada con éxito'
         ], 201);
     }
-
-    
 }
