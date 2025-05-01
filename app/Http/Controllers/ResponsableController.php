@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 class ResponsableController extends Controller
 {
     /**
+     * @deprecated
      * Responsable access 
      * @OA\Post(
      *     path="/api/responsable/access",

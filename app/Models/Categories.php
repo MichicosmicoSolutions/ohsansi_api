@@ -30,6 +30,19 @@ class Categories extends Model
     ];
     public function area()
     {
-        return $this->belongsTo(Areas::class, 'area_id');
+        return $this->belongsTo(
+            Areas::class,
+            'area_id'
+        );
+    }
+
+    public function olympiads()
+    {
+        return $this->belongsToMany(
+            Olympiads::class,
+            'olympiad_areas',
+            'category_id',
+            'olympiad_id'
+        );
     }
 }

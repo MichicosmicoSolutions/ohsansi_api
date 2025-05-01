@@ -2,15 +2,13 @@
 
 use App\Http\Controllers\AreasController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\OlympiadsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ExcelController;
 use App\Http\Controllers\InscriptionController;
-use App\Http\Controllers\OlimpiadasCategoriController;
-use App\Http\Controllers\OlympicsController;
+use App\Http\Controllers\OlympiadAreasController;
 use App\Http\Controllers\PersonSearchController;
-use App\Models\OlimpycAndCategorias;
 use App\Http\Controllers\ResponsableController;
 
 /*
@@ -54,27 +52,21 @@ Route::get('/inscriptions/{id}', [InscriptionController::class, 'show']);
 Route::post('/inscriptions', [InscriptionController::class, 'store']);
 
 
-// Rutas para  excel
-Route::post('/inscriptions/excel', [ExcelController::class, 'store']);
-Route::get('/inscriptions/excel/template', [ExcelController::class, 'downloadTemplate']);
 
 
-// Rutas para  Olympiadas
-//PB14
-// Rutas para areas
-Route::get('/olympics', [OlympicsController::class, 'index']);
-Route::post('/olympics', [OlympicsController::class, 'store']);
-Route::put('/olympics/{id}', [OlympicsController::class, 'update']);
-Route::get('/olympics/{id}/areas', [OlympicsController::class, 'showAreas']);
+Route::get('/olympiads', [OlympiadsController::class, 'index']);
+Route::post('/olympiads', [OlympiadsController::class, 'store']);
+Route::put('/olympiads/{id}', [OlympiadsController::class, 'update']);
+Route::delete('/olympiads/{id}', [OlympiadsController::class, 'destroy']);
+Route::get('/olympiads/{id}/areas', [OlympiadsController::class, 'showAreas']);
+Route::patch('/olympiads/{id}/price', [OlympiadsController::class, 'updatePrice']);
+Route::patch('/olympiads/{id}/publish', [OlympiadsController::class, 'publish']);
 
-// PB 02
-Route::patch('/olympics/{id}/price', [OlympicsController::class, 'updatePrice']);
-//PB 16
-Route::patch('/olympics/{id}/publish', [OlympicsController::class, 'publish']);
 
-Route::get('/olympics/getOlympicInfo/{id}', [OlympicsController::class, 'getOlympicInfo']);
 
-Route::get('/olympics/getAreasByOlympic/{id}', [OlimpycAndCategorias::class, 'getAreasByOlympic']);
+
+Route::get('/olympiads/getOlympicInfo/{id}', [OlympiadsController::class, 'getOlympicInfo']);
+Route::get('/olympiads/getAreasByOlympic/{id}', [OlympiadAreasController::class, 'getAreasByOlympic']);
 Route::get('/legal-tutor/{ci}', [PersonSearchController::class, 'searchLegalTutor']);
 
 // Rutas para   Buscar
@@ -93,10 +85,7 @@ Route::post('/legal-tutor', [PersonSearchController::class, 'storeLegalTutor']);
 // Rutas para  Asociar Olimpiadas y categorias 
 
 
-Route::post('/olimpiadas-categorias', [OlimpiadasCategoriController::class, 'store']);
-Route::get('/olimpiadas-categorias/{olympic_id}/areas/{area_id}/categories', [OlimpiadasCategoriController::class, 'getCategoriesByOlympicAndArea']);
-Route::get('/olimpiadas-categorias/{olympic_id}/areas', [OlimpiadasCategoriController::class, 'getAreasByOlympic']);
-Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlimpiadasCategoriController::class, 'getAreasWithCategoriesByOlympic']);
-
-
-Route::delete('/olympics/{id}', [OlympicsController::class, 'destroy']);
+Route::post('/olimpiadas-categorias', [OlympiadAreasController::class, 'store']);
+Route::get('/olimpiadas-categorias/{olympic_id}/areas/{area_id}/categories', [OlympiadAreasController::class, 'getCategoriesByOlympicAndArea']);
+Route::get('/olimpiadas-categorias/{olympic_id}/areas', [OlympiadAreasController::class, 'getAreasByOlympic']);
+Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlympiadAreasController::class, 'getAreasWithCategoriesByOlympic']);

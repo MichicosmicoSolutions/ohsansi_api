@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @OA\Schema(
- *     schema="LegalTutors",
- *     title="Legal Tutors Model",
- *     description="This model represents the Legal Tutors entity in the application.",
+ *     schema="Teachers",
+ *     title="Teachers Model",
+ *     description="This model represents the teachers in the system.",
  *     required={"personal_data_id"},
- *     @OA\Property(property="id", type="integer", format="int64", description="The unique identifier for the legal tutor."),
- *     @OA\Property(property="personal_data_id", type="integer", format="int64", description="The ID of the associated personal data.")
+ *     @OA\Property(property="id", type="integer", format="int64", description="The unique identifier for the teacher."),
+ *     @OA\Property(property="personal_data_id", type="integer", format="int64", description="The ID of the personal data associated with this teacher.")
  * )
  */
-class LegalTutors extends Model
+class Teachers extends Model
 {
     use HasFactory;
 
@@ -29,7 +29,7 @@ class LegalTutors extends Model
     ];
 
     /**
-     * Define the relationship with PersonalData model.
+     * Get the personal data associated with this teacher.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

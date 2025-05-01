@@ -21,33 +21,25 @@ class CreatePersonalDataTable extends Migration
         });
 
         Schema::create('responsables', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('personal_data_id')->constrained('personal_data')->onDelete('cascade');
-            $table->string('code');
-            $table->timestamps();
+            $table->primary(['personal_data_id']);
         });
 
         Schema::create('legal_tutors', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');
-            $table->timestamps();
+            $table->primary(['personal_data_id']);
         });
 
-        Schema::create('competitors', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('school_id')->constrained('schools')->onDelete('cascade');
-            $table->foreignId('legal_tutor_id')->constrained('legal_tutors')->onDelete('cascade');
-            $table->foreignId('responsable_id')->constrained('responsables')->onDelete('cascade');
+        Schema::create('teachers', function (Blueprint $table) {
             $table->foreignId('personal_data_id')->unique()->constrained('personal_data')->onDelete('cascade');
-            $table->enum('course', RangeCourse::getValues());
-            $table->timestamps();
+            $table->primary(['personal_data_id']);
         });
     }
 
     public function down()
     {
         // Eliminar primero las tablas con dependencias
-        Schema::dropIfExists('competitors');
+        Schema::dropIfExists('teachers');
         Schema::dropIfExists('legal_tutors');
         Schema::dropIfExists('responsables');
         Schema::dropIfExists('personal_data');
