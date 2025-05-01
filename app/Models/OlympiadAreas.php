@@ -7,22 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @OA\Schema(
- *     schema="OlimpiadAreas",
- *     title="OlimpiadAreas Model",
+ *     schema="OlympiadAreas",
+ *     title="OlympiadAreas Model",
  *     description="This model represents the relationship between Olympics, Areas, and Categories.",
  *     required={"id"},
- *     @OA\Property(property="id", type="integer", format="int64", description="The unique identifier for the OlimpiadAreas."),
- *     @OA\Property(property="area_id", type="integer", format="int64", description="The area associated with this OlimpiadAreas."),
- *     @OA\Property(property="category_id", type="integer", format="int64", description="The category associated with this OlimpiadAreas."),
- *     @OA\Property(property="olympic_id", type="integer", format="int64", description="The olympic associated with this OlimpiadAreas.")
+ *     @OA\Property(property="id", type="integer", format="int64", description="The unique identifier for the OlympiadAreas."),
+ *     @OA\Property(property="area_id", type="integer", format="int64", description="The area associated with this OlympiadAreas."),
+ *     @OA\Property(property="category_id", type="integer", format="int64", description="The category associated with this OlympiadAreas."),
+ *     @OA\Property(property="olympic_id", type="integer", format="int64", description="The olympic associated with this OlympiadAreas.")
  * )
  */
-class OlimpiadAreas extends Model
+class OlympiadAreas extends Model
 {
     use HasFactory;
 
     /**
-     * Area associated with this OlimpiadAreas.
+     * Area associated with this OlympiadAreas.
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function area()
@@ -34,7 +34,7 @@ class OlimpiadAreas extends Model
     }
 
     /**
-     * Category associated with this OlimpiadAreas.
+     * Category associated with this OlympiadAreas.
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function category()
@@ -46,7 +46,7 @@ class OlimpiadAreas extends Model
     }
 
     /**
-     * Olympic associated with this OlimpiadAreas.
+     * Olympic associated with this OlympiadAreas.
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function olympiad()

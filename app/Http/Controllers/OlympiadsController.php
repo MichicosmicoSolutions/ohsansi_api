@@ -4,18 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Enums\RangeCourse;
 use App\Models\Areas;
+use App\Models\Olympiads;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Services\OlympicsService;
+use App\Services\OlympiadsService;
 use Illuminate\Validation\Rule;
-use App\Models\Olympics;
-use Illuminate\Support\Facades\Log;
 
-class OlympicsController extends Controller
+
+
+class OlympiadsController extends Controller
 {
     protected $service;
 
-    public function __construct(OlympicsService $service)
+    public function __construct(OlympiadsService $service)
     {
         $this->service = $service;
     }
@@ -37,14 +38,14 @@ class OlympicsController extends Controller
 
     public function index()
     {
-        return response()->json(['Olympics' => Olympics::all()]);
+        return response()->json(['data' => Olympiads::all()]);
     }
 
     /**
      * @OA\Get(
-     *      path="/olympics/{id}/areas",
-     *      operationId="getOlympicsAreas",
-     *      tags={"Olympics"},
+     *      path="/olympiads/{id}/areas",
+     *      operationId="OlympiadsGetAreas",
+     *      tags={"Olympiads"},
      *      summary="Get areas for a specific olympic",
      *      description="Returns the list of areas with their categories based on the olympic ID.",
      *      @OA\Parameter(
@@ -124,7 +125,7 @@ class OlympicsController extends Controller
                 function ($attribute, $value, $fail) {
                     $normalizedInput = $this->normalizeTitle($value);
 
-                    $exists = Olympics::all()->some(function ($olympic) use ($normalizedInput) {
+                    $exists = Olympiads::all()->some(function ($olympic) use ($normalizedInput) {
                         $existingNormalized = $this->normalizeTitle($olympic->title);
                         return $existingNormalized === $normalizedInput;
                     });
@@ -267,7 +268,7 @@ class OlympicsController extends Controller
 
     public function getOlympicInfo($id)
     {
-        $olympic = Olympics::find($id, [
+        $olympic = Olympiads::find($id, [
             'title',
             'description',
             'price',
@@ -300,7 +301,7 @@ class OlympicsController extends Controller
 
     public function destroy($id)
     {
-        $category = Olympics::find($id);
+        $category = Olympiads::find($id);
 
         if (!$category) {
             return response()->json(['message' => 'Olimpiada no encontrada.'], 404);

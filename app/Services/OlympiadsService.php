@@ -2,23 +2,23 @@
 
 namespace App\Services;
 
-use App\Models\Olympics;
+use App\Models\Olympiads;
 
-class OlympicsService
+class OlympiadsService
 {
     public function getById($id)
     {
-        return Olympics::find($id);
+        return Olympiads::find($id);
     }
 
     public function create(array $data)
     {
-        return Olympics::create($data);
+        return Olympiads::create($data);
     }
 
     public function update($id, array $data)
     {
-        $olympic = Olympics::find($id);
+        $olympic = Olympiads::find($id);
         if (!$olympic) {
             return null;
         }
