@@ -20,7 +20,7 @@ class OlympiadAreasSeeder extends Seeder
         $areas = DB::table("areas")->get();
 
         foreach ($areas as $area) {
-            $categories = DB::table("categories")->get();
+            $categories = DB::table("categories")->where('area_id', $area->id)->get();
             foreach ($categories as $category) {
                 DB::table('olympiad_areas')->insert([
                     'olympiad_id' => $olympiad->id,

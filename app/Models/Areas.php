@@ -59,4 +59,14 @@ class Areas extends Model
             'olympiad_id'
         );
     }
+
+    public function olympiadCategories()
+    {
+        return $this->belongsToMany(
+            Categories::class,
+            'olympiad_areas',
+            'area_id',
+            'category_id',
+        );
+    }
 }

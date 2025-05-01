@@ -36,7 +36,7 @@ class Categories extends Model
         );
     }
 
-    public function olympiad()
+    public function olympiads()
     {
         return $this->belongsToMany(
             Olympiads::class,

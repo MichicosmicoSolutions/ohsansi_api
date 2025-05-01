@@ -99,17 +99,19 @@ class OlympiadsController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $areas = Areas::with(['categories'])->whereHas('olympics', function ($query) use ($olympicId) {
-            $query->where('olympics.id', $olympicId);
+        $areas = Areas::with([
+            'olympiadCategories'
+        ])->whereHas('olympiads', function ($query) use ($olympicId) {
+            $query->where('olympiads.id', $olympicId);
         })->get();
 
         if (isset($queryParams['course'])) {
             $areas = Areas::with([
-                'categories' => function ($query) use ($queryParams) {
+                'olympiadCategories' => function ($query) use ($queryParams) {
                     $query->where('range_course', 'like', '%' . $queryParams['course'] . '%');
                 },
-            ])->whereHas('olympics', function ($query) use ($olympicId) {
-                $query->where('olympics.id', $olympicId);
+            ])->whereHas('olympiads', function ($query) use ($olympicId) {
+                $query->where('olympiads.id', $olympicId);
             })->get();
         }
         return response()->json(['data' => $areas]);
