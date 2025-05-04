@@ -7,22 +7,122 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @OA\Schema(
- *     schema="Olympiads",
- *     title="Olympiads Model",
- *     description="A model representing an Olympiads event.",
- *     required={"title", "description", "price", "status", "presentation", "requirements", "start_date", "end_date", "contacts", "awards"},
- *     @OA\Property(property="id", type="integer", description="The unique identifier of the Olympiads event.", example=1),
- *     @OA\Property(property="title", type="string", description="The title of the Olympiads event.", example="Olympiads Event Title"),
- *     @OA\Property(property="description", type="string", description="A brief description of the Olympiads event.", example="This is a description of the Olympiads event."),
- *     @OA\Property(property="price", type="number", format="float", description="The price associated with the Olympiads event.", example=10.99),
- *     @OA\Property(property="status", type="string", description="The status of the Olympiads event (e.g., 'active', 'inactive').", example="active"),
- *     @OA\Property(property="publish", type="string", enum={"borrador", "inscripción", "cerrado"}, description="The publication status of the Olympiads event.", example="inscripción"),
- *     @OA\Property(property="presentation", type="string", description="Details about the presentation of the Olympiads event.", example="Presentation details."),
- *     @OA\Property(property="requirements", type="string", description="The requirements for participating in the Olympiads event.", example="Participants must meet certain requirements."),
- *     @OA\Property(property="start_date", type="string", format="date", description="The start date of the Olympiads event.", example="2023-01-01"),
- *     @OA\Property(property="end_date", type="string", format="date", description="The end date of the Olympiads event.", example="2023-01-07"),
- *     @OA\Property(property="contacts", type="string", description="Contact information for the Olympiads event.", example="contact@olympiads.com"),
- *     @OA\Property(property="awards", type="string", description="Details about the awards available in the Olympiads event.", example="Gold, Silver, Bronze")
+ *     schema="Olympiad",
+ *     type="object",
+ *     title="Olympiad Model",
+ *     description="Represents an olympiad competition or event.",
+ *     required={"title", "start_date", "end_date"},
+ *     @OA\Property(
+ *         property="id",
+ *         type="integer",
+ *         format="int64",
+ *         description="Primary Key",
+ *         readOnly=true,
+ *         example=1
+ *     ),
+ *     @OA\Property(
+ *         property="title",
+ *         type="string",
+ *         description="The official title of the olympiad",
+ *         maxLength=255,
+ *         example="International Mathematics Olympiad 2024"
+ *     ),
+ *     @OA\Property(
+ *         property="status",
+ *         type="string",
+ *         description="Current status (e.g., 'draft', 'published', 'archived', 'ongoing', 'finished')",
+ *         example="published"
+ *     ),
+ *     @OA\Property(
+ *         property="publish",
+ *         type="boolean",
+ *         description="Indicates if the olympiad is publicly visible",
+ *         example=true
+ *     ),
+ *     @OA\Property(
+ *         property="description",
+ *         type="string",
+ *         format="text",
+ *         description="Detailed description of the olympiad",
+ *         example="An annual competition for high school students focused on advanced mathematical problems."
+ *     ),
+ *     @OA\Property(
+ *         property="price",
+ *         type="number",
+ *         format="float",
+ *         description="Registration fee or cost associated with the olympiad",
+ *         example=50.00
+ *     ),
+ *     @OA\Property(
+ *         property="presentation",
+ *         type="string",
+ *         format="text",
+ *         description="Information about the presentation format or link to presentation materials",
+ *         example="Includes online tests and a final presentation round. Details: [link]"
+ *     ),
+ *     @OA\Property(
+ *         property="requirements",
+ *         type="string",
+ *         format="text",
+ *         description="Eligibility criteria and requirements for participants",
+ *         example="Must be a student under 20 years old, not enrolled in university."
+ *     ),
+ *     @OA\Property(
+ *         property="awards",
+ *         type="string",
+ *         format="text",
+ *         description="Description of the prizes and awards offered",
+ *         example="Gold, Silver, Bronze medals. Top 3 receive scholarships."
+ *     ),
+ *     @OA\Property(
+ *         property="start_date",
+ *         type="string",
+ *         format="date-time",
+ *         description="The official start date and time of the olympiad (or registration period)",
+ *         example="2024-09-01T00:00:00Z"
+ *     ),
+ *     @OA\Property(
+ *         property="end_date",
+ *         type="string",
+ *         format="date-time",
+ *         description="The official end date and time of the olympiad (or registration period)",
+ *         example="2024-11-30T23:59:59Z"
+ *     ),
+ *     @OA\Property(
+ *         property="contacts",
+ *         type="string",
+ *         format="text",
+ *         description="Contact information for inquiries about the olympiad",
+ *         example="Email: contact@imo2024.org, Phone: +1-555-123-4567"
+ *     ),
+ *     @OA\Property(
+ *         property="created_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="Timestamp when the record was created",
+ *         readOnly=true,
+ *         example="2023-10-01T10:00:00Z"
+ *     ),
+ *     @OA\Property(
+ *         property="updated_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="Timestamp when the record was last updated",
+ *         readOnly=true,
+ *         example="2023-10-05T12:30:00Z"
+ *     ),
+ *     @OA\Property(
+ *         property="areas",
+ *         type="array",
+ *         description="List of subject areas associated with the olympiad",
+ *         @OA\Items(ref="#/components/schemas/Area")
+ *     ),
+ *     @OA\Property(
+ *         property="categories",
+ *         type="array",
+ *         description="List of categories the olympiad belongs to (e.g., age group, difficulty)",
+ *         @OA\Items(ref="#/components/schemas/Category")
+ *     )
  * )
  */
 class Olympiads extends Model

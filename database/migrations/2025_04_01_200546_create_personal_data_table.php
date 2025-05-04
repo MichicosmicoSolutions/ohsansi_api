@@ -18,9 +18,10 @@ class CreatePersonalDataTable extends Migration
             $table->date('birthdate');
             $table->string('email')->unique();
             $table->string('phone_number');
+            $table->string('gender');
         });
 
-        Schema::create('responsables', function (Blueprint $table) {
+        Schema::create('accountables', function (Blueprint $table) {
             $table->foreignId('personal_data_id')->constrained('personal_data')->onDelete('cascade');
             $table->primary(['personal_data_id']);
         });
@@ -41,7 +42,7 @@ class CreatePersonalDataTable extends Migration
         // Eliminar primero las tablas con dependencias
         Schema::dropIfExists('teachers');
         Schema::dropIfExists('legal_tutors');
-        Schema::dropIfExists('responsables');
+        Schema::dropIfExists('accountables');
         Schema::dropIfExists('personal_data');
     }
 }

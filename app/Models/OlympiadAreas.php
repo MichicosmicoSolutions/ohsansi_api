@@ -7,20 +7,65 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @OA\Schema(
- *     schema="OlympiadAreas",
- *     title="OlympiadAreas Model",
- *     description="This model represents the relationship between Olympics, Areas, and Categories.",
- *     required={"id"},
- *     @OA\Property(property="id", type="integer", format="int64", description="The unique identifier for the OlympiadAreas."),
- *     @OA\Property(property="area_id", type="integer", format="int64", description="The area associated with this OlympiadAreas."),
- *     @OA\Property(property="category_id", type="integer", format="int64", description="The category associated with this OlympiadAreas."),
- *     @OA\Property(property="olympic_id", type="integer", format="int64", description="The olympic associated with this OlympiadAreas.")
+ *     schema="OlympiadArea",
+ *     title="OlympiadArea",
+ *     description="Modelo de la tabla pivote entre Olimpiadas, Áreas y Categorías",
+ *     @OA\Property(
+ *         property="id",
+ *         type="integer",
+ *         format="int64",
+ *         description="ID único del registro"
+ *     ),
+ *     @OA\Property(
+ *         property="olympiad_id",
+ *         type="integer",
+ *         format="int64",
+ *         description="ID de la olimpiada asociada"
+ *     ),
+ *     @OA\Property(
+ *         property="area_id",
+ *         type="integer",
+ *         format="int64",
+ *         description="ID del área asociada"
+ *     ),
+ *      @OA\Property(
+ *         property="category_id",
+ *         type="integer",
+ *         format="int64",
+ *         description="ID de la categoría asociada"
+ *     ),
+ *     @OA\Property(
+ *         property="created_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="Fecha y hora de creación"
+ *     ),
+ *     @OA\Property(
+ *         property="updated_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="Fecha y hora de la última actualización"
+ *     ),
+ *     @OA\Property(
+ *         property="area",
+ *         description="El área asociada con este registro",
+ *         ref="#/components/schemas/Area"
+ *     ),
+ *     @OA\Property(
+ *         property="category",
+ *         description="La categoría asociada con este registro",
+ *         ref="#/components/schemas/Category"
+ *     ),
+ *     @OA\Property(
+ *         property="olympiad",
+ *         description="La olimpiada asociada con este registro",
+ *         ref="#/components/schemas/Olympiad"
+ *     )
  * )
  */
 class OlympiadAreas extends Model
 {
     use HasFactory;
-
     /**
      * Area associated with this OlympiadAreas.
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
