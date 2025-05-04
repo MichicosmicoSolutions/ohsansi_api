@@ -7,43 +7,118 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @OA\Schema(
- *     schema="Inscriptions",
- *     title="Inscriptions Model",
- *     description="Represents an inscription in the system.",
- *     required={"competitor_id", "olympiad_id", "area_id", "category_id", "status"},
- *     @OA\Property(property="id", type="integer", format="int64", readOnly=true, description="The unique identifier for the inscription."),
- *     @OA\Property(property="competitor_id", type="integer", format="int64", description="The ID of the competitor associated with the inscription."),
- *     @OA\Property(property="olympiad_id", type="integer", format="int64", description="The ID of the Olympiad event associated with the inscription."),
- *     @OA\Property(property="area_id", type="integer", format="int64", description="The ID of the area associated with the inscription."),
- *     @OA\Property(property="category_id", type="integer", format="int64", description="The ID of the category associated with the inscription."),
- *     @OA\Property(property="status", type="string", description="The status of the inscription.")
+ *     schema="Inscription",
+ *     title="Inscription",
+ *     description="Inscription model",
+ *     @OA\Property(
+ *         property="id",
+ *         type="integer",
+ *         format="int64",
+ *         description="Primary Key"
+ *     ),
+ *     @OA\Property(
+ *         property="status",
+ *         type="string",
+ *         description="Status of the inscription (e.g., pending, approved, rejected)"
+ *     ),
+ *     @OA\Property(
+ *         property="drive_url",
+ *         type="string",
+ *         format="url",
+ *         nullable=true,
+ *         description="URL to related documents in Google Drive"
+ *     ),
+ *     @OA\Property(
+ *         property="school_id",
+ *         type="integer",
+ *         format="int64",
+ *         description="Foreign key referencing the Schools table"
+ *     ),
+ *     @OA\Property(
+ *         property="competitor_data_id",
+ *         type="integer",
+ *         format="int64",
+ *         description="Foreign key referencing the PersonalData table for the competitor"
+ *     ),
+ *      @OA\Property(
+ *         property="accountable_id",
+ *         type="integer",
+ *         format="int64",
+ *         nullable=true,
+ *         description="Foreign key referencing the PersonalData ID in the Accountables table"
+ *     ),
+ *     @OA\Property(
+ *         property="legal_tutor_id",
+ *         type="integer",
+ *         format="int64",
+ *         nullable=true,
+ *         description="Foreign key referencing the PersonalData ID in the LegalTutors table"
+ *     ),
+ *     @OA\Property(
+ *         property="olympiad_id",
+ *         type="integer",
+ *         format="int64",
+ *         description="Foreign key referencing the Olympiads table"
+ *     ),
+ *     @OA\Property(
+ *         property="created_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="Creation timestamp"
+ *     ),
+ *     @OA\Property(
+ *         property="updated_at",
+ *         type="string",
+ *         format="date-time",
+ *         description="Last update timestamp"
+ *     ),
+ *     @OA\Property(
+ *         nullable=true,
+ *         property="competitor_data",
+ *         ref="#/components/schemas/PersonalData",
+ *         description="Competitor's personal data associated with this inscription"
+ *     ),
+ *      @OA\Property(
+ *         nullable=true,
+ *         property="accountable",
+ *         ref="#/components/schemas/Accountable",
+ *         description="Accountable person associated with this inscription"
+ *     ),
+ *      @OA\Property(
+ *         nullable=true,
+ *         property="legalTutor",
+ *         ref="#/components/schemas/LegalTutor",
+ *         description="Legal tutor associated with this inscription"
+ *     ),
+ *     @OA\Property(
+ *         nullable=true,
+ *         property="school",
+ *         ref="#/components/schemas/School",
+ *         description="School associated with this inscription"
+ *     ),
+ *     @OA\Property(
+ *         nullable=true,
+ *         property="selected_areas",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/SelectedArea"),
+ *         description="Areas selected for this inscription"
+ *     )
  * )
  */
 class Inscriptions extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'status',
-        'paid_at',
         'drive_url',
         'school_id',
         'competitor_data_id',
-        'responsable_id',
+        'accountable_id',
         'legal_tutor_id',
         'olympiad_id'
     ];
 
-    /**
-     * Get the competitor associated with the inscription.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function competitor_data()
     {
         return $this->belongsTo(
@@ -52,11 +127,11 @@ class Inscriptions extends Model
         );
     }
 
-    public function responsable()
+    public function accountable()
     {
         return $this->belongsTo(
-            Responsables::class,
-            'responsable_id',
+            Accountables::class,
+            'accountable_id',
             'personal_data_id'
         );
     }
@@ -70,16 +145,29 @@ class Inscriptions extends Model
         );
     }
 
-    /**
-     * Get the Olympiads event associated with the inscription.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function olympiad()
     {
         return $this->belongsTo(
             Olympiads::class,
             'olympiad_id'
+        );
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(
+            Schools::class,
+            'school_id',
+            'id'
+        );
+    }
+
+    public function selected_areas()
+    {
+        return $this->hasMany(
+            SelectedAreas::class,
+            'inscription_id',
+            'id'
         );
     }
 }

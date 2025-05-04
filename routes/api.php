@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-Route::post('/responsable/access', [ResponsableController::class, 'access']);
+// Route::post('/accountable/access', [ResponsableController::class, 'access']);
 
 // Rutas para areas
 Route::get('/areas', [AreasController::class, 'index']);
@@ -61,8 +61,13 @@ Route::delete('/olympiads/{id}', [OlympiadsController::class, 'destroy']);
 Route::get('/olympiads/{id}/areas', [OlympiadsController::class, 'showAreas']);
 Route::patch('/olympiads/{id}/price', [OlympiadsController::class, 'updatePrice']);
 Route::patch('/olympiads/{id}/publish', [OlympiadsController::class, 'publish']);
-
-
+# inscription onboarding
+Route::post('/olympiads/{id}/inscriptions/init', [InscriptionController::class, 'initInscription']);
+Route::post('/olympiads/{id}/inscriptions', [InscriptionController::class, 'storeCompetitor']);
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/schools', [InscriptionController::class, 'storeCompetitorSchool']);
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/tutors', [InscriptionController::class, 'storeCompetitorTutor']);
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/selected-areas', [InscriptionController::class, 'storeAssociatedArea']);
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/accountables', [InscriptionController::class, 'storeAccountable']);
 
 
 Route::get('/olympiads/getOlympicInfo/{id}', [OlympiadsController::class, 'getOlympicInfo']);

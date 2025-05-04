@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @OA\Schema(
  *     schema="Area",
+ *     title="Area Model",
+ *     description="Represents a knowledge area or domain.",
  *     type="object",
- *     title="Area",
  *     required={"id", "name"},
  *     properties={
  *         @OA\Property(property="id", type="integer", format="int64", example=1),
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  *             property="categories",
  *             type="array",
  *             description="List of categories associated with the area",
- *             @OA\Items(ref="#/components/schemas/Categories")
+ *             @OA\Items(ref="#/components/schemas/Category")
  *         ),
  *         @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
  *         @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00Z")

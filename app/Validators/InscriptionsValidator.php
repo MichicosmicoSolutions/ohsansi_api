@@ -13,11 +13,11 @@ class InscriptionsValidator implements ValidatesInput
         return array_merge(
             [
                 "{$dot}olympic_id" => 'required|exists:olympics,id',
-                "{$dot}responsable" => 'required|array',
+                "{$dot}accountable" => 'required|array',
                 "{$dot}legal_tutor" => 'required|array',
                 "{$dot}competitor" => 'required|array'
             ],
-            PersonalDataValidator::rules("{$dot}responsable"),
+            PersonalDataValidator::rules("{$dot}accountable"),
             PersonalDataValidator::rules("{$dot}legal_tutor"),
             CompetitorValidator::rules("{$dot}competitor")
         );
@@ -28,10 +28,10 @@ class InscriptionsValidator implements ValidatesInput
         $dot = $prefix ? $prefix . "." : "";
         return array_merge(
             [
-                "{$dot}responsable.required" => "El responsable es obligatorio.",
+                "{$dot}accountable.required" => "El accountable es obligatorio.",
                 "{$dot}legal_tutor.required " => "El tutor legal es obligatorio.",
                 "{$dot}competitor.required" => "El competidor es obligatorio.",
-                "{$dot}responsable.array" => "El responsable debe ser un array.",
+                "{$dot}accountable.array" => "El accountable debe ser un array.",
                 "{$dot}legal_tutor.array" => "El tutor legal debe ser un array.",
                 "{$dot}competitor.array" => "El competidor debe ser un array.",
 

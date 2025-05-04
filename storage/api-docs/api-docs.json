@@ -33,748 +33,48 @@
                 }
             }
         },
-        "/api/inscriptions": {
-            "get": {
-                "tags": [
-                    "Inscriptions"
-                ],
-                "summary": "Get inscriptions for the authenticated user",
-                "description": "Get inscriptions for a user.",
-                "operationId": "d123015c8ce6c4531825ea136f17f2b9",
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "competitor_id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "drive_url": {
-                                                        "type": "string",
-                                                        "nullable": true
-                                                    },
-                                                    "olympic_id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "area_id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "category_id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "status": {
-                                                        "type": "string"
-                                                    },
-                                                    "paid_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "nullable": true
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "competitor": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "school_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "legal_tutor_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "responsable_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "personal_data_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "course": {
-                                                                "type": "string"
-                                                            },
-                                                            "created_at": {
-                                                                "type": "string",
-                                                                "format": "date-time"
-                                                            },
-                                                            "updated_at": {
-                                                                "type": "string",
-                                                                "format": "date-time"
-                                                            },
-                                                            "school": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer"
-                                                                    },
-                                                                    "name": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "department": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "province": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "created_at": {
-                                                                        "type": "string",
-                                                                        "format": "date-time"
-                                                                    },
-                                                                    "updated_at": {
-                                                                        "type": "string",
-                                                                        "format": "date-time"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "responsable": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "personal_data_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "code": {
-                                                                "type": "string"
-                                                            },
-                                                            "created_at": {
-                                                                "type": "string",
-                                                                "format": "date-time"
-                                                            },
-                                                            "updated_at": {
-                                                                "type": "string",
-                                                                "format": "date-time"
-                                                            },
-                                                            "personal_data": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer"
-                                                                    },
-                                                                    "ci": {
-                                                                        "type": "integer"
-                                                                    },
-                                                                    "ci_expedition": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "names": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "last_names": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "birthdate": {
-                                                                        "type": "string",
-                                                                        "format": "date"
-                                                                    },
-                                                                    "email": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "phone_number": {
-                                                                        "type": "string"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "legal_tutor": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "personal_data_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "created_at": {
-                                                                "type": "string",
-                                                                "format": "date-time"
-                                                            },
-                                                            "updated_at": {
-                                                                "type": "string",
-                                                                "format": "date-time"
-                                                            },
-                                                            "personal_data": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer"
-                                                                    },
-                                                                    "ci": {
-                                                                        "type": "integer"
-                                                                    },
-                                                                    "ci_expedition": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "names": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "last_names": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "birthdate": {
-                                                                        "type": "string",
-                                                                        "format": "date"
-                                                                    },
-                                                                    "email": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "phone_number": {
-                                                                        "type": "string"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Resource not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/inscriptions/{id}": {
-            "get": {
-                "tags": [
-                    "Inscriptions"
-                ],
-                "summary": "Get an inscription by ID",
-                "description": "Get a specific inscription by ID.",
-                "operationId": "ae55ef3e676d314b67e91171cd2d747c",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Inscription ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "competitor_id": {
-                                                    "type": "integer"
-                                                },
-                                                "drive_url": {
-                                                    "type": "string",
-                                                    "nullable": true
-                                                },
-                                                "olympic_id": {
-                                                    "type": "integer"
-                                                },
-                                                "area_id": {
-                                                    "type": "integer"
-                                                },
-                                                "category_id": {
-                                                    "type": "integer"
-                                                },
-                                                "status": {
-                                                    "type": "string"
-                                                },
-                                                "paid_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "nullable": true
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "competitor": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "school_id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "legal_tutor_id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "responsable_id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "personal_data_id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "course": {
-                                                            "type": "string"
-                                                        },
-                                                        "created_at": {
-                                                            "type": "string",
-                                                            "format": "date-time"
-                                                        },
-                                                        "updated_at": {
-                                                            "type": "string",
-                                                            "format": "date-time"
-                                                        },
-                                                        "school": {
-                                                            "properties": {
-                                                                "id": {
-                                                                    "type": "integer"
-                                                                },
-                                                                "name": {
-                                                                    "type": "string"
-                                                                },
-                                                                "department": {
-                                                                    "type": "string"
-                                                                },
-                                                                "province": {
-                                                                    "type": "string"
-                                                                },
-                                                                "created_at": {
-                                                                    "type": "string",
-                                                                    "format": "date-time"
-                                                                },
-                                                                "updated_at": {
-                                                                    "type": "string",
-                                                                    "format": "date-time"
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "responsable": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "personal_data_id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "code": {
-                                                            "type": "string"
-                                                        },
-                                                        "created_at": {
-                                                            "type": "string",
-                                                            "format": "date-time"
-                                                        },
-                                                        "updated_at": {
-                                                            "type": "string",
-                                                            "format": "date-time"
-                                                        },
-                                                        "personal_data": {
-                                                            "properties": {
-                                                                "id": {
-                                                                    "type": "integer"
-                                                                },
-                                                                "ci": {
-                                                                    "type": "integer"
-                                                                },
-                                                                "ci_expedition": {
-                                                                    "type": "string"
-                                                                },
-                                                                "names": {
-                                                                    "type": "string"
-                                                                },
-                                                                "last_names": {
-                                                                    "type": "string"
-                                                                },
-                                                                "birthdate": {
-                                                                    "type": "string",
-                                                                    "format": "date"
-                                                                },
-                                                                "email": {
-                                                                    "type": "string"
-                                                                },
-                                                                "phone_number": {
-                                                                    "type": "string"
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "olympic": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "title": {
-                                                            "type": "string"
-                                                        },
-                                                        "description": {
-                                                            "type": "string"
-                                                        },
-                                                        "price": {
-                                                            "type": "number"
-                                                        },
-                                                        "status": {
-                                                            "type": "string"
-                                                        },
-                                                        "start_date": {
-                                                            "type": "string",
-                                                            "format": "date"
-                                                        },
-                                                        "end_date": {
-                                                            "type": "string",
-                                                            "format": "date"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "area": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "name": {
-                                                            "type": "string"
-                                                        },
-                                                        "description": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "category": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer"
-                                                        },
-                                                        "name": {
-                                                            "type": "string"
-                                                        },
-                                                        "range_course": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "area_id": {
-                                                            "type": "integer"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Resource not found"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/inscriptions": {
+        "/olympiads/{olympiadId}/inscriptions/init": {
             "post": {
                 "tags": [
                     "Inscriptions"
                 ],
-                "summary": "Store a new inscription",
-                "description": "Create a new inscription with the provided data",
-                "operationId": "c88d0618702fc1e3a00fd27a70d4f641",
+                "summary": "Initialize or retrieve competitor data for an olympiad inscription",
+                "description": "Checks if a person with the given CI and birthdate exists. If found, returns their data including any existing inscription details for the specified olympiad.",
+                "operationId": "initOlympiadInscription",
+                "parameters": [
+                    {
+                        "name": "olympiadId",
+                        "in": "path",
+                        "description": "ID of the Olympiad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "example": 1
+                        }
+                    }
+                ],
                 "requestBody": {
-                    "description": "Data for creating an inscription",
+                    "description": "Competitor identification data",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "olympic_id",
-                                    "legal_tutor",
-                                    "responsable",
-                                    "competitor"
+                                    "ci",
+                                    "birthdate"
                                 ],
                                 "properties": {
-                                    "olympic_id": {
-                                        "description": "The ID of the Olympic event",
+                                    "ci": {
+                                        "description": "Competitor's Cédula de Identidad",
                                         "type": "integer",
-                                        "example": 1
+                                        "example": 1234567
                                     },
-                                    "legal_tutor": {
-                                        "description": "Legal tutor information",
-                                        "required": [
-                                            "ci",
-                                            "ci_expedition",
-                                            "names",
-                                            "last_names",
-                                            "birthdate",
-                                            "email",
-                                            "phone_number"
-                                        ],
-                                        "properties": {
-                                            "ci": {
-                                                "type": "integer",
-                                                "example": 7890123
-                                            },
-                                            "ci_expedition": {
-                                                "type": "string",
-                                                "example": "Santa Cruz"
-                                            },
-                                            "names": {
-                                                "type": "string",
-                                                "example": "Maria Garcia"
-                                            },
-                                            "last_names": {
-                                                "type": "string",
-                                                "example": "Rodriguez Gomez"
-                                            },
-                                            "birthdate": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "1965-11-24"
-                                            },
-                                            "email": {
-                                                "type": "string",
-                                                "format": "email",
-                                                "example": "maria.garcia@example.com"
-                                            },
-                                            "phone_number": {
-                                                "type": "string",
-                                                "pattern": "+591 [0-9]{8}",
-                                                "example": "+591 78901234"
-                                            }
-                                        },
-                                        "type": "object"
-                                    },
-                                    "responsable": {
-                                        "description": "Responsable information",
-                                        "required": [
-                                            "ci",
-                                            "ci_expedition",
-                                            "names",
-                                            "last_names",
-                                            "birthdate",
-                                            "email",
-                                            "phone_number"
-                                        ],
-                                        "properties": {
-                                            "ci": {
-                                                "type": "integer",
-                                                "example": 7890123
-                                            },
-                                            "ci_expedition": {
-                                                "type": "string",
-                                                "example": "Santa Cruz"
-                                            },
-                                            "names": {
-                                                "type": "string",
-                                                "example": "Maria Garcia"
-                                            },
-                                            "last_names": {
-                                                "type": "string",
-                                                "example": "Rodriguez Gomez"
-                                            },
-                                            "birthdate": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "1965-11-24"
-                                            },
-                                            "email": {
-                                                "type": "string",
-                                                "format": "email",
-                                                "example": "maria.garcia@example.com"
-                                            },
-                                            "phone_number": {
-                                                "type": "string",
-                                                "pattern": "+591 [0-9]{8}",
-                                                "example": "+591 78901234"
-                                            }
-                                        },
-                                        "type": "object"
-                                    },
-                                    "competitor": {
-                                        "description": "Competitor information",
-                                        "required": [
-                                            "ci",
-                                            "ci_expedition",
-                                            "names",
-                                            "last_names",
-                                            "birthdate",
-                                            "email",
-                                            "phone_number",
-                                            "school_data",
-                                            "selected_areas"
-                                        ],
-                                        "properties": {
-                                            "ci": {
-                                                "type": "integer",
-                                                "example": 9387321
-                                            },
-                                            "ci_expedition": {
-                                                "type": "string",
-                                                "example": "Cochabamba"
-                                            },
-                                            "names": {
-                                                "type": "string",
-                                                "example": "Juan Perez"
-                                            },
-                                            "last_names": {
-                                                "type": "string",
-                                                "example": "Gonzalez Lopez"
-                                            },
-                                            "birthdate": {
-                                                "type": "string",
-                                                "format": "date",
-                                                "example": "2020-05-18"
-                                            },
-                                            "email": {
-                                                "type": "string",
-                                                "format": "email",
-                                                "example": "juan2.perez@example.com"
-                                            },
-                                            "phone_number": {
-                                                "type": "string",
-                                                "pattern": "+591 [0-9]{8}",
-                                                "example": "+591 67834512"
-                                            },
-                                            "school_data": {
-                                                "description": "School data information",
-                                                "required": [
-                                                    "name",
-                                                    "department",
-                                                    "province",
-                                                    "course"
-                                                ],
-                                                "properties": {
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Colegio San Jose"
-                                                    },
-                                                    "department": {
-                                                        "type": "string",
-                                                        "example": "Cochabamba"
-                                                    },
-                                                    "province": {
-                                                        "type": "string",
-                                                        "example": "Cercado"
-                                                    },
-                                                    "course": {
-                                                        "type": "string",
-                                                        "example": "3ro Primaria"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            },
-                                            "selected_areas": {
-                                                "description": "Selected areas information",
-                                                "type": "array",
-                                                "items": {
-                                                    "required": [
-                                                        "area_id",
-                                                        "category_id"
-                                                    ],
-                                                    "properties": {
-                                                        "area_id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "category_id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "academic_tutor": {
-                                                            "description": "Academic tutor information",
-                                                            "properties": {
-                                                                "ci": {
-                                                                    "type": "integer",
-                                                                    "example": 4567890
-                                                                },
-                                                                "ci_expedition": {
-                                                                    "type": "string",
-                                                                    "example": "Cochabamba"
-                                                                },
-                                                                "names": {
-                                                                    "type": "string",
-                                                                    "example": "Carlos Sanchez"
-                                                                },
-                                                                "last_names": {
-                                                                    "type": "string",
-                                                                    "example": "Lopez Perez"
-                                                                },
-                                                                "birthdate": {
-                                                                    "type": "string",
-                                                                    "format": "date",
-                                                                    "example": "1972-03-12"
-                                                                },
-                                                                "email": {
-                                                                    "type": "string",
-                                                                    "format": "email",
-                                                                    "example": "carlos.sanchez@example.com"
-                                                                },
-                                                                "phone_number": {
-                                                                    "type": "string",
-                                                                    "pattern": "+591 [0-9]{8}",
-                                                                    "example": "+591 89012345"
-                                                                }
-                                                            },
-                                                            "type": "object"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            }
-                                        },
-                                        "type": "object"
+                                    "birthdate": {
+                                        "description": "Competitor's birthdate (YYYY-MM-DD)",
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2005-08-15"
                                     }
                                 },
                                 "type": "object"
@@ -783,15 +83,14 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "Inscription created successfully",
+                    "200": {
+                        "description": "Competitor data found successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data saved successfully"
+                                        "data": {
+                                            "$ref": "#/components/schemas/CompetitorPersonalData"
                                         }
                                     },
                                     "type": "object"
@@ -799,28 +98,17 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error",
+                    "404": {
+                        "description": "Competitor data not found for the given CI and birthdate",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "errors": {
-                                            "description": "Detailed validation errors for each field that failed validation.",
                                             "properties": {
-                                                "legal_tutor.ci": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The legal tutor ci field is required."
-                                                    }
-                                                },
-                                                "responsable.email": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The responsable email must be a valid email address."
-                                                    }
+                                                "details": {
+                                                    "type": "string",
+                                                    "example": "Personal data not found"
                                                 }
                                             },
                                             "type": "object"
@@ -831,16 +119,116 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal server error",
+                    "422": {
+                        "description": "Validation error (e.g., missing or invalid input)",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "errors": {
-                                            "description": "Detailed error message for internal server errors.",
+                                            "description": "Object containing validation errors",
                                             "properties": {
-                                                "message": {
+                                                "ci": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "The ci field is required."
+                                                    ]
+                                                },
+                                                "birthdate": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "The birthdate field must be a valid date."
+                                                    ]
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized (e.g., invalid or missing token)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/olympiads/{olympiadId}/inscriptions": {
+            "post": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Store a new competitor",
+                "description": "Returns the newly created inscription",
+                "operationId": "storeCompetitor",
+                "parameters": [
+                    {
+                        "name": "olympiadId",
+                        "in": "path",
+                        "description": "Olympiad ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PersonalDataRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CompetitorPersonalData"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for bad requests.",
+                                            "properties": {
+                                                "param_name": {
                                                     "type": "string",
                                                     "example": "Algo salió mal"
                                                 }
@@ -853,21 +241,35 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/inscriptions/{id}": {
-            "put": {
+        "/olympiads/{olympiadId}/inscriptions/{inscriptionId}/schools": {
+            "post": {
                 "tags": [
                     "Inscriptions"
                 ],
-                "summary": "Update an inscription",
-                "description": "Updates an inscription",
-                "operationId": "95cab9680fd0a04b2f7a6f6ff6f1d667",
+                "summary": "Store a new competitor school data",
+                "operationId": "4f536bed0e0068c385e7c322e555fb74",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "olympiadId",
                         "in": "path",
+                        "description": "ID of the olympiad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "inscriptionId",
+                        "in": "path",
+                        "description": "ID of the inscription",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -879,55 +281,37 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "example": "John Doe"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "example": "john@example.com"
-                                    },
-                                    "other_data": {
-                                        "type": "string",
-                                        "example": "Some other data"
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/SchoolData"
                             }
                         }
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": "Successful response",
+                    "201": {
+                        "description": "Created",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/School"
                                 }
                             }
                         }
                     },
                     "422": {
-                        "description": "Validation error",
+                        "description": "Bad Request",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "errors": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            }
+                                            "description": "Detailed error message for bad requests.",
+                                            "properties": {
+                                                "param_name": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -936,41 +320,377 @@
                         }
                     },
                     "404": {
-                        "description": "Inscription not found"
-                    },
-                    "500": {
-                        "description": "Internal server error"
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for not found resources.",
+                                            "properties": {
+                                                "details": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
-            },
-            "delete": {
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/olympiads/{olympiadId}/inscriptions/{inscriptionId}/tutors": {
+            "post": {
                 "tags": [
                     "Inscriptions"
                 ],
-                "summary": "Delete an inscription",
-                "description": "Deletes an inscription",
-                "operationId": "48bee95784e92974faf55deac42c83d5",
+                "summary": "Store a new competitor tutor",
+                "operationId": "f125054d3f91f0d5079e79e3e05840b5",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "olympiadId",
                         "in": "path",
+                        "description": "ID of the olympiad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "inscriptionId",
+                        "in": "path",
+                        "description": "ID of the inscription",
                         "required": true,
                         "schema": {
                             "type": "integer"
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PersonalData"
+                            }
+                        }
+                    }
+                },
                 "responses": {
-                    "204": {
-                        "description": "Successful response"
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonalData"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for bad requests.",
+                                            "properties": {
+                                                "param_name": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Inscription not found"
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for not found resources.",
+                                            "properties": {
+                                                "details": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for conflict.",
+                                            "properties": {
+                                                "details": {
+                                                    "type": "string",
+                                                    "example": "El competidor ya tiene un tutor legal asociado."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "500": {
-                        "description": "Internal server error"
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for internal server error.",
+                                            "properties": {
+                                                "details": {
+                                                    "type": "string",
+                                                    "example": "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/olympiads/{olympiadId}/inscriptions/{inscriptionId}/selected-areas": {
+            "post": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Create selected areas for the inscription",
+                "operationId": "7433bab0f971e6e72c18ed8efb95b4f9",
+                "parameters": [
+                    {
+                        "name": "olympiadId",
+                        "in": "path",
+                        "description": "ID of the olympiad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "inscriptionId",
+                        "in": "path",
+                        "description": "ID of the inscription",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SelectedAreaRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SelectedArea"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for bad requests.",
+                                            "properties": {
+                                                "param_name": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for not found resources.",
+                                            "properties": {
+                                                "details": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/olympiads/{olympiadId}/inscriptions/{inscriptionId}/accountables": {
+            "post": {
+                "tags": [
+                    "Inscriptions"
+                ],
+                "summary": "Create accountable for the inscription",
+                "operationId": "2a964773a3db3fbc06c64193e8928436",
+                "parameters": [
+                    {
+                        "name": "olympiadId",
+                        "in": "path",
+                        "description": "ID of the olympiad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "inscriptionId",
+                        "in": "path",
+                        "description": "ID of the inscription",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PersonalDataRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PersonalData"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for bad requests.",
+                                            "properties": {
+                                                "param_name": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "description": "Detailed error message for not found resources.",
+                                            "properties": {
+                                                "details": {
+                                                    "type": "string",
+                                                    "example": "Algo salió mal"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/olympiads/{id}/areas": {
@@ -1048,16 +768,16 @@
                 }
             }
         },
-        "/api/responsable/access": {
+        "/api/accountable/access": {
             "post": {
                 "tags": [
                     "Responsable"
                 ],
-                "summary": "Access to responsable data with JWT token",
-                "description": "Authenticate a responsable by CI and code, then generate a JWT token.",
+                "summary": "Access to accountable data with JWT token",
+                "description": "Authenticate a accountable by CI and code, then generate a JWT token.",
                 "operationId": "access",
                 "requestBody": {
-                    "description": "Credentials to access responsable data",
+                    "description": "Credentials to access accountable data",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -1164,8 +884,74 @@
     },
     "components": {
         "schemas": {
+            "Accountable": {
+                "title": "Accountable Model",
+                "description": "Modelo Accountables que representa a quien se responsabiliza por el pago de las inscripciones",
+                "required": [
+                    "personal_data_id"
+                ],
+                "properties": {
+                    "personal_data_id": {
+                        "description": "ID de los datos personales asociados (actúa como clave primaria y foránea).",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "personal_data": {
+                        "description": "The associated PersonalData object (loaded via relationship)",
+                        "properties": {
+                            "ci": {
+                                "description": "Cedula de Identidad (National ID number)",
+                                "type": "string",
+                                "example": "1234567"
+                            },
+                            "ci_expedition": {
+                                "description": "Place of expedition for the CI (e.g., LP for La Paz)",
+                                "type": "string",
+                                "example": "LP",
+                                "nullable": true
+                            },
+                            "names": {
+                                "description": "First name(s) of the individual",
+                                "type": "string",
+                                "example": "Juan Carlos"
+                            },
+                            "last_names": {
+                                "description": "Last name(s) of the individual",
+                                "type": "string",
+                                "example": "Perez Garcia"
+                            },
+                            "birthdate": {
+                                "description": "Date of birth",
+                                "type": "string",
+                                "format": "date",
+                                "example": "1995-08-15"
+                            },
+                            "email": {
+                                "description": "Email address",
+                                "type": "string",
+                                "format": "email",
+                                "example": "juan.perez@example.com"
+                            },
+                            "phone_number": {
+                                "description": "Contact phone number",
+                                "type": "string",
+                                "example": "71234567"
+                            },
+                            "gender": {
+                                "description": "Gender of the individual (e.g., Male, Female, Other)",
+                                "type": "string",
+                                "example": "Male"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "Area": {
-                "title": "Area",
+                "title": "Area Model",
+                "description": "Represents a knowledge area or domain.",
                 "required": [
                     "id",
                     "name"
@@ -1184,7 +970,7 @@
                         "description": "List of categories associated with the area",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/Categories"
+                            "$ref": "#/components/schemas/Category"
                         }
                     },
                     "created_at": {
@@ -1200,26 +986,31 @@
                 },
                 "type": "object"
             },
-            "Categories": {
-                "title": "Categories Model",
+            "Category": {
+                "title": "Category Model",
                 "description": "This model represents the Categories table in the database.",
                 "required": [
-                    "id"
+                    "id",
+                    "name",
+                    "area_id"
                 ],
                 "properties": {
                     "id": {
                         "description": "The unique identifier for the category.",
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "example": 1
                     },
                     "name": {
                         "description": "The name of the category.",
-                        "type": "string"
+                        "type": "string",
+                        "example": "Matemáticas Primaria"
                     },
                     "area_id": {
                         "description": "The ID of the area to which this category belongs.",
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "example": 1
                     },
                     "range_course": {
                         "description": "An array representing the range of courses available in this category.",
@@ -1233,6 +1024,825 @@
                             "3ro Primaria",
                             "4to Primaria",
                             "5to Primaria",
+                            "6to Primaria"
+                        ]
+                    },
+                    "created_at": {
+                        "description": "The timestamp when the category was created (if timestamps are enabled).",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "description": "The timestamp when the category was last updated (if timestamps are enabled).",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-01-01T13:00:00Z",
+                        "nullable": true
+                    },
+                    "area": {
+                        "$ref": "#/components/schemas/Area"
+                    }
+                },
+                "type": "object"
+            },
+            "Inscription": {
+                "title": "Inscription",
+                "description": "Inscription model",
+                "properties": {
+                    "id": {
+                        "description": "Primary Key",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "status": {
+                        "description": "Status of the inscription (e.g., pending, approved, rejected)",
+                        "type": "string"
+                    },
+                    "drive_url": {
+                        "description": "URL to related documents in Google Drive",
+                        "type": "string",
+                        "format": "url",
+                        "nullable": true
+                    },
+                    "school_id": {
+                        "description": "Foreign key referencing the Schools table",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "competitor_data_id": {
+                        "description": "Foreign key referencing the PersonalData table for the competitor",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "accountable_id": {
+                        "description": "Foreign key referencing the PersonalData ID in the Accountables table",
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "legal_tutor_id": {
+                        "description": "Foreign key referencing the PersonalData ID in the LegalTutors table",
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "olympiad_id": {
+                        "description": "Foreign key referencing the Olympiads table",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "description": "Creation timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Last update timestamp",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "competitor_data": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/PersonalData"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Competitor's personal data associated with this inscription"
+                    },
+                    "accountable": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Accountable"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Accountable person associated with this inscription"
+                    },
+                    "legalTutor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/LegalTutor"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Legal tutor associated with this inscription"
+                    },
+                    "school": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/School"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "School associated with this inscription"
+                    },
+                    "selected_areas": {
+                        "description": "Areas selected for this inscription",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SelectedArea"
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "LegalTutor": {
+                "title": "Legal Tutor",
+                "description": "Represents a legal tutor linked to personal data.",
+                "properties": {
+                    "personal_data_id": {
+                        "description": "The ID of the associated personal data record (Foreign Key and potentially Primary Key as incrementing is false)",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "personal_data": {
+                        "description": "The associated PersonalData object (loaded via relationship)",
+                        "properties": {
+                            "ci": {
+                                "description": "Cedula de Identidad (National ID number)",
+                                "type": "string",
+                                "example": "1234567"
+                            },
+                            "ci_expedition": {
+                                "description": "Place of expedition for the CI (e.g., LP for La Paz)",
+                                "type": "string",
+                                "example": "LP",
+                                "nullable": true
+                            },
+                            "names": {
+                                "description": "First name(s) of the individual",
+                                "type": "string",
+                                "example": "Juan Carlos"
+                            },
+                            "last_names": {
+                                "description": "Last name(s) of the individual",
+                                "type": "string",
+                                "example": "Perez Garcia"
+                            },
+                            "birthdate": {
+                                "description": "Date of birth",
+                                "type": "string",
+                                "format": "date",
+                                "example": "1995-08-15"
+                            },
+                            "email": {
+                                "description": "Email address",
+                                "type": "string",
+                                "format": "email",
+                                "example": "juan.perez@example.com"
+                            },
+                            "phone_number": {
+                                "description": "Contact phone number",
+                                "type": "string",
+                                "example": "71234567"
+                            },
+                            "gender": {
+                                "description": "Gender of the individual (e.g., Male, Female, Other)",
+                                "type": "string",
+                                "example": "Male"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "OlympiadArea": {
+                "title": "OlympiadArea",
+                "description": "Modelo de la tabla pivote entre Olimpiadas, Áreas y Categorías",
+                "properties": {
+                    "id": {
+                        "description": "ID único del registro",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "olympiad_id": {
+                        "description": "ID de la olimpiada asociada",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "area_id": {
+                        "description": "ID del área asociada",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "category_id": {
+                        "description": "ID de la categoría asociada",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "description": "Fecha y hora de creación",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Fecha y hora de la última actualización",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "area": {
+                        "$ref": "#/components/schemas/Area"
+                    },
+                    "category": {
+                        "$ref": "#/components/schemas/Category"
+                    },
+                    "olympiad": {
+                        "$ref": "#/components/schemas/Olympiad"
+                    }
+                },
+                "type": "object"
+            },
+            "Olympiad": {
+                "title": "Olympiad Model",
+                "description": "Represents an olympiad competition or event.",
+                "required": [
+                    "title",
+                    "start_date",
+                    "end_date"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Primary Key",
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "title": {
+                        "description": "The official title of the olympiad",
+                        "type": "string",
+                        "maxLength": 255,
+                        "example": "International Mathematics Olympiad 2024"
+                    },
+                    "status": {
+                        "description": "Current status (e.g., 'draft', 'published', 'archived', 'ongoing', 'finished')",
+                        "type": "string",
+                        "example": "published"
+                    },
+                    "publish": {
+                        "description": "Indicates if the olympiad is publicly visible",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "description": {
+                        "description": "Detailed description of the olympiad",
+                        "type": "string",
+                        "format": "text",
+                        "example": "An annual competition for high school students focused on advanced mathematical problems."
+                    },
+                    "price": {
+                        "description": "Registration fee or cost associated with the olympiad",
+                        "type": "number",
+                        "format": "float",
+                        "example": 50
+                    },
+                    "presentation": {
+                        "description": "Information about the presentation format or link to presentation materials",
+                        "type": "string",
+                        "format": "text",
+                        "example": "Includes online tests and a final presentation round. Details: [link]"
+                    },
+                    "requirements": {
+                        "description": "Eligibility criteria and requirements for participants",
+                        "type": "string",
+                        "format": "text",
+                        "example": "Must be a student under 20 years old, not enrolled in university."
+                    },
+                    "awards": {
+                        "description": "Description of the prizes and awards offered",
+                        "type": "string",
+                        "format": "text",
+                        "example": "Gold, Silver, Bronze medals. Top 3 receive scholarships."
+                    },
+                    "start_date": {
+                        "description": "The official start date and time of the olympiad (or registration period)",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-09-01T00:00:00Z"
+                    },
+                    "end_date": {
+                        "description": "The official end date and time of the olympiad (or registration period)",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-11-30T23:59:59Z"
+                    },
+                    "contacts": {
+                        "description": "Contact information for inquiries about the olympiad",
+                        "type": "string",
+                        "format": "text",
+                        "example": "Email: contact@imo2024.org, Phone: +1-555-123-4567"
+                    },
+                    "created_at": {
+                        "description": "Timestamp when the record was created",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "example": "2023-10-01T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Timestamp when the record was last updated",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "example": "2023-10-05T12:30:00Z"
+                    },
+                    "areas": {
+                        "description": "List of subject areas associated with the olympiad",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Area"
+                        }
+                    },
+                    "categories": {
+                        "description": "List of categories the olympiad belongs to (e.g., age group, difficulty)",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Category"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "PersonalData": {
+                "title": "Personal Data",
+                "description": "Represents personal identification and contact information for an individual.",
+                "required": [
+                    "ci",
+                    "ci_expedition",
+                    "names",
+                    "last_names",
+                    "birthdate",
+                    "email",
+                    "email",
+                    "phone_number",
+                    "gender"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the personal data record",
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "ci": {
+                        "description": "Cedula de Identidad (National ID number)",
+                        "type": "string",
+                        "example": "1234567"
+                    },
+                    "ci_expedition": {
+                        "description": "Place of expedition for the CI (e.g., LP for La Paz)",
+                        "type": "string",
+                        "example": "LP",
+                        "nullable": true
+                    },
+                    "names": {
+                        "description": "First name(s) of the individual",
+                        "type": "string",
+                        "example": "Juan Carlos"
+                    },
+                    "last_names": {
+                        "description": "Last name(s) of the individual",
+                        "type": "string",
+                        "example": "Perez Garcia"
+                    },
+                    "birthdate": {
+                        "description": "Date of birth",
+                        "type": "string",
+                        "format": "date",
+                        "example": "1995-08-15"
+                    },
+                    "email": {
+                        "description": "Email address",
+                        "type": "string",
+                        "format": "email",
+                        "example": "juan.perez@example.com"
+                    },
+                    "phone_number": {
+                        "description": "Contact phone number",
+                        "type": "string",
+                        "example": "71234567"
+                    },
+                    "gender": {
+                        "description": "Gender of the individual (e.g., M, F)",
+                        "type": "string",
+                        "example": "M"
+                    }
+                },
+                "type": "object"
+            },
+            "CompetitorPersonalData": {
+                "title": "Personal Data",
+                "description": "Represents personal identification and contact information for an individual.",
+                "required": [
+                    "ci",
+                    "ci_expedition",
+                    "names",
+                    "last_names",
+                    "birthdate",
+                    "email",
+                    "email",
+                    "phone_number",
+                    "gender"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the personal data record",
+                        "type": "integer",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "ci": {
+                        "description": "Cedula de Identidad (National ID number)",
+                        "type": "string",
+                        "example": "1234567"
+                    },
+                    "ci_expedition": {
+                        "description": "Place of expedition for the CI (e.g., LP for La Paz)",
+                        "type": "string",
+                        "example": "LP",
+                        "nullable": true
+                    },
+                    "names": {
+                        "description": "First name(s) of the individual",
+                        "type": "string",
+                        "example": "Juan Carlos"
+                    },
+                    "last_names": {
+                        "description": "Last name(s) of the individual",
+                        "type": "string",
+                        "example": "Perez Garcia"
+                    },
+                    "birthdate": {
+                        "description": "Date of birth",
+                        "type": "string",
+                        "format": "date",
+                        "example": "1995-08-15"
+                    },
+                    "email": {
+                        "description": "Email address",
+                        "type": "string",
+                        "format": "email",
+                        "example": "juan.perez@example.com"
+                    },
+                    "phone_number": {
+                        "description": "Contact phone number",
+                        "type": "string",
+                        "example": "71234567"
+                    },
+                    "gender": {
+                        "description": "Gender of the individual (e.g., M, F)",
+                        "type": "string",
+                        "example": "M"
+                    },
+                    "inscription": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Inscription"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The inscription associated with this personal data if the person is a competitor. Eager loaded when requested.",
+                        "type": "object"
+                    },
+                    "legal_tutor": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/LegalTutor"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The legal tutor associated with this personal data (if it is a tutor). Eager loaded when requested.",
+                        "type": "object"
+                    },
+                    "accountable": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Accountable"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The accountable person associated with this personal data (if it is accountable). Eager loaded when requested.",
+                        "type": "object"
+                    },
+                    "teacher": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Teacher"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The teacher associated with this personal data (if it is a teacher). Eager loaded when requested.",
+                        "type": "object"
+                    },
+                    "is_accountable": {
+                        "description": "Flag indicating if the person is an accountable tutor",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "is_competitor": {
+                        "description": "Flag indicating if the person is a competitor",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "is_tutor": {
+                        "description": "Flag indicating if the person is a tutor",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "is_teacher": {
+                        "description": "Flag indicating if the person is a teacher",
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "School": {
+                "title": "School Model",
+                "description": "Represents a school entry.",
+                "properties": {
+                    "id": {
+                        "description": "The unique identifier for the school.",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "The name of the school.",
+                        "type": "string",
+                        "example": "Marista"
+                    },
+                    "department": {
+                        "description": "The department the school belongs to.",
+                        "type": "string",
+                        "enum": [
+                            "Cochabamba",
+                            "La Paz",
+                            "Oruro",
+                            "Potosi",
+                            "Tarija",
+                            "Santa Cruz",
+                            "Beni",
+                            "Pando"
+                        ],
+                        "example": "Cochabamba"
+                    },
+                    "province": {
+                        "description": "The province where the school is located.",
+                        "type": "string",
+                        "example": "Cercado"
+                    },
+                    "created_at": {
+                        "description": "Timestamp when the school was created.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-15T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Timestamp when the school was last updated.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-05-15T12:30:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "SelectedArea": {
+                "title": "Selected Area",
+                "description": "Represents an area selected within an inscription, potentially associated with a teacher and category.",
+                "required": [
+                    "inscription_id",
+                    "area_id"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for the selected area record",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "paid_at": {
+                        "description": "Timestamp when the area selection was paid for (if applicable)",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-10-27T10:00:00Z",
+                        "nullable": true
+                    },
+                    "inscription_id": {
+                        "description": "Foreign key referencing the inscription",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 5
+                    },
+                    "area_id": {
+                        "description": "Foreign key referencing the area",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 12
+                    },
+                    "category_id": {
+                        "description": "Foreign key referencing the category (optional)",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 3,
+                        "nullable": true
+                    },
+                    "teacher_id": {
+                        "description": "Foreign key referencing the teacher (optional, linked via personal_data_id)",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 8,
+                        "nullable": true
+                    },
+                    "area": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Area"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The related area"
+                    },
+                    "category": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Category"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The related category"
+                    },
+                    "teacher": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Teacher"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The related teacher"
+                    }
+                },
+                "type": "object"
+            },
+            "Teacher": {
+                "title": "Teacher",
+                "description": "Teacher model",
+                "required": [
+                    "personal_data_id"
+                ],
+                "properties": {
+                    "personal_data_id": {
+                        "description": "ID of the associated personal data (also likely the primary key)",
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "personal_data": {
+                        "description": "The associated PersonalData object (loaded via relationship)",
+                        "properties": {
+                            "ci": {
+                                "description": "Cedula de Identidad (National ID number)",
+                                "type": "string",
+                                "example": "1234567"
+                            },
+                            "ci_expedition": {
+                                "description": "Place of expedition for the CI (e.g., LP for La Paz)",
+                                "type": "string",
+                                "example": "LP",
+                                "nullable": true
+                            },
+                            "names": {
+                                "description": "First name(s) of the individual",
+                                "type": "string",
+                                "example": "Juan Carlos"
+                            },
+                            "last_names": {
+                                "description": "Last name(s) of the individual",
+                                "type": "string",
+                                "example": "Perez Garcia"
+                            },
+                            "birthdate": {
+                                "description": "Date of birth",
+                                "type": "string",
+                                "format": "date",
+                                "example": "1995-08-15"
+                            },
+                            "email": {
+                                "description": "Email address",
+                                "type": "string",
+                                "format": "email",
+                                "example": "juan.perez@example.com"
+                            },
+                            "phone_number": {
+                                "description": "Contact phone number",
+                                "type": "string",
+                                "example": "71234567"
+                            },
+                            "gender": {
+                                "description": "Gender of the individual (e.g., M, F)",
+                                "type": "string",
+                                "example": "M"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "PersonalDataRequest": {
+                "required": [
+                    "ci",
+                    "ci_expedition",
+                    "names",
+                    "last_names"
+                ],
+                "properties": {
+                    "ci": {
+                        "type": "integer",
+                        "example": "12345678"
+                    },
+                    "ci_expedition": {
+                        "type": "string",
+                        "example": "Cochabamba"
+                    },
+                    "names": {
+                        "type": "string",
+                        "example": "Juan"
+                    },
+                    "last_names": {
+                        "type": "string",
+                        "example": "Perez"
+                    },
+                    "birthdate": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2015-01-01"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "juan.perez@example.com"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "example": "+591789456123"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "M"
+                    }
+                },
+                "type": "object"
+            },
+            "SchoolData": {
+                "title": "School Data",
+                "description": "Represents the school data for a competitor.",
+                "required": [
+                    "name",
+                    "department",
+                    "province",
+                    "course"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "The name of the school.",
+                        "type": "string"
+                    },
+                    "department": {
+                        "description": "The department where the school is located.",
+                        "type": "string",
+                        "enum": [
+                            "Cochabamba",
+                            "La Paz",
+                            "Oruro",
+                            "Potosi",
+                            "Tarija",
+                            "Santa Cruz",
+                            "Beni",
+                            "Pando"
+                        ]
+                    },
+                    "province": {
+                        "description": "The province where the school is located.",
+                        "type": "string"
+                    },
+                    "course": {
+                        "description": "The course the competitor is enrolled in.",
+                        "type": "string",
+                        "enum": [
+                            "1ro Primaria",
+                            "2do Primaria",
+                            "3ro Primaria",
+                            "4to Primaria",
+                            "5to Primaria",
                             "6to Primaria",
                             "1ro Secundaria",
                             "2do Secundaria",
@@ -1241,372 +1851,36 @@
                             "5to Secundaria",
                             "6to Secundaria"
                         ]
-                    },
-                    "created_at": {
-                        "description": "The timestamp when the category was created.",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "description": "The timestamp when the category was last updated.",
-                        "type": "string",
-                        "format": "date-time"
                     }
                 },
                 "type": "object"
             },
-            "Competitors": {
-                "title": "Competitors Model",
-                "description": "Represents a Competitor in the system.",
+            "SelectedAreaRequest": {
+                "title": "Selected Area Data",
+                "description": "Data for creating or updating a selected area.",
                 "required": [
-                    "course",
-                    "school_id",
-                    "legal_tutor_id",
-                    "responsable_id",
-                    "personal_data_id"
-                ],
-                "properties": {
-                    "course": {
-                        "type": "string",
-                        "example": "Computer Science"
-                    },
-                    "school_id": {
-                        "type": "integer",
-                        "example": 1
-                    },
-                    "legal_tutor_id": {
-                        "type": "integer",
-                        "example": 2
-                    },
-                    "responsable_id": {
-                        "type": "integer",
-                        "example": 3
-                    },
-                    "personal_data_id": {
-                        "type": "integer",
-                        "example": 4
-                    }
-                },
-                "type": "object"
-            },
-            "Inscriptions": {
-                "title": "Inscriptions Model",
-                "description": "Represents an inscription in the system.",
-                "required": [
-                    "competitor_id",
-                    "olympiad_id",
                     "area_id",
-                    "category_id",
-                    "status"
+                    "category_id"
                 ],
                 "properties": {
-                    "id": {
-                        "description": "The unique identifier for the inscription.",
+                    "area_id": {
+                        "description": "The ID of the area.",
                         "type": "integer",
                         "format": "int64",
-                        "readOnly": true
-                    },
-                    "competitor_id": {
-                        "description": "The ID of the competitor associated with the inscription.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "olympiad_id": {
-                        "description": "The ID of the Olympiad event associated with the inscription.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "area_id": {
-                        "description": "The ID of the area associated with the inscription.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "category_id": {
-                        "description": "The ID of the category associated with the inscription.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "status": {
-                        "description": "The status of the inscription.",
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
-            "LegalTutors": {
-                "title": "Legal Tutors Model",
-                "description": "This model represents the Legal Tutors entity in the application.",
-                "required": [
-                    "personal_data_id"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier for the legal tutor.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "personal_data_id": {
-                        "description": "The ID of the associated personal data.",
-                        "type": "integer",
-                        "format": "int64"
-                    }
-                },
-                "type": "object"
-            },
-            "OlympiadAreas": {
-                "title": "OlympiadAreas Model",
-                "description": "This model represents the relationship between Olympics, Areas, and Categories.",
-                "required": [
-                    "id"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier for the OlympiadAreas.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "area_id": {
-                        "description": "The area associated with this OlympiadAreas.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "category_id": {
-                        "description": "The category associated with this OlympiadAreas.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "olympic_id": {
-                        "description": "The olympic associated with this OlympiadAreas.",
-                        "type": "integer",
-                        "format": "int64"
-                    }
-                },
-                "type": "object"
-            },
-            "Olympiads": {
-                "title": "Olympiads Model",
-                "description": "A model representing an Olympiads event.",
-                "required": [
-                    "title",
-                    "description",
-                    "price",
-                    "status",
-                    "presentation",
-                    "requirements",
-                    "start_date",
-                    "end_date",
-                    "contacts",
-                    "awards"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier of the Olympiads event.",
-                        "type": "integer",
                         "example": 1
                     },
-                    "title": {
-                        "description": "The title of the Olympiads event.",
-                        "type": "string",
-                        "example": "Olympiads Event Title"
-                    },
-                    "description": {
-                        "description": "A brief description of the Olympiads event.",
-                        "type": "string",
-                        "example": "This is a description of the Olympiads event."
-                    },
-                    "price": {
-                        "description": "The price associated with the Olympiads event.",
-                        "type": "number",
-                        "format": "float",
-                        "example": 10.99
-                    },
-                    "status": {
-                        "description": "The status of the Olympiads event (e.g., 'active', 'inactive').",
-                        "type": "string",
-                        "example": "active"
-                    },
-                    "publish": {
-                        "description": "The publication status of the Olympiads event.",
-                        "type": "string",
-                        "enum": [
-                            "borrador",
-                            "inscripción",
-                            "cerrado"
-                        ],
-                        "example": "inscripción"
-                    },
-                    "presentation": {
-                        "description": "Details about the presentation of the Olympiads event.",
-                        "type": "string",
-                        "example": "Presentation details."
-                    },
-                    "requirements": {
-                        "description": "The requirements for participating in the Olympiads event.",
-                        "type": "string",
-                        "example": "Participants must meet certain requirements."
-                    },
-                    "start_date": {
-                        "description": "The start date of the Olympiads event.",
-                        "type": "string",
-                        "format": "date",
-                        "example": "2023-01-01"
-                    },
-                    "end_date": {
-                        "description": "The end date of the Olympiads event.",
-                        "type": "string",
-                        "format": "date",
-                        "example": "2023-01-07"
-                    },
-                    "contacts": {
-                        "description": "Contact information for the Olympiads event.",
-                        "type": "string",
-                        "example": "contact@olympiads.com"
-                    },
-                    "awards": {
-                        "description": "Details about the awards available in the Olympiads event.",
-                        "type": "string",
-                        "example": "Gold, Silver, Bronze"
-                    }
-                },
-                "type": "object"
-            },
-            "PersonalData": {
-                "title": "Personal Data Model",
-                "description": "A model representing personal data of an individual.",
-                "required": [
-                    "ci",
-                    "names",
-                    "last_names",
-                    "birthdate",
-                    "email",
-                    "phone_number"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier for the personal data record.",
+                    "category_id": {
+                        "description": "The ID of the category.",
                         "type": "integer",
-                        "format": "int64"
+                        "format": "int64",
+                        "example": 2
                     },
-                    "ci": {
-                        "description": "The identity card number of the individual.",
-                        "type": "string",
-                        "maxLength": 10
-                    },
-                    "ci_expedition": {
-                        "description": "The date when the identity card was issued.",
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "names": {
-                        "description": "The first names of the individual.",
-                        "type": "string",
-                        "maxLength": 255
-                    },
-                    "last_names": {
-                        "description": "The last names of the individual.",
-                        "type": "string",
-                        "maxLength": 255
-                    },
-                    "birthdate": {
-                        "description": "The birthdate of the individual.",
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "email": {
-                        "description": "The email address of the individual.",
-                        "type": "string",
-                        "format": "email",
-                        "maxLength": 255
-                    },
-                    "phone_number": {
-                        "description": "The phone number of the individual.",
-                        "type": "string",
-                        "pattern": "[0-9]{10}"
-                    }
-                },
-                "type": "object"
-            },
-            "Responsables": {
-                "title": "Responsables Model",
-                "description": "This model represents the Responsables table in the database.",
-                "required": [
-                    "personal_data_id",
-                    "code"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier of the responsable",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "personal_data_id": {
-                        "description": "The ID of the personal data associated with this responsable",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "code": {
-                        "description": "A code or identifier for the responsable",
-                        "type": "string"
-                    }
-                },
-                "type": "object"
-            },
-            "Schools": {
-                "title": "Schools Model",
-                "description": "A model representing a school with name, department, and province.",
-                "required": [
-                    "name"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier of the school",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "name": {
-                        "description": "The name of the school",
-                        "type": "string",
-                        "example": "Example University"
-                    },
-                    "department": {
-                        "description": "The department of the school",
-                        "type": "string",
-                        "example": "Computer Science"
-                    },
-                    "province": {
-                        "description": "The province where the school is located",
-                        "type": "string",
-                        "example": "Ontario"
-                    },
-                    "created_at": {
-                        "description": "The timestamp when the school was created",
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "description": "The timestamp when the school was last updated",
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "type": "object"
-            },
-            "Teachers": {
-                "title": "Teachers Model",
-                "description": "This model represents the teachers in the system.",
-                "required": [
-                    "personal_data_id"
-                ],
-                "properties": {
-                    "id": {
-                        "description": "The unique identifier for the teacher.",
-                        "type": "integer",
-                        "format": "int64"
-                    },
-                    "personal_data_id": {
-                        "description": "The ID of the personal data associated with this teacher.",
-                        "type": "integer",
-                        "format": "int64"
+                    "academic_tutor": {
+                        "description": "Information about the academic tutor, if applicable.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PersonalDataRequest"
+                        }
                     }
                 },
                 "type": "object"

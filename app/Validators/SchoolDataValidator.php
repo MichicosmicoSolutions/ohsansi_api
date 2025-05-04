@@ -8,6 +8,40 @@ use App\Enums\RangeCourse;
 use App\Validators\Contracts\ValidatesInput;
 use Illuminate\Validation\Rule;
 
+/**
+ * @OA\Schema(
+ *     schema="SchoolData",
+ *     title="School Data",
+ *     description="Represents the school data for a competitor.",
+ *     required={"name", "department", "province", "course"},
+ *     @OA\Property(property="name", type="string", description="The name of the school."),
+ *     @OA\Property(property="department", type="string", description="The department where the school is located.", enum={
+ *         "Cochabamba",
+ *         "La Paz",
+ *         "Oruro",
+ *         "Potosi",
+ *         "Tarija",
+ *         "Santa Cruz",
+ *         "Beni",
+ *         "Pando"
+ *     }),
+ *     @OA\Property(property="province", type="string", description="The province where the school is located."),
+ *     @OA\Property(property="course", type="string", description="The course the competitor is enrolled in.", enum={
+ *         "1ro Primaria",
+ *         "2do Primaria",
+ *         "3ro Primaria",
+ *         "4to Primaria",
+ *         "5to Primaria",
+ *         "6to Primaria",
+ *         "1ro Secundaria",
+ *         "2do Secundaria",
+ *         "3ro Secundaria",
+ *         "4to Secundaria",
+ *         "5to Secundaria",
+ *         "6to Secundaria"
+ *     })
+ * )
+ */
 class SchoolDataValidator implements ValidatesInput
 {
     public static function rules(string $prefix = ''): array

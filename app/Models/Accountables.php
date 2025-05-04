@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @OA\Schema(
- *     schema="Teacher",
+ *     schema="Accountable",
  *     type="object",
- *     title="Teacher",
- *     description="Teacher model",
+ *     title="Accountable Model",
+ *     description="Modelo Accountables que representa a quien se responsabiliza por el pago de las inscripciones",
  *     required={"personal_data_id"},
  *     @OA\Property(
  *         property="personal_data_id",
  *         type="integer",
  *         format="int64",
- *         description="ID of the associated personal data (also likely the primary key)",
+ *         description="ID de los datos personales asociados (actúa como clave primaria y foránea).",
  *         example=1
  *     ),
  *     @OA\Property(
@@ -71,17 +71,20 @@ use Illuminate\Database\Eloquent\Model;
  *         @OA\Property(
  *             property="gender",
  *             type="string",
- *             description="Gender of the individual (e.g., M, F)",
- *             example="M"
+ *             description="Gender of the individual (e.g., Male, Female, Other)",
+ *             example="Male"
  *        ),
  *     )
  * )
  */
-class Teachers extends Model
+class Accountables extends Model
 {
     use HasFactory;
     public $timestamps = false;
     public $incrementing = false;
+
+    protected $primaryKey = 'personal_data_id';
+
 
     /**
      * The attributes that are mass assignable.
@@ -93,7 +96,7 @@ class Teachers extends Model
     ];
 
     /**
-     * Get the personal data associated with this teacher.
+     * Get the personal data associated with this accountable.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

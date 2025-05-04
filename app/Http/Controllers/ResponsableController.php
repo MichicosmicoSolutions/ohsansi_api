@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Responsables;
+use App\Models\Accountables;
 use App\Services\ResponsableService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,14 +13,14 @@ class ResponsableController extends Controller
      * @deprecated
      * Responsable access 
      * @OA\Post(
-     *     path="/api/responsable/access",
-     *     summary="Access to responsable data with JWT token",
-     *     description="Authenticate a responsable by CI and code, then generate a JWT token.",
+     *     path="/api/accountable/access",
+     *     summary="Access to accountable data with JWT token",
+     *     description="Authenticate a accountable by CI and code, then generate a JWT token.",
      *     operationId="access",
      *     tags={"Responsable"},
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Credentials to access responsable data",
+     *         description="Credentials to access accountable data",
      *         @OA\JsonContent(
      *             required={"ci","code"},
      *             @OA\Property(property="ci", type="integer", example=12345678),
@@ -78,23 +78,23 @@ class ResponsableController extends Controller
 
         $ci = $request->input("ci");
 
-        $responsable = Responsables::with("personalData")->whereHas("personalData", function ($query) use ($ci) {
+        $accountable = Accountables::with("personalData")->whereHas("personalData", function ($query) use ($ci) {
             $query->where("ci", $ci);
         })->first();
 
-        if (!$responsable) {
+        if (!$accountable) {
             return response()->json([
                 "error" => "Responsable not found",
             ], 404);
         }
 
-        if ($responsable->code !== $request->input("code")) {
+        if ($accountable->code !== $request->input("code")) {
             return response()->json([
                 "error" => "Invalid code",
             ], 401);
         }
 
-        $token = ResponsableService::generateJWT($responsable->personalData->ci, $responsable->code);
+        $token = ResponsableService::generateJWT($accountable->personalData->ci, $accountable->code);
         return response()->json([
             "token" => $token,
         ], 200);

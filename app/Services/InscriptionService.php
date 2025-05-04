@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\InscriptionStatus;
-use App\Models\{Competitors, Olympics, PersonalData, Schools, Areas, Categories, Inscriptions, LegalTutors, Responsables};
+use App\Models\{Competitors, Olympics, PersonalData, Schools, Areas, Categories, Inscriptions, LegalTutors, Accountables};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use Exception;
@@ -16,15 +16,15 @@ class InscriptionService
         return Inscriptions::with([
             'competitor',
             'competitor.school',
-            'competitor.responsable.personalData',
+            'competitor.accountable.personalData',
             'competitor.legalTutor.personalData',
             'olympic',
             'area',
             'category',
-        ])->whereHas('competitor.responsable.personalData', function ($query) use ($ci) {
+        ])->whereHas('competitor.accountable.personalData', function ($query) use ($ci) {
             $query->where('ci', $ci);
         })->whereHas('competitor', function ($query) use ($code) {
-            $query->whereHas('responsable', function ($query) use ($code) {
+            $query->whereHas('accountable', function ($query) use ($code) {
                 $query->where('code', $code);
             });
         })->get();
@@ -35,15 +35,15 @@ class InscriptionService
         return Inscriptions::with([
             'competitor',
             'competitor.school',
-            'competitor.responsable.personalData',
+            'competitor.accountable.personalData',
             'competitor.legalTutor.personalData',
             'olympic',
             'area',
             'category',
-        ])->whereHas('competitor.responsable.personalData', function ($query) use ($ci) {
+        ])->whereHas('competitor.accountable.personalData', function ($query) use ($ci) {
             $query->where('ci', $ci);
         })->whereHas('competitor', function ($query) use ($code) {
-            $query->whereHas('responsable', function ($query) use ($code) {
+            $query->whereHas('accountable', function ($query) use ($code) {
                 $query->where('code', $code);
             });
         })->findOrFail($id);
@@ -60,7 +60,7 @@ class InscriptionService
                 return ['errors' => ['olympic_id' => ['This Olympic is not active.']]];
             }
 
-            $responsableData = $this->getOrCreatePersonalData($validatedData['responsable'], 'ci');
+            $responsableData = $this->getOrCreatePersonalData($validatedData['accountable'], 'ci');
             $legalTutorData = $this->getOrCreatePersonalData($validatedData['legal_tutor'], 'ci');
             $competitorData = $this->getOrCreatePersonalData($validatedData['competitor'], 'ci');
 
@@ -80,7 +80,7 @@ class InscriptionService
                 ]
             );
 
-            $responsable = Responsables::firstOrCreate(
+            $accountable = Accountables::firstOrCreate(
                 ['personal_data_id' => $responsableData->id],
                 [
                     'personal_data_id' => $responsableData->id,
@@ -99,7 +99,7 @@ class InscriptionService
                     'school_id' => $school->id,
                     'legal_tutor_id' => $legalTutor->id,
                     'personal_data_id' => $competitorData->id,
-                    'responsable_id' => $responsable->id,
+                    'accountable_id' => $accountable->id,
                     "course" => $validatedData['competitor']['school_data']['course'],
                 ]);
             }
@@ -132,7 +132,7 @@ class InscriptionService
             DB::commit();
             return ['data' => [
                 "message" => "Data validated successfully",
-                "code" => $responsable->code
+                "code" => $accountable->code
             ]];
         } catch (QueryException $e) {
             DB::rollBack();
