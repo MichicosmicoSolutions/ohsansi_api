@@ -27,6 +27,7 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\ToArray;
 
 /**
  * Class InscriptionController
@@ -218,6 +219,7 @@ class InscriptionController extends Controller
             'inscription.selected_areas',
             'inscription.selected_areas.teacher',
             'inscription.selected_areas.teacher.personalData',
+            'inscription.accountable',
             'inscription.accountable.personalData',
         ])->where('ci', $request->ci)
             ->where('birthdate', $request->birthdate)->first();
@@ -228,11 +230,8 @@ class InscriptionController extends Controller
             ], 404);
         }
 
-        // Prepare response data
-        $responseData = $person->toArray();
-        // Ensure inscription is the one for the requested olympiad, or null
-        $responseData['inscription'] = $person->inscription->first(); // Get the single inscription loaded by the constrained eager loading
 
+        $responseData = $person->toArray();
         // Add helper flags
         $responseData['is_accountable'] = $person->isAccountable();
         $responseData['is_competitor'] = $person->isCompetitor();
@@ -330,6 +329,7 @@ class InscriptionController extends Controller
             ])->find($person->id);
 
             return response()->json([
+                'message' => "Inscription created successfully",
                 'data' => $person,
             ], 201);
         } catch (QueryException $qe) {
@@ -666,7 +666,7 @@ class InscriptionController extends Controller
             ], 404);
         }
 
-        $registeredAreasCount = count($olympiad->selected_areas);
+        $registeredAreasCount = count($inscription->selected_areas);
         $selectedAreasCount = count($request->input('selected_areas'));
         if (2 - $registeredAreasCount < $selectedAreasCount) {
             return response()->json([
