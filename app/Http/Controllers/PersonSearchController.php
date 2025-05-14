@@ -11,9 +11,25 @@ use Illuminate\Http\Request;
 class PersonSearchController extends Controller
 {
 
-    public function index()
+     public function index()
     {
-        return response()->json(['Inscriptions' => Inscriptions::all()]);
+        $inscriptions = Inscriptions::with([
+            'competitor.personalData',
+            'legalTutor.personalData',
+            'responsable.personalData',
+            'area'
+        ])->get()->map(function ($inscription) {
+            return [
+                'competitor_name' => $inscription->competitor->personalData->names . ' ' . $inscription->competitor->personalData->last_names,
+                'legal_tutor_name' => $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names ?? null,
+                'responsable_name' => $inscription->responsable->personalData->names . ' ' . $inscription->responsable->personalData->last_names ?? null,
+                'status' => $inscription->status,
+                'area' => $inscription->area->name ?? null,
+                'created_at' => $inscription->created_at,
+            ];
+        });
+
+        return response()->json($inscriptions);
     }
     public function searchStudent($ci)
     {
