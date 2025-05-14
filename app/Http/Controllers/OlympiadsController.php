@@ -26,13 +26,9 @@ class OlympiadsController extends Controller
 
     private function normalizeTitle($title)
     {
-        // Convertir a minúsculas
+       
         $normalized = mb_strtolower($title, 'UTF-8');
-
-        // Eliminar signos de puntuación y caracteres especiales
         $normalized = preg_replace('/[^\p{L}\p{N}]+/u', '', $normalized);
-
-        // Opcional: eliminar tildes
         $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
         $normalized = preg_replace('/[^a-zA-Z0-9]/', '', $normalized);
 

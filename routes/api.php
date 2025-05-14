@@ -79,6 +79,8 @@ Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStuden
 
 // Rutas De Reportes
 //PB 11
+
+Route::get('/inscriptions', [PersonSearchController::class, 'index']);
 Route::get('/search-inscriptions/by-status/{status}', [PersonSearchController::class, 'searchByStatus']);
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 
