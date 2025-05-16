@@ -170,4 +170,10 @@ class Inscriptions extends Model
             'id'
         );
     }
+    
+    public function area()
+    {
+        return $this->belongsTo(Areas::class, 'area_id');
+    }
+    
 }

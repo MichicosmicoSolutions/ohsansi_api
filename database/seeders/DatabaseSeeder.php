@@ -21,6 +21,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AreaAndCategoriesSeeder::class,
             OlympiadAreasSeeder::class,
+            OlympiadsSeeder::class,
+            PersonalDataSeeder::class,
+            InscriptionSeeder::class,
+            SchoolsSeeder::class,
+            SelectedAreasSeeder::class,
         ]);
     }
 }

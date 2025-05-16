@@ -81,12 +81,19 @@ Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStuden
 //PB 11
 
 Route::get('/inscriptions', [PersonSearchController::class, 'index']);
-Route::get('/search-inscriptions/by-status/{status}', [PersonSearchController::class, 'searchByStatus']);
+Route::get('status/{status}', [PersonSearchController::class, 'searchByStatus']);
+Route::get('/inscriptions/by-department/{department}', [PersonSearchController::class, 'filterByDepartment']);
+Route::get('/inscriptions/by-province/{province}', [PersonSearchController::class, 'filterByProvince']);
+Route::get('/inscriptions/by-area/{area_id}', [PersonSearchController::class, 'filterByArea']);
+Route::get('/inscriptions/by-category/{category_id}', [PersonSearchController::class, 'filterByCategory']);
+Route::get('/inscriptions/by-olympiad/{olympiad_id}', [PersonSearchController::class, 'filterByOlympiad']);
+Route::get('/inscriptions/by-birthdate-range/{from}/{to}', [PersonSearchController::class, 'filterByBirthdate']);
+
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 //PB 12
-Route::get('/search-inscriptions', [PersonSearchController::class, 'index']);
+
 Route::post('/personal-data', [PersonSearchController::class, 'storePersonalData']);
 Route::post('/legal-tutor', [PersonSearchController::class, 'storeLegalTutor']);
 // Rutas para  Asociar Olimpiadas y categorias 
