@@ -268,34 +268,48 @@ public function filter(Request $request)
     ])->paginate($perPage, ['*'], 'page', $page);
 
     // Transformamos solo los items actuales paginados
-    $transformedItems = collect($paginator->items())->map(function ($inscription) {
-        return [
-            'id' => $inscription->id,
-            'status' => $inscription->status,
-            'drive_url' => $inscription->drive_url,
-            'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
-            'school' => $inscription->school ? $inscription->school->name : null,
-            'accountable' => $inscription->accountable && $inscription->accountable->personalData
-                ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names
-                : null,
-            'legal_tutor' => $inscription->legalTutor && $inscription->legalTutor->personalData
-                ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names
-                : null,
-            'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
-            'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
-                return [
-                    'area' => $selectedArea->area ? $selectedArea->area->name : null,
-                    'category' => $selectedArea->category ? $selectedArea->category->name : null,
-                    'teacher' => $selectedArea->teacher && $selectedArea->teacher->personalData
-                        ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names
-                        : null,
-                    'paid_at' => $selectedArea->paid_at,
-                ];
-            }),
-            'created_at' => $inscription->created_at,
-            'updated_at' => $inscription->updated_at,
-        ];
-    });
+ $transformedItems = collect($paginator->items())->map(function ($inscription) {
+    return [
+        'id' => $inscription->id,
+        'status' => $inscription->status,
+        'drive_url' => $inscription->drive_url,
+        'competitor' => $inscription->competitor_data
+            ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names
+            : null,
+        'birthdate' => $inscription->competitor_data ? $inscription->competitor_data->birthdate : null,
+        'gender' => $inscription->competitor_data ? $inscription->competitor_data->gender : null,
+        'school' => $inscription->school ? $inscription->school->name : null,
+        'school_department' => $inscription->school && $inscription->school->department
+            ? $inscription->school->department
+            : null,
+        'school_province' => $inscription->school && $inscription->school->province
+            ? $inscription->school->province
+            : null,
+        'accountable' => $inscription->accountable && $inscription->accountable->personalData
+            ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names
+            : null,
+        'legal_tutor' => $inscription->legalTutor && $inscription->legalTutor->personalData
+            ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names
+            : null,
+        'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
+        'olympiad_price' => $inscription->olympiad ? $inscription->olympiad->price : null,
+        'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
+            return [
+                'area' => $selectedArea->area ? $selectedArea->area->name : null,
+                'category' => $selectedArea->category ? $selectedArea->category->name : null,
+                'teacher' => $selectedArea->teacher && $selectedArea->teacher->personalData
+                    ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names
+                    : null,
+                'paid_at' => $selectedArea->paid_at,
+                'category_range' => $selectedArea->category ? $selectedArea->category->range : null,
+                'area_description' => $selectedArea->area ? $selectedArea->area->description : null,
+            ];
+        }),
+        'created_at' => $inscription->created_at,
+        'updated_at' => $inscription->updated_at,
+    ];
+});
+
 
     // Crear un nuevo paginador con la colección transformada y datos de paginación originales
     $paginated = new LengthAwarePaginator(
