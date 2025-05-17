@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\PersonalData;
 use App\Models\Inscriptions;
 use App\Models\LegalTutors;
@@ -193,57 +193,98 @@ public function storeLegalTutor(Request $request)
         'data' => $legalTutor
     ], 201);
 }
-public function filterByDepartment($department)
+
+
+public function filter(Request $request)
 {
-    $inscriptions = Inscriptions::whereHas('school', function($q) use ($department) {
-        $q->where('department', $department);
-    })->get();
+    $query = Inscriptions::query();
 
-    return response()->json($inscriptions);
+    if ($request->has('department')) {
+        $query->whereHas('school', fn($q) => $q->where('department', $request->query('department')));
+    }
+
+    if ($request->has('province')) {
+        $query->whereHas('school', fn($q) => $q->where('province', $request->query('province')));
+    }
+
+    if ($request->has('area_id')) {
+        $query->whereHas('selected_areas', fn($q) => $q->where('area_id', $request->query('area_id')));
+    }
+
+    if ($request->has('category_id')) {
+        $query->whereHas('selected_areas', fn($q) =>
+            $q->whereHas('category', fn($q2) => $q2->where('id', $request->query('category_id')))
+        );
+    }
+
+    if ($request->has('olympiad_id')) {
+        $query->where('olympiad_id', $request->query('olympiad_id'));
+    }
+
+    if ($request->has(['birthdate_from', 'birthdate_to'])) {
+        $query->whereHas('competitor_data', fn($q) => $q->whereBetween('birthdate', [
+            $request->query('birthdate_from'),
+            $request->query('birthdate_to')
+        ]));
+    }
+
+    // Parámetros para la paginación
+    $perPage = 10;
+    $page = $request->query('page', 1);
+
+    // Obtener los datos paginados con las relaciones
+    $paginator = $query->with([
+        'competitor_data',
+        'school',
+        'accountable.personalData',
+        'legalTutor.personalData',
+        'selected_areas.area',
+        'selected_areas.category',
+        'selected_areas.teacher.personalData',
+        'olympiad'
+    ])->paginate($perPage, ['*'], 'page', $page);
+
+    // Transformamos solo los items actuales paginados
+    $transformedItems = collect($paginator->items())->map(function ($inscription) {
+        return [
+            'id' => $inscription->id,
+            'status' => $inscription->status,
+            'drive_url' => $inscription->drive_url,
+            'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
+            'school' => $inscription->school ? $inscription->school->name : null,
+            'accountable' => $inscription->accountable && $inscription->accountable->personalData
+                ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names
+                : null,
+            'legal_tutor' => $inscription->legalTutor && $inscription->legalTutor->personalData
+                ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names
+                : null,
+            'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
+            'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
+                return [
+                    'area' => $selectedArea->area ? $selectedArea->area->name : null,
+                    'category' => $selectedArea->category ? $selectedArea->category->name : null,
+                    'teacher' => $selectedArea->teacher && $selectedArea->teacher->personalData
+                        ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names
+                        : null,
+                    'paid_at' => $selectedArea->paid_at,
+                ];
+            }),
+            'created_at' => $inscription->created_at,
+            'updated_at' => $inscription->updated_at,
+        ];
+    });
+
+    // Crear un nuevo paginador con la colección transformada y datos de paginación originales
+    $paginated = new LengthAwarePaginator(
+        $transformedItems,
+        $paginator->total(),
+        $paginator->perPage(),
+        $paginator->currentPage(),
+        ['path' => $request->url(), 'query' => $request->query()]
+    );
+
+    return response()->json($paginated);
 }
 
-public function filterByProvince($province)
-{
-    $inscriptions = Inscriptions::whereHas('school', function($q) use ($province) {
-        $q->where('province', $province);
-    })->get();
-
-    return response()->json($inscriptions);
 }
 
-public function filterByArea($area_id)
-{
-    $inscriptions = Inscriptions::whereHas('selected_areas.area', function($q) use ($area_id) {
-        $q->where('id', $area_id);
-    })->get();
-
-    return response()->json($inscriptions);
-}
-
-public function filterByCategory($category_id)
-{
-    $inscriptions = Inscriptions::whereHas('selected_areas.category', function($q) use ($category_id) {
-        $q->where('id', $category_id);
-    })->get();
-
-    return response()->json($inscriptions);
-}
-
-public function filterByOlympiad($olympiad_id)
-{
-    $inscriptions = Inscriptions::where('olympiad_id', $olympiad_id)->get();
-
-    return response()->json($inscriptions);
-}
-
-public function filterByBirthdate($from, $to) {
-    $inscriptions = Inscriptions::whereHas('competitor_data', function($query) use ($from, $to) {
-        $query->whereBetween('birthdate', [$from, $to]);
-    })->with(['competitor_data', 'school', 'area',  'olympiad'])
-    ->get();
-
-    return response()->json($inscriptions);
-}
-
-
-}

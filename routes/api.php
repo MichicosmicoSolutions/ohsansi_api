@@ -82,16 +82,11 @@ Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStuden
 
 Route::get('/inscriptions', [PersonSearchController::class, 'index']);
 Route::get('status/{status}', [PersonSearchController::class, 'searchByStatus']);
-Route::get('/inscriptions/by-department/{department}', [PersonSearchController::class, 'filterByDepartment']);
-Route::get('/inscriptions/by-province/{province}', [PersonSearchController::class, 'filterByProvince']);
-Route::get('/inscriptions/by-area/{area_id}', [PersonSearchController::class, 'filterByArea']);
-Route::get('/inscriptions/by-category/{category_id}', [PersonSearchController::class, 'filterByCategory']);
-Route::get('/inscriptions/by-olympiad/{olympiad_id}', [PersonSearchController::class, 'filterByOlympiad']);
-Route::get('/inscriptions/by-birthdate-range/{from}/{to}', [PersonSearchController::class, 'filterByBirthdate']);
+Route::get('/inscriptions/search/date', [PersonSearchController::class, 'searchByDate']); // con query params from y to
+Route::get('/filter', [PersonSearchController::class, 'filter']); // con query params
 
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 
-Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
 //PB 12
 
 Route::post('/personal-data', [PersonSearchController::class, 'storePersonalData']);
@@ -103,3 +98,8 @@ Route::post('/olimpiadas-categorias', [OlympiadAreasController::class, 'store'])
 Route::get('/olimpiadas-categorias/{olympic_id}/areas/{area_id}/categories', [OlympiadAreasController::class, 'getCategoriesByOlympicAndArea']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas', [OlympiadAreasController::class, 'getAreasByOlympic']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlympiadAreasController::class, 'getAreasWithCategoriesByOlympic']);
+
+
+Route::get('/inscriptions/filter', function () {
+    return response()->json(['message' => 'Route works']);
+});
