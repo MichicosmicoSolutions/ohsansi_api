@@ -52,9 +52,9 @@ class PersonSearchController extends Controller
         return response()->json(PersonalData::where('ci', $ci)->first());
     }
 
- public function searchByStatus($status)
+ 
+public function searchByStatus($status, Request $request)
 {
-    // Estados válidos para validar entrada
     $validStatuses = ['pending', 'completed', 'cancelled'];
 
     if (!in_array($status, $validStatuses)) {
@@ -64,7 +64,10 @@ class PersonSearchController extends Controller
         ], 400);
     }
 
-    $inscriptions = Inscriptions::with([
+    $perPage = 10;
+    $page = $request->query('page', 1);
+
+    $paginator = Inscriptions::with([
         'competitor_data',
         'school',
         'accountable.personalData',
@@ -75,34 +78,47 @@ class PersonSearchController extends Controller
         'olympiad'
     ])
     ->where('status', $status)
-    ->get()
-    ->map(function ($inscription) {
+    ->paginate($perPage, ['*'], 'page', $page);
+
+    $transformedItems = collect($paginator->items())->map(function ($inscription) {
         return [
             'id' => $inscription->id,
             'status' => $inscription->status,
             'drive_url' => $inscription->drive_url,
             'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
             'school' => $inscription->school ? $inscription->school->name : null,
-            'accountable' => $inscription->accountable ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names : null,
-            'legal_tutor' => $inscription->legalTutor ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names : null,
+            'accountable' => $inscription->accountable && $inscription->accountable->personalData
+                ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names
+                : null,
+            'legal_tutor' => $inscription->legalTutor && $inscription->legalTutor->personalData
+                ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names
+                : null,
             'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
             'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
                 return [
-                    'area'  => $selectedArea->area ? $selectedArea->area->name : null,
+                    'area' => $selectedArea->area ? $selectedArea->area->name : null,
                     'category' => $selectedArea->category ? $selectedArea->category->name : null,
-                    'teacher' => $selectedArea->teacher ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names : null,
+                    'teacher' => $selectedArea->teacher && $selectedArea->teacher->personalData
+                        ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names
+                        : null,
                     'paid_at' => $selectedArea->paid_at,
                 ];
             }),
             'created_at' => $inscription->created_at,
             'updated_at' => $inscription->updated_at,
         ];
-    });
+    })->toArray();
 
-    return response()->json([
-        'message' => 'Inscripciones encontradas.',
-        'data' => $inscriptions,
-    ], 200);
+    $paginated = new LengthAwarePaginator(
+        $transformedItems,
+        $paginator->total(),
+        $paginator->perPage(),
+        $paginator->currentPage(),
+        ['path' => $request->url(), 'query' => $request->query()]
+    );
+
+    // Devuelve el paginador directamente, no dentro de un array 'data'
+    return response()->json($paginated);
 }
 
     public function searchByArea($area_id)
@@ -220,6 +236,13 @@ public function filter(Request $request)
     if ($request->has('olympiad_id')) {
         $query->where('olympiad_id', $request->query('olympiad_id'));
     }
+
+   if ($request->has('gender')) {
+    $query->whereHas('competitor_data', function($q) use ($request) {
+        $q->where('gender', $request->query('gender'));
+    });
+}
+
 
     if ($request->has(['birthdate_from', 'birthdate_to'])) {
         $query->whereHas('competitor_data', fn($q) => $q->whereBetween('birthdate', [

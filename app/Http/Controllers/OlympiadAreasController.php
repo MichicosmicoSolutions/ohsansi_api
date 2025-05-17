@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -11,13 +10,12 @@ class OlympiadAreasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'olympic_id' => 'required|exists:olympics,id',
+            'olympiad_id' => 'required|exists:olympiads,id',
             'area_id' => 'required|exists:areas,id',
             'category_id' => 'required|exists:categories,id',
         ]);
 
-
-        $exists = OlympiadAreas::where('olympic_id', $request->olympic_id)
+        $exists = OlympiadAreas::where('olympiad_id', $request->olympiad_id)
             ->where('area_id', $request->area_id)
             ->where('category_id', $request->category_id)
             ->exists();
@@ -30,7 +28,7 @@ class OlympiadAreasController extends Controller
         }
 
         $olimpiada = new OlympiadAreas;
-        $olimpiada->olympic_id = $request->olympic_id;
+        $olimpiada->olympiad_id = $request->olympiad_id;
         $olimpiada->area_id = $request->area_id;
         $olimpiada->category_id = $request->category_id;
         $olimpiada->save();
@@ -40,46 +38,43 @@ class OlympiadAreasController extends Controller
             'message' => 'Olimpiada creada exitosamente'
         ], 201);
     }
-    public function getCategoriesByOlympicAndArea($olympic_id, $area_id)
+
+    public function getCategoriesByOlympicAndArea($olympiad_id, $area_id)
     {
-        $categories = OlympiadAreas::where('olympic_id', $olympic_id)
+        $categories = OlympiadAreas::where('olympiad_id', $olympiad_id)
             ->where('area_id', $area_id)
-            ->with('category') // traer relación category
+            ->with('category')
             ->get()
-            ->pluck('category') // solo categorías
-            ->filter() // elimina nulos
-            ->values(); // reindexar
-
-        return response()->json([
-
-            'categories' => $categories
-        ]);
-    }
-
-
-    public function getAreasByOlympic($olympic_id)
-    {
-        $areas = OlympiadAreas::where('olympic_id', $olympic_id)
-            ->with('area') // traer relación area
-            ->get()
-            ->pluck('area') // solo áreas
-            ->unique('id') // evita duplicados
+            ->pluck('category')
             ->filter()
             ->values();
 
         return response()->json([
+            'categories' => $categories
+        ]);
+    }
 
+    public function getAreasByOlympic($olympiad_id)
+    {
+        $areas = OlympiadAreas::where('olympiad_id', $olympiad_id)
+            ->with('area')
+            ->get()
+            ->pluck('area')
+            ->unique('id')
+            ->filter()
+            ->values();
+
+        return response()->json([
             'areas' => $areas
         ]);
     }
 
-
-    public function getAreasWithCategoriesByOlympic($olympic_id)
+    public function getAreasWithCategoriesByOlympic($olympiad_id)
     {
-        $data = OlympiadAreas::where('olympic_id', $olympic_id)
-            ->with(['area', 'category']) // traer area y category
+        $data = OlympiadAreas::where('olympiad_id', $olympiad_id)
+            ->with(['area', 'category'])
             ->get()
-            ->groupBy('area.id') // agrupar por área
+            ->groupBy('area.id')
             ->map(function ($group) {
                 $area = $group->first()->area;
                 $categories = $group->pluck('category')->filter()->values();
@@ -91,7 +86,6 @@ class OlympiadAreasController extends Controller
             ->values();
 
         return response()->json([
-
             'areas' => $data
         ]);
     }
