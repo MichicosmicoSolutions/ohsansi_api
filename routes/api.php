@@ -81,12 +81,14 @@ Route::get('/search-student/{ci}', [PersonSearchController::class, 'searchStuden
 //PB 11
 
 Route::get('/inscriptions', [PersonSearchController::class, 'index']);
-Route::get('/search-inscriptions/by-status/{status}', [PersonSearchController::class, 'searchByStatus']);
-Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
+Route::get('status/{status}', [PersonSearchController::class, 'searchByStatus']);
+Route::get('/inscriptions/search/date', [PersonSearchController::class, 'searchByDate']); // con query params from y to
+Route::get('/filter', [PersonSearchController::class, 'filter']); // con query params
 
 Route::get('/search-inscriptions/by-area/{area_id}', [PersonSearchController::class, 'searchByArea']);
+
 //PB 12
-Route::get('/search-inscriptions', [PersonSearchController::class, 'index']);
+
 Route::post('/personal-data', [PersonSearchController::class, 'storePersonalData']);
 Route::post('/legal-tutor', [PersonSearchController::class, 'storeLegalTutor']);
 // Rutas para  Asociar Olimpiadas y categorias 
@@ -96,3 +98,8 @@ Route::post('/olimpiadas-categorias', [OlympiadAreasController::class, 'store'])
 Route::get('/olimpiadas-categorias/{olympic_id}/areas/{area_id}/categories', [OlympiadAreasController::class, 'getCategoriesByOlympicAndArea']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas', [OlympiadAreasController::class, 'getAreasByOlympic']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlympiadAreasController::class, 'getAreasWithCategoriesByOlympic']);
+
+
+Route::get('/inscriptions/filter', function () {
+    return response()->json(['message' => 'Route works']);
+});

@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\PersonalData;
 use App\Models\Inscriptions;
 use App\Models\LegalTutors;
@@ -11,47 +11,99 @@ use Illuminate\Http\Request;
 class PersonSearchController extends Controller
 {
 
-     public function index()
-    {
-        $inscriptions = Inscriptions::with([
-            'competitor.personalData',
-            'legalTutor.personalData',
-            'responsable.personalData',
-            'area'
-        ])->get()->map(function ($inscription) {
-            return [
-                'competitor_name' => $inscription->competitor->personalData->names . ' ' . $inscription->competitor->personalData->last_names,
-                'legal_tutor_name' => $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names ?? null,
-                'responsable_name' => $inscription->responsable->personalData->names . ' ' . $inscription->responsable->personalData->last_names ?? null,
-                'status' => $inscription->status,
-                'area' => $inscription->area->name ?? null,
-                'created_at' => $inscription->created_at,
-            ];
-        });
+  public function index()
+{
+    $inscriptions = Inscriptions::with([
+        'competitor_data',
+        'school',
+        'accountable',
+        'legalTutor',
+        'selected_areas.area',
+        'selected_areas.category',
+        'selected_areas.teacher',
+        'olympiad'
+    ])->get()->map(function ($inscription) {
+        return [
+            'id' => $inscription->id,
+            'status' => $inscription->status,
+            'drive_url' => $inscription->drive_url,
+            'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
+            'school' => $inscription->school ? $inscription->school->name : null,
+            'accountable' => $inscription->accountable ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names : null,
+            'legal_tutor' => $inscription->legalTutor ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names : null,
+            'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
+            'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
+                return [
+                    'area'  => $selectedArea->area ? $selectedArea->area->name : null,
+                    'category' => $selectedArea->category ? $selectedArea->category->name : null,
+                    'teacher' => $selectedArea->teacher ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names : null,
+                    'paid_at' => $selectedArea->paid_at,
+                ];
+            }),
+            'created_at' => $inscription->created_at,
+            'updated_at' => $inscription->updated_at,
+        ];
+    });
 
-        return response()->json($inscriptions);
-    }
+    return response()->json($inscriptions);
+}
     public function searchStudent($ci)
     {
         return response()->json(PersonalData::where('ci', $ci)->first());
     }
 
-    public function searchByStatus($status)
-    {
-        $inscriptions = Inscriptions::with(['competitor.personalData', 'area'])
-            ->where('status', $status)
-            ->get()
-            ->map(function ($inscription) {
-                return [
-                    'competitor_name' => $inscription->competitor->personalData->names . ' ' . $inscription->competitor->personalData->last_names,
-                    'status' => $inscription->status,
-                    'area' => $inscription->area->name ?? null,
-                    'created_at' => $inscription->created_at,
-                ];
-            });
+ public function searchByStatus($status)
+{
+    // Estados válidos para validar entrada
+    $validStatuses = ['pending', 'completed', 'cancelled'];
 
-        return response()->json($inscriptions);
+    if (!in_array($status, $validStatuses)) {
+        return response()->json([
+            'message' => 'Estado no válido.',
+            'valid_statuses' => $validStatuses,
+        ], 400);
     }
+
+    $inscriptions = Inscriptions::with([
+        'competitor_data',
+        'school',
+        'accountable.personalData',
+        'legalTutor.personalData',
+        'selected_areas.area',
+        'selected_areas.category',
+        'selected_areas.teacher.personalData',
+        'olympiad'
+    ])
+    ->where('status', $status)
+    ->get()
+    ->map(function ($inscription) {
+        return [
+            'id' => $inscription->id,
+            'status' => $inscription->status,
+            'drive_url' => $inscription->drive_url,
+            'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
+            'school' => $inscription->school ? $inscription->school->name : null,
+            'accountable' => $inscription->accountable ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names : null,
+            'legal_tutor' => $inscription->legalTutor ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names : null,
+            'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
+            'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
+                return [
+                    'area'  => $selectedArea->area ? $selectedArea->area->name : null,
+                    'category' => $selectedArea->category ? $selectedArea->category->name : null,
+                    'teacher' => $selectedArea->teacher ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names : null,
+                    'paid_at' => $selectedArea->paid_at,
+                ];
+            }),
+            'created_at' => $inscription->created_at,
+            'updated_at' => $inscription->updated_at,
+        ];
+    });
+
+    return response()->json([
+        'message' => 'Inscripciones encontradas.',
+        'data' => $inscriptions,
+    ], 200);
+}
 
     public function searchByArea($area_id)
     {
@@ -141,4 +193,98 @@ public function storeLegalTutor(Request $request)
         'data' => $legalTutor
     ], 201);
 }
+
+
+public function filter(Request $request)
+{
+    $query = Inscriptions::query();
+
+    if ($request->has('department')) {
+        $query->whereHas('school', fn($q) => $q->where('department', $request->query('department')));
+    }
+
+    if ($request->has('province')) {
+        $query->whereHas('school', fn($q) => $q->where('province', $request->query('province')));
+    }
+
+    if ($request->has('area_id')) {
+        $query->whereHas('selected_areas', fn($q) => $q->where('area_id', $request->query('area_id')));
+    }
+
+    if ($request->has('category_id')) {
+        $query->whereHas('selected_areas', fn($q) =>
+            $q->whereHas('category', fn($q2) => $q2->where('id', $request->query('category_id')))
+        );
+    }
+
+    if ($request->has('olympiad_id')) {
+        $query->where('olympiad_id', $request->query('olympiad_id'));
+    }
+
+    if ($request->has(['birthdate_from', 'birthdate_to'])) {
+        $query->whereHas('competitor_data', fn($q) => $q->whereBetween('birthdate', [
+            $request->query('birthdate_from'),
+            $request->query('birthdate_to')
+        ]));
+    }
+
+    // Parámetros para la paginación
+    $perPage = 10;
+    $page = $request->query('page', 1);
+
+    // Obtener los datos paginados con las relaciones
+    $paginator = $query->with([
+        'competitor_data',
+        'school',
+        'accountable.personalData',
+        'legalTutor.personalData',
+        'selected_areas.area',
+        'selected_areas.category',
+        'selected_areas.teacher.personalData',
+        'olympiad'
+    ])->paginate($perPage, ['*'], 'page', $page);
+
+    // Transformamos solo los items actuales paginados
+    $transformedItems = collect($paginator->items())->map(function ($inscription) {
+        return [
+            'id' => $inscription->id,
+            'status' => $inscription->status,
+            'drive_url' => $inscription->drive_url,
+            'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
+            'school' => $inscription->school ? $inscription->school->name : null,
+            'accountable' => $inscription->accountable && $inscription->accountable->personalData
+                ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names
+                : null,
+            'legal_tutor' => $inscription->legalTutor && $inscription->legalTutor->personalData
+                ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names
+                : null,
+            'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
+            'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
+                return [
+                    'area' => $selectedArea->area ? $selectedArea->area->name : null,
+                    'category' => $selectedArea->category ? $selectedArea->category->name : null,
+                    'teacher' => $selectedArea->teacher && $selectedArea->teacher->personalData
+                        ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names
+                        : null,
+                    'paid_at' => $selectedArea->paid_at,
+                ];
+            }),
+            'created_at' => $inscription->created_at,
+            'updated_at' => $inscription->updated_at,
+        ];
+    });
+
+    // Crear un nuevo paginador con la colección transformada y datos de paginación originales
+    $paginated = new LengthAwarePaginator(
+        $transformedItems,
+        $paginator->total(),
+        $paginator->perPage(),
+        $paginator->currentPage(),
+        ['path' => $request->url(), 'query' => $request->query()]
+    );
+
+    return response()->json($paginated);
 }
+
+}
+

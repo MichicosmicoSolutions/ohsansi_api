@@ -253,4 +253,5 @@ class PersonalData extends Model
     {
         return $this->legalTutor()->exists();
     }
+    
 }
