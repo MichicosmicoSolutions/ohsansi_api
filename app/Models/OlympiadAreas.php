@@ -64,7 +64,14 @@ use Illuminate\Database\Eloquent\Model;
  * )
  */
 class OlympiadAreas extends Model
+
+
 {
+
+
+      public $timestamps = false;  // Sin created_at ni updated_at
+    public $incrementing = false; // ❌ Desactiva el incremento automático del ID
+    protected $primaryKey = null; // ❌ Sin clave primaria estándar
     use HasFactory;
     /**
      * Area associated with this OlympiadAreas.
