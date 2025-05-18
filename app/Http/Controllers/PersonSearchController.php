@@ -213,7 +213,7 @@ public function storeLegalTutor(Request $request)
 
 public function filter(Request $request)
 {
-    $query = Inscriptions::query();
+    $query = Inscriptions::where('status', 'completed');
 
     if ($request->has('department')) {
         $query->whereHas('school', fn($q) => $q->where('department', $request->query('department')));
@@ -293,18 +293,15 @@ public function filter(Request $request)
             : null,
         'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
         'olympiad_price' => $inscription->olympiad ? $inscription->olympiad->price : null,
-        'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
-            return [
-                'area' => $selectedArea->area ? $selectedArea->area->name : null,
-                'category' => $selectedArea->category ? $selectedArea->category->name : null,
-                'teacher' => $selectedArea->teacher && $selectedArea->teacher->personalData
-                    ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names
-                    : null,
-                'paid_at' => $selectedArea->paid_at,
-                'category_range' => $selectedArea->category ? $selectedArea->category->range : null,
-                'area_description' => $selectedArea->area ? $selectedArea->area->description : null,
-            ];
-        }),
+         'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
+                return [
+                    'area'  => $selectedArea->area ? $selectedArea->area->name : null,
+                    'category' => $selectedArea->category ? $selectedArea->category->name : null,
+                    'teacher' => $selectedArea->teacher ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names : null,
+                    'paid_at' => $selectedArea->paid_at,
+                ];
+            }),
+         
         'created_at' => $inscription->created_at,
         'updated_at' => $inscription->updated_at,
     ];

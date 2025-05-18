@@ -166,8 +166,8 @@ class Inscriptions extends Model
     {
         return $this->hasMany(
             SelectedAreas::class,
-            'inscription_id',
-            'id'
+            'inscription_id'
+           
         );
     }
     
