@@ -6,6 +6,7 @@ use App\Http\Controllers\OlympiadsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BoletaDePagoController;
 use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\OlympiadAreasController;
 use App\Http\Controllers\PersonSearchController;
@@ -98,6 +99,9 @@ Route::post('/olimpiadas-categorias', [OlympiadAreasController::class, 'store'])
 Route::get('/olimpiadas-categorias/{olympic_id}/areas/{area_id}/categories', [OlympiadAreasController::class, 'getCategoriesByOlympicAndArea']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas', [OlympiadAreasController::class, 'getAreasByOlympic']);
 Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlympiadAreasController::class, 'getAreasWithCategoriesByOlympic']);
+
+Route::get('/boletas', [BoletaDePagoController::class, 'index']);
+Route::post('/boletas', [BoletaDePagoController::class, 'store']);
 
 
 Route::get('/inscriptions/filter', function () {
