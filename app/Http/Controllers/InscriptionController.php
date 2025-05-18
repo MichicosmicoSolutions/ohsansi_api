@@ -225,9 +225,10 @@ class InscriptionController extends Controller
             ->where('birthdate', $request->birthdate)->first();
 
         if (!$person) {
-            return response()->json([
-                'errors' => ['details' => 'Personal data not found'],
-            ], 404);
+            $person = new PersonalData();
+            $person->ci = $request->ci;
+            $person->birthdate = $request->birthdate;
+            $person->save();
         }
 
 
@@ -235,6 +236,8 @@ class InscriptionController extends Controller
         // Add helper flags
         $responseData['is_accountable'] = $person->isAccountable();
         $responseData['is_competitor'] = $person->isCompetitor();
+        $responseData['is_tutor'] = $person->isTutor();
+        $responseData['is_teacher'] = $person->isTeacher();
 
 
         return response()->json([
@@ -309,7 +312,17 @@ class InscriptionController extends Controller
                 $request->all()
             );
 
-            $inscription = Inscriptions::firstOrCreate(
+            if (!$person->isCompetitor() && ($person->isTutor() || $person->isAccountable() || $person->isTeacher())) {
+                DB::rollBack();
+                return response()->json([
+                    "message" => "El CI proporcionado yá está registrado pero no pertenece a un competidor",
+                    "data" => $person
+                ], 409);
+            }
+
+            PersonalData::where('ci', $request->ci)->update($request->all());
+
+            Inscriptions::firstOrCreate(
                 [
                     'competitor_data_id' => $person->id,
                     'olympiad_id' => $olympiadId
