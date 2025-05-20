@@ -298,12 +298,12 @@ class OlympiadsController extends Controller
             'description',
             'price',
             'status',
-            'Presentation',
-            'Requirements',
+            'presentation',
+            'requirements',
             'start_date',
             'end_date',
             'awards',
-            'Contacts'
+            'contacts'
         ]);
 
         if (!$olympiad) {
@@ -315,12 +315,12 @@ class OlympiadsController extends Controller
             'description' => $olympiad->description,
             'price' => $olympiad->price,
             'status' => $olympiad->status,
-            'Presentation' => $olympiad->Presentation,
-            'Requirements' => $olympiad->Requirements,
+            'presentation' => $olympiad->presentation,
+            'requirements' => $olympiad->Requirements,
             'Start_date' => $olympiad->start_date,
             'End_date' => $olympiad->end_date,
             'Awards' => $olympiad->awards,
-            'Contacts' => $olympiad->Contacts,
+            'contacts' => $olympiad->Contacts,
         ], 200);
     }
 
