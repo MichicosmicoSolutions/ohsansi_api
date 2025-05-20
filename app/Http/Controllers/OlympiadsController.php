@@ -35,11 +35,12 @@ class OlympiadsController extends Controller
         return $normalized;
     }
 
-    public function index()
-    {
-        return response()->json(['data' => Olympiads::all()]);
-    }
+  public function index()
+{
+    $olympiads = Olympiads::with('areas')->get();
 
+    return response()->json(['data' => $olympiads]);
+}
     /**
      * @OA\Get(
      *      path="/olympiads/{id}/areas",

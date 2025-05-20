@@ -108,4 +108,8 @@ class OlympiadAreas extends Model
             'olympiad_id',
         );
     }
+    public function olympiadAreas()
+{
+    return $this->hasMany(OlympiadAreas::class, 'olympiad_id');
+}
 }
