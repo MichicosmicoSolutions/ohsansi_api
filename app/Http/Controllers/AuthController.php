@@ -2,42 +2,73 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function register(Request $request)
     {
-        // Validar los campos email y password
-        $validator = Validator::make($request->json()->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users',
+            'password' => 'required|string|min:6|confirmed',
+            'tipo' => 'in:admin,usuario', // opcional si ya tiene default
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'tipo' => $validated['tipo'] ?? 'usuario',
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Usuario registrado correctamente',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ], 201);
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Credenciales incorrectas'],
+            ]);
         }
 
-        $credentials = $request->json()->all(); // Solicita el email y password en formato JSON
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        if (Auth::attempt($credentials)) {
-            $user = $request->user();
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json(['token' => $token], Response::HTTP_OK);
-        }
-
-        return response()->json(['message' => 'Invalid credentials'], Response::HTTP_UNAUTHORIZED);
+        return response()->json([
+            'message' => 'Inicio de sesión exitoso',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out'], 200);
+        return response()->json([
+            'message' => 'Sesión cerrada correctamente',
+        ]);
+    }
+
+    public function me(Request $request)
+    {
+        return response()->json($request->user());
     }
 }

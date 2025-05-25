@@ -213,7 +213,7 @@ public function storeLegalTutor(Request $request)
 
 public function filter(Request $request)
 {
-    $query = Inscriptions::where('status', 'completed');
+     $query = Inscriptions::query();
 
     if ($request->has('department')) {
         $query->whereHas('school', fn($q) => $q->where('department', $request->query('department')));
