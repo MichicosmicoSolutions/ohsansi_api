@@ -18,4 +18,8 @@ class BoletaDePago extends Model
         'importe',
         'total'
     ];
+    public function inscriptions()
+{
+    return $this->hasMany(Inscriptions::class, 'boleta_de_pago_id');
+}
 }

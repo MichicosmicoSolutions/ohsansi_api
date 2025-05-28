@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoletaDePagoController;
 use App\Http\Controllers\InscriptionController;
+use App\Http\Controllers\OCRController;
 use App\Http\Controllers\OlympiadAreasController;
 use App\Http\Controllers\PersonSearchController;
 use App\Http\Controllers\ResponsableController;
@@ -102,6 +103,14 @@ Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlympiadArea
 
 Route::get('/boletas', [BoletaDePagoController::class, 'index']);
 Route::post('/boletas', [BoletaDePagoController::class, 'store']);
+
+Route::post('/verificar-comprobante', [OCRController::class, 'verificarComprobante']);
+
+
+
+
+
+
 
 
 Route::get('/inscriptions/filter', function () {

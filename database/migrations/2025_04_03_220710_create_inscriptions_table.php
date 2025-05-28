@@ -24,6 +24,7 @@ class CreateInscriptionsTable extends Migration
             $table->foreignId('legal_tutor_id')->nullable()->constrained('legal_tutors', 'personal_data_id')->onDelete('cascade');
             $table->foreignId('olympiad_id')->constrained('olympiads')->onDelete('cascade');
             $table->unique(['competitor_data_id', 'olympiad_id']);
+            $table->foreignId('boleta_de_pago_id')->nullable()->constrained('boleta_de_pago')->onDelete('set null');
             $table->timestamps();
         });
 
