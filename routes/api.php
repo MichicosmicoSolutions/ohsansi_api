@@ -107,7 +107,7 @@ Route::post('/boletas', [BoletaDePagoController::class, 'store']);
 Route::post('/verificar-comprobante', [OCRController::class, 'verificarComprobante']);
 
 
-
+Route::get('/buscar', [PersonSearchController::class, 'getBoletasByCiAndBirthdate']);
 
 
 
