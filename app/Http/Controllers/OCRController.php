@@ -8,6 +8,7 @@ use thiagoalessio\TesseractOCR\UnsuccessfulCommandException;
 use App\Models\BoletaDePago;
 use App\Enums\InscriptionStatus;
 use App\Models\Inscriptions;
+use Illuminate\Support\Facades\Log;
 
 class OCRController extends Controller
 {
@@ -18,15 +19,15 @@ class OCRController extends Controller
         ]);
 
         try {
-       
+
             $imagen = $request->file('imagen');
             $ruta = $imagen->storeAs('ocr', uniqid() . '.' . $imagen->getClientOriginalExtension(), 'public');
             $path = storage_path('app/public/' . $ruta);
 
-         
+
             $ocr = (new TesseractOCR($path))
-                ->executable('C:\Program Files\Tesseract-OCR\tesseract.exe') 
-                ->lang('eng'); 
+                ->executable('/usr/bin/tesseract')
+                ->lang('eng');
 
             $texto = $ocr->run();
 
@@ -38,6 +39,8 @@ class OCRController extends Controller
 
             preg_match('/\b\d{6,}\b/', $texto, $matches);
             $numeroDetectado = $matches[0] ?? null;
+
+            Log::info("Texto detectado: " . $texto);
 
             if (!$numeroDetectado) {
                 return response()->json([
@@ -70,7 +73,6 @@ class OCRController extends Controller
                 'texto_completo' => $texto,
                 'numero_detectado' => $numeroDetectado
             ]);
-
         } catch (UnsuccessfulCommandException $e) {
             return response()->json([
                 'error' => 'Intenta con una imagen más clara.'
