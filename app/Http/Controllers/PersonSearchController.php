@@ -6,6 +6,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\PersonalData;
 use App\Models\Inscriptions;
 use App\Models\LegalTutors;
+use App\Models\BoletaDePago;
 use Illuminate\Http\Request;
 
 class PersonSearchController extends Controller
@@ -319,6 +320,48 @@ public function filter(Request $request)
 
     return response()->json($paginated);
 }
+public function getBoletasByCiAndBirthdate(Request $request)
+{
+    $request->validate([
+        'ci' => 'required|string',
+        'birthdate' => 'required|date',
+    ]);
+
+    $person = PersonalData::where('ci', $request->ci)
+        ->where('birthdate', $request->birthdate)
+        ->first();
+
+    if (!$person) {
+        return response()->json(['message' => 'Persona no encontrada'], 404);
+    }
+
+    // Traemos inscripciones con boletas y olimpiadas relacionadas
+    $inscriptions = Inscriptions::where('competitor_data_id', $person->id)
+        ->whereNotNull('boleta_de_pago_id')
+        ->with(['boletaDePago', 'olympiad'])
+        ->get();
+
+    // Armamos la estructura con boleta, estado y olimpiada
+    $result = $inscriptions->map(function ($inscription) {
+        return [
+            'boleta' => $inscription->boletaDePago,
+            'estado_inscripcion' => $inscription->status,
+            'olimpiada' => [
+                'id' => $inscription->olympiad->id,
+                'titulo' => $inscription->olympiad->title ?? null,
+                'fecha_inicio' => $inscription->olympiad->start_date ?? null,
+                'fecha_fin' => $inscription->olympiad->end_date ?? null,
+            ],
+        ];
+    });
+
+    return response()->json([
+        'persona' => $person->names . ' ' . $person->last_names,
+        'inscripciones' => $result,
+    ]);
+}
+
+
 
 }
 
