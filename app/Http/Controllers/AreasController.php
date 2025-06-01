@@ -77,4 +77,25 @@ class AreasController extends Controller
             'message' => 'Área creada con éxito'
         ], 201);
     }
+
+   public function destroy($id)
+    {
+        $area = Areas::find($id);
+
+        if (!$area) {
+            return response()->json([
+                'errors' => 'Área no encontrada'
+            ], 404);
+        }
+
+        $area->delete();
+
+        return response()->json([
+            'message' => 'Área eliminada con éxito'
+        ], 200);
+    }
+
+
+
+
 }
