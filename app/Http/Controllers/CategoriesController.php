@@ -8,8 +8,12 @@ use Illuminate\Support\Str;
 use App\Enums\RangeCourse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Normalizer;
 
 class CategoriesController extends Controller
+
+
+
 {
     public function index(Request $request)
     {
@@ -30,6 +34,31 @@ class CategoriesController extends Controller
         return response()->json(['categorias' => $categorias]);
     }
 
+ private function normalizeName(string $name): string
+{
+    // Convierte a minúsculas
+    $name = mb_strtolower($name, 'UTF-8');
+
+    // Normaliza Unicode (NFD separa letras de acentos)
+    if (class_exists('Normalizer')) {
+        $name = \Normalizer::normalize($name, \Normalizer::FORM_D);
+    }
+
+    // Elimina tildes/acento (caracteres de marca no espaciadora)
+    $name = preg_replace('/\p{Mn}/u', '', $name);
+
+    // Reemplaza caracteres especiales con espacio o elimina
+    $name = preg_replace('/[^a-z0-9 ]/u', '', $name);
+
+    // Quita espacios múltiples y bordes
+    $name = preg_replace('/\s+/', ' ', $name);
+    $name = trim($name);
+
+    return $name;
+}
+
+
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -38,20 +67,21 @@ class CategoriesController extends Controller
                 'string',
                 'max:255',
                 function ($attribute, $value, $fail) use ($request) {
-                    $normalizedInput = Str::ascii(strtolower($value));
+    $normalizedInput = $this->normalizeName($value);
 
-                    $exists = DB::table('categories')
-                        ->where('area_id', $request->area_id)
-                        ->get()
-                        ->some(function ($cat) use ($normalizedInput) {
-                            $normalizedExisting = Str::ascii(strtolower($cat->name));
-                            return $normalizedExisting === $normalizedInput;
-                        });
+    $exists = DB::table('categories')
+        ->where('area_id', $request->area_id)
+        ->get()
+        ->some(function ($cat) use ($normalizedInput) {
+            $normalizedExisting = $this->normalizeName($cat->name);
+            return $normalizedExisting === $normalizedInput;
+        });
 
-                    if ($exists) {
-                        $fail('La categoría ya existe en esta área.');
-                    }
-                }
+    if ($exists) {
+        $fail('La categoría ya existe en esta área.');
+    }
+}
+
             ],
             'range_course' => [
                 'required',
