@@ -10,6 +10,7 @@ class InscriptionStatus
     public const COMPLETED  = 'completed';
     public const REJECTED = 'rejected';
     public const CANCELLED = 'cancelled';
+    public const DRAFT = 'draft';
 
 
     public static function getValues(): array
@@ -19,6 +20,7 @@ class InscriptionStatus
             self::COMPLETED,
             self::REJECTED,
             self::CANCELLED,
+            self::DRAFT,
         ];
     }
 }

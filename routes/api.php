@@ -47,13 +47,56 @@ Route::post('/categories', [CategoriesController::class, 'store']);
 Route::get('/area/{area_id}/categories', [CategoriesController::class, 'getCategoriasPorArea']);
 Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
 
-// Rutas para inscripciones
-Route::get('/inscriptions', [InscriptionController::class, 'index']);
-Route::get('/inscriptions/{id}', [InscriptionController::class, 'show']);
-Route::post('/inscriptions', [InscriptionController::class, 'store']);
+// Rutas para inscripciones -- NO SE USAN
+// Route::get('/inscriptions/{id}', [InscriptionController::class, 'show']);
+// Route::get('/inscriptions', [InscriptionController::class, 'index']);
+// Route::post('/inscriptions', [InscriptionController::class, 'store']);
+
+// Route::post('/inscriptions/multiple', [InscriptionController::class, 'storeMultiple']);
+// Route::post('/inscriptions/excel', [InscriptionController::class, 'storeExcel']);
+
+Route::get('/inscription/form', [InscriptionController::class, 'getFormData']);
+Route::post('/inscription/olympic', [InscriptionController::class, 'storeOlympic']);
 
 
+// PRIMER PASO
+// 1. Registrar memoria
+// 2. Registrar olimpiada
+// 3. Registrar departamento, provincia y colegio
 
+// SEGUNDO PASO
+// 1. Registrar estudiante o estudiantes
+// 2. Registrar su grado del estudiante
+// 3. Registrar tutor legal o apoderado
+
+// TERCER PASO
+// 1. Registrar areas y tutores guías
+
+// CUARTO PASO
+// 1. Registrar información del responsable del pago (por defecto el tutor legal)
+
+// QUITO PASO
+// 1. Mostrar voucher y terminar
+
+
+// ============================================================
+
+// primer paso escoger olimpiada /check
+// segundo paso es registrar carnet y fecha para la memoria /check
+Route::post('/olympiads/{id}/inscriptions/init', [InscriptionController::class, 'initInscription']); //primer paso
+// tercer paso es registrar al estudiante /check
+Route::post('/olympiads/{id}/inscriptions', [InscriptionController::class, 'storeCompetitor']); //segundo paso[]
+// cuarto paso es registrar al tutor legal o apoderado /check
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/tutors', [InscriptionController::class, 'storeCompetitorTutor']); //tercer paso[]
+// quito paso es registrar dep, prov, col y grado /check
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/schools', [InscriptionController::class, 'storeCompetitorSchool']); //cuarto paso
+// sexto paso es registrar areas (una o dos) con su respectivo tutor (opcional)
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/selected-areas', [InscriptionController::class, 'storeAssociatedArea']); //quinto paso[]
+// séptimo paso es registrar información del responsable del pago
+Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/accountables', [InscriptionController::class, 'storeAccountable']); // sexto paso, se paga todo en uno para el colegio
+// octavo paso es generar voucher
+
+# inscription onboarding
 
 Route::get('/olympiads', [OlympiadsController::class, 'index']);
 Route::post('/olympiads', [OlympiadsController::class, 'store']);
@@ -62,13 +105,6 @@ Route::delete('/olympiads/{id}', [OlympiadsController::class, 'destroy']);
 Route::get('/olympiads/{id}/areas', [OlympiadsController::class, 'showAreas']);
 Route::patch('/olympiads/{id}/price', [OlympiadsController::class, 'updatePrice']);
 Route::patch('/olympiads/{id}/publish', [OlympiadsController::class, 'publish']);
-# inscription onboarding
-Route::post('/olympiads/{id}/inscriptions/init', [InscriptionController::class, 'initInscription']);
-Route::post('/olympiads/{id}/inscriptions', [InscriptionController::class, 'storeCompetitor']);
-Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/schools', [InscriptionController::class, 'storeCompetitorSchool']);
-Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/tutors', [InscriptionController::class, 'storeCompetitorTutor']);
-Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/selected-areas', [InscriptionController::class, 'storeAssociatedArea']);
-Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/accountables', [InscriptionController::class, 'storeAccountable']);
 
 
 Route::get('/olympiads/getOlympicInfo/{id}', [OlympiadsController::class, 'getOlympicInfo']);

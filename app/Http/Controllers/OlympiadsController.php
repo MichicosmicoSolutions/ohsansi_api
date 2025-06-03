@@ -26,7 +26,7 @@ class OlympiadsController extends Controller
 
     private function normalizeTitle($title)
     {
-       
+
         $normalized = mb_strtolower($title, 'UTF-8');
         $normalized = preg_replace('/[^\p{L}\p{N}]+/u', '', $normalized);
         $normalized = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
@@ -35,12 +35,12 @@ class OlympiadsController extends Controller
         return $normalized;
     }
 
-  public function index()
-{
-    $olympiads = Olympiads::with('areas')->get();
+    public function index()
+    {
+        $olympiads = Olympiads::with('areas')->get();
 
-    return response()->json(['data' => $olympiads]);
-}
+        return response()->json(['data' => $olympiads]);
+    }
     /**
      * @OA\Get(
      *      path="/olympiads/{id}/areas",
