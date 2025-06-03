@@ -42,7 +42,7 @@ class OCRController extends Controller
         $inscripcion->status = InscriptionStatus::COMPLETED;
         $inscripcion->save();
 
-        $boleta->estado = 'completed';
+        $boleta->status = 'completed';
         $boleta->save();
 
         return response()->json([

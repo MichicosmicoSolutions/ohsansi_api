@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('boleta_de_pago', function (Blueprint $table) {
             $table->id();
             $table->string('numero_orden_de_pago')->nullable()->unique();
+            $table->string('status')->nullable();
             $table->string('nombre')->nullable();
             $table->string('apellido')->nullable();
             $table->date('fecha_nacimiento')->nullable();
