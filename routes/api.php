@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoletaDePagoController;
 use App\Http\Controllers\InscriptionController;
+use App\Http\Controllers\OCRController;
 use App\Http\Controllers\OlympiadAreasController;
 use App\Http\Controllers\PersonSearchController;
 use App\Http\Controllers\ResponsableController;
@@ -38,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/areas', [AreasController::class, 'index']);
 Route::post('/areas', [AreasController::class, 'store']);
 Route::patch('/areas/{id}/pricing', [AreasController::class, 'updatePrice']);
-
+Route::delete('/areas/{id}', [AreasController::class, 'destroy']);
 
 
 // Rutas para Categoriess
@@ -54,6 +55,7 @@ Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
 
 // Route::post('/inscriptions/multiple', [InscriptionController::class, 'storeMultiple']);
 // Route::post('/inscriptions/excel', [InscriptionController::class, 'storeExcel']);
+
 
 Route::get('/inscription/form', [InscriptionController::class, 'getFormData']);
 Route::post('/inscription/olympic', [InscriptionController::class, 'storeOlympic']);
@@ -139,6 +141,10 @@ Route::get('/olimpiadas-categorias/{olympic_id}/areas-categories', [OlympiadArea
 Route::get('/boletas', [BoletaDePagoController::class, 'index']);
 Route::post('/boletas', [BoletaDePagoController::class, 'store']);
 
+Route::post('/verificar-comprobante', [OCRController::class, 'verificarComprobante']);
+
+
+Route::get('/buscar', [PersonSearchController::class, 'getBoletasByCiAndBirthdate']);
 
 Route::get('/inscriptions/filter', function () {
     return response()->json(['message' => 'Route works']);
