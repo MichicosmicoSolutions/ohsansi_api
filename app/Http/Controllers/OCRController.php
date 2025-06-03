@@ -18,7 +18,7 @@ class OCRController extends Controller
         $numero = $request->input('numero_orden_de_pago');
         $numeroLimpio = ltrim($numero, '0');
 
-        // Buscar boleta por número original o sin ceros iniciales
+      
         $boleta = BoletaDePago::where('numero_orden_de_pago', $numero)
                     ->orWhere('numero_orden_de_pago', $numeroLimpio)
                     ->first();
@@ -39,7 +39,6 @@ class OCRController extends Controller
             ], 404);
         }
 
-        // Actualizar estados
         $inscripcion->status = InscriptionStatus::COMPLETED;
         $inscripcion->save();
 
