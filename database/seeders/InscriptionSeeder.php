@@ -31,7 +31,8 @@ class InscriptionSeeder extends Seeder
                 'competitor_data_id' => PersonalData::inRandomOrder()->value('id'),
                 'accountable_id' => Accountables::inRandomOrder()->value('personal_data_id') ?? null,
                 'legal_tutor_id' => LegalTutors::inRandomOrder()->value('personal_data_id') ?? null,
-                'olympiad_id' => Olympiads::inRandomOrder()->value('id')
+                'olympiad_id' => Olympiads::inRandomOrder()->value('id'),
+                'identifier' => $faker->randomNumber(7, true) . '|' . $faker->date('Y-m-d'),
             ]);
         }
     }
