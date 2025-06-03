@@ -118,8 +118,7 @@ class PersonSearchController extends Controller
             $paginator->currentPage(),
             ['path' => $request->url(), 'query' => $request->query()]
         );
-
-
+    }
 
     public function searchByArea($area_id)
     {
