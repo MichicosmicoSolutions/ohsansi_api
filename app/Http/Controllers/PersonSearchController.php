@@ -263,11 +263,10 @@ class PersonSearchController extends Controller
             });
         }
 
-        // Parámetros para la paginación
         $perPage = 10;
         $page = $request->query('page', 1);
 
-        // Obtener los datos paginados con las relaciones
+    
         $paginator = $query->with([
             'competitor_data',
             'school',
@@ -279,7 +278,7 @@ class PersonSearchController extends Controller
             'olympiad'
         ])->paginate($perPage, ['*'], 'page', $page);
 
-        // Transformamos solo los items actuales paginados
+ 
         $transformedItems = collect($paginator->items())->map(function ($inscription) {
             return [
                 'id' => $inscription->id,
@@ -320,7 +319,7 @@ class PersonSearchController extends Controller
         });
 
 
-        // Crear un nuevo paginador con la colección transformada y datos de paginación originales
+      
         $paginated = new LengthAwarePaginator(
             $transformedItems,
             $paginator->total(),
@@ -346,13 +345,12 @@ class PersonSearchController extends Controller
             return response()->json(['message' => 'Persona no encontrada'], 404);
         }
 
-        // Traemos inscripciones con boletas y olimpiadas relacionadas
         $inscriptions = Inscriptions::where('competitor_data_id', $person->id)
             ->whereNotNull('boleta_de_pago_id')
             ->with(['boletaDePago', 'olympiad'])
             ->get();
 
-        // Armamos la estructura con boleta, estado y olimpiada
+
         $result = $inscriptions->map(function ($inscription) {
             return [
                 'boleta' => $inscription->boletaDePago,

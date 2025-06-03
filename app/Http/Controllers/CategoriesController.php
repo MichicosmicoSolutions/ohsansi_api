@@ -36,21 +36,21 @@ class CategoriesController extends Controller
 
  private function normalizeName(string $name): string
 {
-    // Convierte a minúsculas
+  
     $name = mb_strtolower($name, 'UTF-8');
 
-    // Normaliza Unicode (NFD separa letras de acentos)
+ 
     if (class_exists('Normalizer')) {
         $name = \Normalizer::normalize($name, \Normalizer::FORM_D);
     }
 
-    // Elimina tildes/acento (caracteres de marca no espaciadora)
+    
     $name = preg_replace('/\p{Mn}/u', '', $name);
 
-    // Reemplaza caracteres especiales con espacio o elimina
+   
     $name = preg_replace('/[^a-z0-9 ]/u', '', $name);
 
-    // Quita espacios múltiples y bordes
+   
     $name = preg_replace('/\s+/', ' ', $name);
     $name = trim($name);
 

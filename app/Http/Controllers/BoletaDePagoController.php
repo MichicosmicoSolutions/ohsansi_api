@@ -7,18 +7,19 @@ use Illuminate\Http\Request;
 
 class BoletaDePagoController extends Controller
 {
-    // Obtener todas las boletas de pago
+
     public function index()
     {
         $boletas = BoletaDePago::all();
         return response()->json($boletas, 200);
     }
 
-    // Crear una nueva boleta de pago
+  
     public function store(Request $request)
     {
         $boleta = BoletaDePago::create([
             'numero_orden_de_pago' => $request->input('numero_orden_de_pago'),
+            'ci'=> $request->input('ci'),
             'status' => 'pending',
             'nombre' => $request->input('nombre'),
             'apellido' => $request->input('apellido'),
