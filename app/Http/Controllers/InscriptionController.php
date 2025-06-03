@@ -1216,6 +1216,10 @@ class InscriptionController extends Controller
                         $teacherData
                     );
                     $teacherId = $teacher->id;
+                    $teacherRelation = Teachers::firstOrCreate([
+                        'personal_data_id' => $teacherId,
+                    ]);
+                    $teacherId = $teacherRelation->personal_data_id;
                 }
 
                 // Crear o actualizar en selected_areas
@@ -1481,6 +1485,10 @@ class InscriptionController extends Controller
                             $teacherData
                         );
                         $teacherId = $teacher->id;
+                        $teacherRelation = Teachers::firstOrCreate([
+                            'personal_data_id' => $teacherId,
+                        ]);
+                        $teacherId = $teacherRelation->personal_data_id;
                     }
 
                     SelectedAreas::updateOrCreate(
