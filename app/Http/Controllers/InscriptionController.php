@@ -1001,11 +1001,7 @@ class InscriptionController extends Controller
         $olympiadId = $identity['olympicId'];
         $identifier = $ci . '|' . $birthdate;
 
-        if (empty($identifier)) {
-            return response()->json([
-                'error' => 'Internal error: missing identifier for inscription'
-            ], 409);
-        }
+# Removed redundant check for empty $identifier.
 
         $olympiad = Olympiads::find($olympiadId);
         if (!$olympiad) {
