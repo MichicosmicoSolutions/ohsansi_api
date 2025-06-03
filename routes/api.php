@@ -98,7 +98,7 @@ Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/selected-areas', [Insc
 Route::post('/olympiads/{id}/inscriptions/{inscriptionId}/accountables', [InscriptionController::class, 'storeAccountable']); // sexto paso, se paga todo en uno para el colegio
 // octavo paso es generar voucher
 
-# inscription onboarding
+// inscription onboarding
 
 Route::get('/olympiads', [OlympiadsController::class, 'index']);
 Route::post('/olympiads', [OlympiadsController::class, 'store']);
