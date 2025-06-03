@@ -28,6 +28,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToArray;
+use Illuminate\Support\Str;
 
 /**
  * Class InscriptionController
@@ -910,7 +911,7 @@ class InscriptionController extends Controller
             'ci' => 'required|string',
             'birthdate' => 'required|date',
             'olympicId' => 'required|integer|exists:olympiads,id',
-            'type' => 'required|in:single,group',
+            'type' => 'required|in:single,multiple',
         ]);
 
         if ($validator->fails()) {
@@ -922,45 +923,91 @@ class InscriptionController extends Controller
         $olympiadId = $request->input('olympicId');
         $type = $request->input('type');
         $identifier = $ci . '|' . $birthdate;
+        $groupIdentifier = $ci . '|' . $birthdate . '|' . $olympiadId;
 
-        $person = PersonalData::where('ci', $ci)
-            ->where('birthdate', $birthdate)
-            ->first();
+        if (empty($identifier)) {
+            return response()->json(['error' => 'Identifier cannot be empty'], 422);
+        }
+        if (!in_array($type, ['single', 'multiple'])) {
+            return response()->json(['error' => 'Invalid type provided'], 422);
+        }
+        // Check if the inscription exists and is in draft status
 
-        $inscription = Inscriptions::with([
-            'school',
-            'legalTutor',
-            'legalTutor.personalData',
-            'accountable',
-            'accountable.personalData',
-            'selected_areas',
-            'selected_areas.teacher',
-            'selected_areas.teacher.personalData',
-        ])
-            ->where('identifier', $identifier)
-            ->where('olympiad_id', $olympiadId)
-            ->first();
 
-        $areas = Areas::all(['id', 'name']);
-        $categories = Categories::all(['id', 'name']);
+        if ($type === 'single') {
+            $inscription = Inscriptions::with([
+                'school',
+                'legalTutor',
+                'legalTutor.personalData',
+                'accountable',
+                'accountable.personalData',
+                'selected_areas',
+                'selected_areas.teacher',
+                'selected_areas.teacher.personalData',
+            ])
+                ->where('identifier', $identifier)
+                ->where('olympiad_id', $olympiadId)
+                ->first();
 
-        $olympiad = Olympiads::find($olympiadId);
+            if ($inscription->status !== InscriptionStatus::DRAFT) {
+                return response()->json([
+                    'error' => 'Inscription is not in draft status.',
+                ], 409);
+            }
 
-        return response()->json([
-            'message' => 'Datos del formulario cargados correctamente.',
-            'data' => [
-                'person' => $person,
-                'inscription' => $inscription,
-                'areas' => $areas,
-                'categories' => $categories,
-                'olympiad' => [
-                    'id' => $olympiad->id,
-                    'name' => $olympiad->name,
-                    'price' => $olympiad->price,
+            $olympiad = Olympiads::find($olympiadId);
+
+            return response()->json([
+                'message' => 'Datos del formulario cargados correctamente.',
+                'data' => [
+                    'person' => null,
+                    'inscription' => $inscription,
+                    'olympiad' => [
+                        'id' => $olympiad->id,
+                        'name' => $olympiad->name,
+                        'price' => $olympiad->price,
+                    ],
+                    'type' => $type,
                 ],
-                'type' => $type,
-            ],
-        ]);
+            ]);
+        } else if ($type === 'multiple') {
+            $inscriptions = Inscriptions::with([
+                'school',
+                'legalTutor',
+                'legalTutor.personalData',
+                'accountable',
+                'accountable.personalData',
+                'selected_areas',
+                'selected_areas.teacher',
+                'selected_areas.teacher.personalData',
+            ])
+                ->where('identifier', $groupIdentifier)
+                ->where('olympiad_id', $olympiadId)
+                ->get();
+
+            if ($inscriptions->isEmpty()) {
+                return response()->json([
+                    'error' => 'No inscriptions found for the provided identifier.',
+                ], 404);
+            }
+
+            $olympiad = Olympiads::find($olympiadId);
+
+            return response()->json([
+                'message' => 'Datos del formulario cargados correctamente.',
+                'data' => [
+                    'person' => null,
+                    'inscriptions' => $inscriptions,
+                    'olympiad' => [
+                        'id' => $olympiad->id,
+                        'name' => $olympiad->name,
+                        'price' => $olympiad->price,
+                    ],
+                    'type' => $type,
+                ],
+            ]);
+        }
+        return response()->json(['error' => 'Invalid type provided'], 422);
     }
 
     public function storeOlympic(Request $request)
@@ -1001,12 +1048,7 @@ class InscriptionController extends Controller
         $olympiadId = $identity['olympicId'];
         $identifier = $ci . '|' . $birthdate;
 
-# Removed redundant check for empty $identifier.
 
-        $olympiad = Olympiads::find($olympiadId);
-        if (!$olympiad) {
-            return response()->json(['error' => 'Olympiad not found'], 404);
-        }
 
         $verifyInscription = Inscriptions::where('identifier', $identifier)
             ->where('olympiad_id', $olympiadId)
@@ -1134,8 +1176,8 @@ class InscriptionController extends Controller
                 'selected_areas.*.data.area_id' => 'required|integer|exists:areas,id',
                 'selected_areas.*.data.category_id' => 'required|integer|exists:categories,id',
 
-                'selected_areas.*.teacher.ci' => 'required|string|max:20',
-                'selected_areas.*.teacher.birthdate' => 'required|date',
+                'selected_areas.*.teacher.ci' => 'nullable|string|max:20',
+                'selected_areas.*.teacher.birthdate' => 'nullable|date',
                 'selected_areas.*.teacher.ci_expedition' => 'nullable|string|max:10',
                 'selected_areas.*.teacher.names' => 'nullable|string|max:255',
                 'selected_areas.*.teacher.last_names' => 'nullable|string|max:255',
@@ -1164,15 +1206,17 @@ class InscriptionController extends Controller
 
             foreach ($selectedAreas as $entry) {
                 $areaData = $entry['data'];
-                $teacherData = $entry['teacher'];
+                $teacherData = $entry['teacher'] ?? null;
 
-                // Guardar o actualizar teacher
-                $teacher = PersonalData::updateOrCreate(
-                    [
-                        'ci' => $teacherData['ci'],
-                    ],
-                    $teacherData
-                );
+                $teacherId = null;
+
+                if ($teacherData && isset($teacherData['ci'])) {
+                    $teacher = PersonalData::updateOrCreate(
+                        ['ci' => $teacherData['ci']],
+                        $teacherData
+                    );
+                    $teacherId = $teacher->id;
+                }
 
                 // Crear o actualizar en selected_areas
                 $selectedArea = SelectedAreas::updateOrCreate(
@@ -1182,7 +1226,7 @@ class InscriptionController extends Controller
                     ],
                     [
                         'category_id' => $areaData['category_id'],
-                        'teacher_id' => $teacher->id,
+                        'teacher_id' => $teacherId,
                         'paid_at' => null, // O colocar valor si ya se pagó
                     ]
                 );
@@ -1190,7 +1234,7 @@ class InscriptionController extends Controller
                 $results[] = [
                     'area_id' => $selectedArea->area_id,
                     'category_id' => $selectedArea->category_id,
-                    'teacher_id' => $teacher->id,
+                    'teacher_id' => $teacherId,
                 ];
             }
 
@@ -1243,12 +1287,329 @@ class InscriptionController extends Controller
             $inscription->status = InscriptionStatus::PENDING;
             $inscription->save();
 
+            $olympiad = Olympiads::find($olympiadId);
+
             return response()->json([
                 'message' => 'Responsable de pago guardado correctamente.',
                 'data' => [
                     'accountable' => $accountable,
                     'inscription' => $inscription,
                     "price" => $olympiad->price,
+                ],
+            ]);
+        }
+    }
+
+    public function storeOlympicMultiple(Request $request)
+    {
+        $identityHeader = $request->header('Identity');
+        $step = $request->header('Step');
+
+        if (!$identityHeader) {
+            return response()->json(['error' => 'Missing Identity header'], 400);
+        }
+
+        $identity = json_decode($identityHeader, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return response()->json(['error' => 'Invalid JSON in Identity header'], 400);
+        }
+
+        if (!$step) {
+            return response()->json(['error' => 'Missing Step header'], 400);
+        }
+
+        if (!is_numeric($step) || (int)$step < 1) {
+            return response()->json(['error' => 'Invalid Step value'], 422);
+        }
+
+        $step = (int)$step;
+        $ci = $identity['ci'];
+        $birthdate = $identity['birthdate'];
+        $olympiadId = $identity['olympicId'];
+        $identifier = $ci . '|' . $birthdate;
+        $groupIdentifier = $identity['ci'] . '|' . $identity['birthdate'] . '|' . $olympiadId;
+
+        $olympiad = Olympiads::find($olympiadId);
+        if (!$olympiad) {
+            return response()->json(['error' => 'Olympiad not found'], 404);
+        }
+
+        $verifyInscription = Inscriptions::where('identifier', $identifier)
+            ->where('olympiad_id', $olympiadId)
+            ->first();
+        if ($verifyInscription && $verifyInscription->status !== InscriptionStatus::DRAFT) {
+            return response()->json([
+                'error' => 'Inscription already exists and is not in draft status.'
+            ], 409);
+        }
+
+        if ($step === 1) {
+            $validator = Validator::make($request->all(), [
+                'school' => 'required|array',
+                'school.name' => 'required|string|max:255',
+                'school.department' => 'required|string|max:255',
+                'school.province' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $schoolData = $validator->validated()['school'];
+
+
+            // Crear o actualizar la escuela
+            $school = Schools::updateOrCreate(
+                ['name' => $schoolData['name']],
+                [
+                    'department' => $schoolData['department'],
+                    'province' => $schoolData['province'],
+                ]
+            );
+
+            $inscription = Inscriptions::firstOrNew([
+                'identifier' => $identifier,
+                'olympiad_id' => $olympiadId,
+
+            ]);
+            $inscription->status = InscriptionStatus::DRAFT;
+            $inscription->school_id = $school->id;
+            $inscription->identifier = $identifier;
+            $inscription->olympiad_id = $olympiadId;
+            $inscription->save();
+
+            return response()->json([
+                'message' => 'Escuela registrada correctamente para inscripción múltiple.',
+                'data' => [
+                    'school_id' => $school->id,
+                    'school' => $school,
+                ],
+            ]);
+        } else if ($step === 2) {
+            $validator = Validator::make($request->all(), [
+                '*.student.ci' => 'required|string|max:20',
+                '*.student.birthdate' => 'required|date',
+                '*.student.ci_expedition' => 'nullable|string|max:10',
+                '*.student.names' => 'nullable|string|max:255',
+                '*.student.last_names' => 'nullable|string|max:255',
+                '*.student.email' => 'nullable|email|max:255',
+                '*.student.phone_number' => 'nullable|string|max:20',
+                '*.student.gender' => 'nullable|string|in:M,F,O',
+
+                '*.legal_tutor.ci' => 'required|string|max:20',
+                '*.legal_tutor.birthdate' => 'required|date',
+                '*.legal_tutor.ci_expedition' => 'nullable|string|max:10',
+                '*.legal_tutor.names' => 'nullable|string|max:255',
+                '*.legal_tutor.last_names' => 'nullable|string|max:255',
+                '*.legal_tutor.email' => 'nullable|email|max:255',
+                '*.legal_tutor.phone_number' => 'nullable|string|max:20',
+                '*.legal_tutor.gender' => 'nullable|string|in:M,F,O',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $payload = $request->all();
+            $results = [];
+
+            $baseInscription = Inscriptions::where('identifier', $identifier)
+                ->where('olympiad_id', $olympiadId)
+                ->first();
+
+            if (!$baseInscription) {
+                return response()->json(['error' => 'Base inscription not found'], 404);
+            }
+
+            $schoolId = $baseInscription->school_id;
+
+            foreach ($payload as $entry) {
+                $studentData = $entry['student'];
+                $tutorData = $entry['legal_tutor'];
+
+                $student = PersonalData::updateOrCreate(
+                    ['ci' => $studentData['ci'], 'birthdate' => $studentData['birthdate']],
+                    $studentData
+                );
+
+                $tutor = PersonalData::updateOrCreate(
+                    ['ci' => $tutorData['ci'], 'birthdate' => $tutorData['birthdate']],
+                    $tutorData
+                );
+
+                // asegurar relación en tabla legal_tutors
+                LegalTutors::firstOrCreate(['personal_data_id' => $tutor->id]);
+
+                $identifier = $student->ci . '|' . $student->birthdate;
+
+                $inscription = Inscriptions::updateOrCreate(
+                    ['identifier' => $identifier],
+                    [
+                        'identifier' => $identifier,
+                        'group_identifier' => $groupIdentifier,
+                        'olympiad_id' => $olympiadId,
+                        'school_id' => $schoolId,
+                        'legal_tutor_id' => $tutor->id,
+                        'competitor_data_id' => $student->id,
+                        'status' => InscriptionStatus::DRAFT,
+                    ]
+                );
+
+                $results[] = [
+                    'inscription_id' => $inscription->id,
+                    'student' => $student,
+                    'legal_tutor' => $tutor,
+                ];
+            }
+
+            return response()->json([
+                'message' => 'Paso 2 completado: estudiantes y tutores registrados.',
+                'data' => $results,
+            ]);
+        } else if ($step === 3) {
+            $validator = Validator::make($request->all(), [
+                '*.student.ci' => 'required|string|max:20',
+                '*.student.ci_expedition' => 'required|string|max:10',
+                '*.selected_areas' => 'required|array|min:1',
+
+                '*.selected_areas.*.data.area_id' => 'required|integer|exists:areas,id',
+                '*.selected_areas.*.data.category_id' => 'required|integer|exists:categories,id',
+
+                '*.selected_areas.*.teacher.ci' => 'nullable|string|max:20',
+                '*.selected_areas.*.teacher.birthdate' => 'nullable|date',
+                '*.selected_areas.*.teacher.ci_expedition' => 'nullable|string|max:10',
+                '*.selected_areas.*.teacher.names' => 'nullable|string|max:255',
+                '*.selected_areas.*.teacher.last_names' => 'nullable|string|max:255',
+                '*.selected_areas.*.teacher.email' => 'nullable|email|max:255',
+                '*.selected_areas.*.teacher.phone_number' => 'nullable|string|max:20',
+                '*.selected_areas.*.teacher.gender' => 'nullable|string|in:M,F,O',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $payload = $request->all();
+            $results = [];
+
+            foreach ($payload as $entry) {
+                $student = PersonalData::where('ci', $entry['student']['ci'])
+                    ->where('ci_expedition', $entry['student']['ci_expedition'])
+                    ->first();
+
+                if (!$student) {
+                    return response()->json(['error' => 'Student not found: ' . $entry['student']['ci']], 404);
+                }
+
+                $inscription = Inscriptions::where('competitor_data_id', $student->id)
+                    ->where('group_identifier', $groupIdentifier)
+                    ->where('olympiad_id', $olympiadId)
+                    ->first();
+
+                if (!$inscription) {
+                    return response()->json(['error' => 'Inscription not found for student: ' . $entry['student']['ci']], 404);
+                }
+
+                foreach ($entry['selected_areas'] as $areaEntry) {
+                    $areaData = $areaEntry['data'];
+                    $teacherData = $areaEntry['teacher'] ?? null;
+
+                    $teacherId = null;
+
+                    if ($teacherData && !empty($teacherData['ci'])) {
+                        $teacher = PersonalData::updateOrCreate(
+                            ['ci' => $teacherData['ci']],
+                            $teacherData
+                        );
+                        $teacherId = $teacher->id;
+                    }
+
+                    SelectedAreas::updateOrCreate(
+                        [
+                            'inscription_id' => $inscription->id,
+                            'area_id' => $areaData['area_id'],
+                        ],
+                        [
+                            'category_id' => $areaData['category_id'],
+                            'teacher_id' => $teacherId,
+                            'paid_at' => null,
+                        ]
+                    );
+
+                    $results[] = [
+                        'student_ci' => $student->ci,
+                        'area_id' => $areaData['area_id'],
+                        'category_id' => $areaData['category_id'],
+                        'teacher_id' => $teacherId,
+                    ];
+                }
+            }
+
+            return response()->json([
+                'message' => 'Paso 3 completado: áreas y docentes asignados.',
+                'data' => $results,
+            ]);
+        } else if ($step === 4) {
+            $validator = Validator::make($request->all(), [
+                'accountable' => 'required|array',
+                'accountable.ci' => 'required|string|max:20',
+                'accountable.birthdate' => 'required|date',
+                'accountable.ci_expedition' => 'nullable|string|max:10',
+                'accountable.names' => 'nullable|string|max:255',
+                'accountable.last_names' => 'nullable|string|max:255',
+                'accountable.email' => 'nullable|email|max:255',
+                'accountable.phone_number' => 'nullable|string|max:20',
+                'accountable.gender' => 'nullable|string|in:M,F,O',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $accountableData = $request->input('accountable');
+
+            // Crear o actualizar datos personales
+            $personalData = PersonalData::updateOrCreate(
+                [
+                    'ci' => $accountableData['ci'],
+                    'birthdate' => $accountableData['birthdate'],
+                ],
+                $accountableData
+            );
+
+            // Asegurar que exista en tabla `accountables`
+            $accountable = Accountables::firstOrCreate([
+                'personal_data_id' => $personalData->id,
+            ]);
+
+            // Obtener todas las inscripciones del grupo
+            $inscriptions = Inscriptions::where('group_identifier', $groupIdentifier)
+                ->where('olympiad_id', $olympiadId)
+                ->get();
+
+            if ($inscriptions->isEmpty()) {
+                return response()->json(['error' => 'No inscriptions found for this group identifier'], 404);
+            }
+
+            foreach ($inscriptions as $inscription) {
+                $inscription->accountable_id = $accountable->id;
+                $inscription->status = InscriptionStatus::PENDING;
+                $inscription->save();
+            }
+
+            // delete base inscription
+            $baseInscription = Inscriptions::where('identifier', $identifier)
+                ->where('olympiad_id', $olympiadId)
+                ->first();
+            if ($baseInscription) {
+                $baseInscription->delete();
+            }
+
+            return response()->json([
+                'message' => 'Responsable de pago asociado a todas las inscripciones del grupo.',
+                'data' => [
+                    'accountable' => $personalData,
+                    'inscriptions_updated' => $inscriptions->count(),
                 ],
             ]);
         }
