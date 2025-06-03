@@ -8,27 +8,25 @@ use App\Models\Areas;
 use App\Models\Categories;
 use App\Models\Inscriptions;
 use App\Models\LegalTutors;
-use App\Models\OlympiadAreas;
 use App\Models\Olympiads;
 use App\Models\PersonalData;
 use App\Models\Schools;
 use App\Models\SelectedAreas;
 use App\Models\Teachers;
 use App\Validators\SchoolDataValidator;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\InscriptionService;
 use App\Services\ResponsableService;
 use Illuminate\Support\Facades\Validator;
-use App\Validators\InscriptionsValidator;
 use App\Validators\PersonalDataValidator;
 use App\Validators\SelectedAreaValidator;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Maatwebsite\Excel\Concerns\ToArray;
-use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\OlympicInscriptionImport;
+use App\Models\OlympiadAreas;
+use App\Services\InscriptionExcelService;
 
 /**
  * Class InscriptionController
@@ -1600,6 +1598,104 @@ class InscriptionController extends Controller
                     'inscriptions_updated' => $inscriptions->count(),
                 ],
             ]);
+        }
+    }
+
+    public function exportToExcel(Request $request)
+    {
+        $olympiadId  = $request->route('id');
+
+        $olympiad = Olympiads::find($olympiadId);
+        if (!$olympiad) {
+            return response()->json(['error' => 'Olympiad not found'], 404);
+        }
+
+        $fileName = 'inscripciones_' . now()->timestamp . '.xlsx';
+        $filePath = storage_path("app/{$fileName}");
+
+        $areas = OlympiadAreas::where('olympiad_id', $olympiadId)->with('area')->with('category')->get();
+
+        InscriptionExcelService::generateExcel($filePath, $areas);
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+
+    public function importFromExcel(Request $request)
+    {
+        $olympiadId  = $request->route('id');
+
+        $olympiad = Olympiads::find($olympiadId);
+        if (!$olympiad) {
+            return response()->json(['error' => 'Olympiad not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:xlsx,xls',
+            'schoolName' => 'required|string|max:255',
+            'schoolDepartment' => 'required|string|max:255',
+            'schoolProvince' => 'required|string|max:255',
+
+            'accountableCi' => 'required|string|max:20',
+            'accountableBirthdate' => 'required|date',
+            'accountableCiExpedition' => 'nullable|string|max:10',
+            'accountableNames' => 'nullable|string|max:255',
+            'accountableLastNames' => 'nullable|string|max:255',
+            'accountableEmail' => 'nullable|email|max:255',
+            'accountablePhoneNumber' => 'nullable|string|max:20',
+            'accountableGender' => 'nullable|string|in:M,F,O',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $data = $validator->validated();
+
+        DB::beginTransaction();
+
+        try {
+            $school = Schools::updateOrCreate(
+                ['name' => $data['schoolName']],
+                [
+                    'department' => $data['schoolDepartment'],
+                    'province' => $data['schoolProvince'],
+                ]
+            );
+
+            // Crear o actualizar el responsable (PersonalData y Accountables)
+            $accountable = PersonalData::updateOrCreate(
+                ['ci' => $data['accountableCi'], 'birthdate' => $data['accountableBirthdate']],
+                [
+                    'ci_expedition' => $data['accountableCiExpedition'],
+                    'names' => $data['accountableNames'],
+                    'last_names' => $data['accountableLastNames'],
+                    'email' => $data['accountableEmail'],
+                    'phone_number' => $data['accountablePhoneNumber'],
+                    'gender' => $data['accountableGender'],
+                ]
+            );
+
+            $accountableRelation = Accountables::firstOrCreate([
+                'personal_data_id' => $accountable->id,
+            ]);
+
+            // Procesar Excel (necesitas definir OlympicInscriptionImport)
+            Excel::import(new OlympicInscriptionImport($school->id, $olympiadId, $accountableRelation->id), $request->file('file'));
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Importación completada correctamente',
+                'data' => [
+                    'school' => $school,
+                    'accountable' => $accountable,
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Error al procesar la importación',
+                'details' => $e->getMessage(),
+            ], 500);
         }
     }
 }

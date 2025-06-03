@@ -61,6 +61,9 @@ Route::get('/inscription/form', [InscriptionController::class, 'getFormData']);
 Route::post('/inscription/olympic', [InscriptionController::class, 'storeOlympic']);
 Route::post('/inscription/olympic/multiple', [InscriptionController::class, 'storeOlympicMultiple']);
 
+Route::get('/inscription/excel/olympic/{id}', [InscriptionController::class, 'exportToExcel']);
+Route::post('/inscription/excel/olympic/{id}', [InscriptionController::class, 'importFromExcel']);
+
 
 // PRIMER PASO
 // 1. Registrar memoria
