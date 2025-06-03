@@ -27,7 +27,6 @@ class InscriptionExcelService
             $sheet2->setCellValue('C' . ($index + 2), $area['category_id']);
         }
 
-        $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet2 = $spreadsheet->createSheet();
