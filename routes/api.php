@@ -69,11 +69,8 @@ Route::post('/inscription/olympic/multiple', [InscriptionController::class, 'sto
 
 // SEGUNDO PASO
 // 1. Registrar estudiante o estudiantes
-// 2. Registrar su grado del estudiante
-// 3. Registrar tutor legal o apoderado
-
-// TERCER PASO
-// 1. Registrar areas y tutores guías
+// 2. Registrar tutor legal o apoderado
+// 3. Registrar areas y tutores guías
 
 // CUARTO PASO
 // 1. Registrar información del responsable del pago (por defecto el tutor legal)
