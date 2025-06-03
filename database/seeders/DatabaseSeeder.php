@@ -23,7 +23,6 @@ class DatabaseSeeder extends Seeder
             OlympiadAreasSeeder::class,
             OlympiadsSeeder::class,
             PersonalDataSeeder::class,
-            InscriptionSeeder::class,
             SchoolsSeeder::class,
             SelectedAreasSeeder::class,
         ]);
