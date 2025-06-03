@@ -54,8 +54,6 @@ Route::get('/inscriptions/{id}', [InscriptionController::class, 'show']);
 Route::post('/inscriptions', [InscriptionController::class, 'store']);
 
 
-
-
 Route::get('/olympiads', [OlympiadsController::class, 'index']);
 Route::post('/olympiads', [OlympiadsController::class, 'store']);
 Route::put('/olympiads/{id}', [OlympiadsController::class, 'update']);
@@ -108,10 +106,6 @@ Route::post('/verificar-comprobante', [OCRController::class, 'verificarComproban
 
 
 Route::get('/buscar', [PersonSearchController::class, 'getBoletasByCiAndBirthdate']);
-
-
-
-
 
 Route::get('/inscriptions/filter', function () {
     return response()->json(['message' => 'Route works']);
