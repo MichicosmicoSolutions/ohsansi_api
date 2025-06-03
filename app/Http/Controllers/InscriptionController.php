@@ -949,6 +949,12 @@ class InscriptionController extends Controller
                 ->where('olympiad_id', $olympiadId)
                 ->first();
 
+            if (!$inscription) {
+                return response()->json([
+                    'error' => 'Inscription not found.',
+                ], 400);
+            }
+
             if ($inscription->status !== InscriptionStatus::DRAFT) {
                 return response()->json([
                     'error' => 'Inscription is not in draft status.',
@@ -989,6 +995,14 @@ class InscriptionController extends Controller
                 return response()->json([
                     'error' => 'No inscriptions found for the provided identifier.',
                 ], 404);
+            }
+
+            foreach ($inscriptions as $inscription) {
+                if ($inscription->status !== InscriptionStatus::DRAFT) {
+                    return response()->json([
+                        'error' => 'One or more inscriptions are not in draft status.',
+                    ], 409);
+                }
             }
 
             $olympiad = Olympiads::find($olympiadId);
