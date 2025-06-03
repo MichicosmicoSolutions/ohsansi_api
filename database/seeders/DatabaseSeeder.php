@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         Olympiads::factory(1)->create();
 
         $this->call([
+            InscriptionSeeder::class,
             AreaAndCategoriesSeeder::class,
             OlympiadAreasSeeder::class,
             OlympiadsSeeder::class,

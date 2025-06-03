@@ -9,12 +9,14 @@ use App\Models\Areas;
 use App\Models\Categories;
 use App\Models\Teachers;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SelectedAreasSeeder extends Seeder
 {
     public function run()
     {
         $inscriptions = Inscriptions::all();
+        Log::info("Inscripciones cargadas: " . count($inscriptions));
         $areas = Areas::all();
         $categories = Categories::all();
         $teachers = Teachers::all();
