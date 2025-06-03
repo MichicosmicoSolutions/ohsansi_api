@@ -1230,6 +1230,10 @@ class InscriptionController extends Controller
                         $teacherData
                     );
                     $teacherId = $teacher->id;
+                    $teacherRelation = Teachers::firstOrCreate([
+                        'personal_data_id' => $teacherId,
+                    ]);
+                    $teacherId = $teacherRelation->personal_data_id;
                 }
 
                 // Crear o actualizar en selected_areas
@@ -1418,74 +1422,8 @@ class InscriptionController extends Controller
                 '*.legal_tutor.email' => 'nullable|email|max:255',
                 '*.legal_tutor.phone_number' => 'nullable|string|max:20',
                 '*.legal_tutor.gender' => 'nullable|string|in:M,F,O',
-            ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            $payload = $request->all();
-            $results = [];
-
-            $baseInscription = Inscriptions::where('identifier', $identifier)
-                ->where('olympiad_id', $olympiadId)
-                ->first();
-
-            if (!$baseInscription) {
-                return response()->json(['error' => 'Base inscription not found'], 404);
-            }
-
-            $schoolId = $baseInscription->school_id;
-
-            foreach ($payload as $entry) {
-                $studentData = $entry['student'];
-                $tutorData = $entry['legal_tutor'];
-
-                $student = PersonalData::updateOrCreate(
-                    ['ci' => $studentData['ci'], 'birthdate' => $studentData['birthdate']],
-                    $studentData
-                );
-
-                $tutor = PersonalData::updateOrCreate(
-                    ['ci' => $tutorData['ci'], 'birthdate' => $tutorData['birthdate']],
-                    $tutorData
-                );
-
-                // asegurar relación en tabla legal_tutors
-                LegalTutors::firstOrCreate(['personal_data_id' => $tutor->id]);
-
-                $identifier = $student->ci . '|' . $student->birthdate;
-
-                $inscription = Inscriptions::updateOrCreate(
-                    ['identifier' => $identifier],
-                    [
-                        'identifier' => $identifier,
-                        'group_identifier' => $groupIdentifier,
-                        'olympiad_id' => $olympiadId,
-                        'school_id' => $schoolId,
-                        'legal_tutor_id' => $tutor->id,
-                        'competitor_data_id' => $student->id,
-                        'status' => InscriptionStatus::DRAFT,
-                    ]
-                );
-
-                $results[] = [
-                    'inscription_id' => $inscription->id,
-                    'student' => $student,
-                    'legal_tutor' => $tutor,
-                ];
-            }
-
-            return response()->json([
-                'message' => 'Paso 2 completado: estudiantes y tutores registrados.',
-                'data' => $results,
-            ]);
-        } else if ($step === 3) {
-            $validator = Validator::make($request->all(), [
-                '*.student.ci' => 'required|string|max:20',
-                '*.student.ci_expedition' => 'required|string|max:10',
                 '*.selected_areas' => 'required|array|min:1',
-
                 '*.selected_areas.*.data.area_id' => 'required|integer|exists:areas,id',
                 '*.selected_areas.*.data.category_id' => 'required|integer|exists:categories,id',
 
@@ -1506,23 +1444,48 @@ class InscriptionController extends Controller
             $payload = $request->all();
             $results = [];
 
+            $baseInscription = Inscriptions::where('identifier', $identifier)
+                ->where('olympiad_id', $olympiadId)
+                ->first();
+
+            if (!$baseInscription) {
+                return response()->json(['error' => 'Base inscription not found'], 404);
+            }
+
+            $schoolId = $baseInscription->school_id;
+
+            DB::beginTransaction();
+
             foreach ($payload as $entry) {
-                $student = PersonalData::where('ci', $entry['student']['ci'])
-                    ->where('ci_expedition', $entry['student']['ci_expedition'])
-                    ->first();
+                $studentData = $entry['student'];
+                $tutorData = $entry['legal_tutor'];
 
-                if (!$student) {
-                    return response()->json(['error' => 'Student not found: ' . $entry['student']['ci']], 404);
-                }
+                $student = PersonalData::updateOrCreate(
+                    ['ci' => $studentData['ci'], 'birthdate' => $studentData['birthdate']],
+                    $studentData
+                );
 
-                $inscription = Inscriptions::where('competitor_data_id', $student->id)
-                    ->where('group_identifier', $groupIdentifier)
-                    ->where('olympiad_id', $olympiadId)
-                    ->first();
+                $tutor = PersonalData::updateOrCreate(
+                    ['ci' => $tutorData['ci'], 'birthdate' => $tutorData['birthdate']],
+                    $tutorData
+                );
 
-                if (!$inscription) {
-                    return response()->json(['error' => 'Inscription not found for student: ' . $entry['student']['ci']], 404);
-                }
+                LegalTutors::firstOrCreate(['personal_data_id' => $tutor->id]);
+
+                $studentIdentifier = $student->ci . '|' . $student->birthdate;
+
+                $inscription = Inscriptions::updateOrCreate(
+                    ['identifier' => $studentIdentifier, 'olympiad_id' => $olympiadId],
+                    [
+                        'group_identifier' => $groupIdentifier,
+                        'school_id' => $schoolId,
+                        'legal_tutor_id' => $tutor->id,
+                        'competitor_data_id' => $student->id,
+                        'status' => InscriptionStatus::DRAFT,
+                    ]
+                );
+
+                $areaResults = [];
 
                 foreach ($entry['selected_areas'] as $areaEntry) {
                     $areaData = $areaEntry['data'];
@@ -1536,6 +1499,10 @@ class InscriptionController extends Controller
                             $teacherData
                         );
                         $teacherId = $teacher->id;
+                        $teacherRelation = Teachers::firstOrCreate([
+                            'personal_data_id' => $teacherId,
+                        ]);
+                        $teacherId = $teacherRelation->personal_data_id;
                     }
 
                     SelectedAreas::updateOrCreate(
@@ -1550,20 +1517,27 @@ class InscriptionController extends Controller
                         ]
                     );
 
-                    $results[] = [
-                        'student_ci' => $student->ci,
+                    $areaResults[] = [
                         'area_id' => $areaData['area_id'],
                         'category_id' => $areaData['category_id'],
                         'teacher_id' => $teacherId,
                     ];
                 }
+
+                $results[] = [
+                    'student_ci' => $student->ci,
+                    'inscription_id' => $inscription->id,
+                    'areas' => $areaResults,
+                ];
             }
 
+            DB::commit();
+
             return response()->json([
-                'message' => 'Paso 3 completado: áreas y docentes asignados.',
+                'message' => 'Paso 2 completado: estudiantes, tutores y áreas registradas.',
                 'data' => $results,
             ]);
-        } else if ($step === 4) {
+        } else if ($step === 3) {
             $validator = Validator::make($request->all(), [
                 'accountable' => 'required|array',
                 'accountable.ci' => 'required|string|max:20',
