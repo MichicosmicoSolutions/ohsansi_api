@@ -59,7 +59,7 @@ Route::delete('/categories/{id}', [CategoriesController::class, 'destroy']);
 
 Route::get('/inscription/form', [InscriptionController::class, 'getFormData']);
 Route::post('/inscription/olympic', [InscriptionController::class, 'storeOlympic']);
-Route::get('/inscription/form', [InscriptionController::class, 'storeOlympicMultiple']);
+Route::post('/inscription/olympic/multiple', [InscriptionController::class, 'storeOlympicMultiple']);
 
 
 // PRIMER PASO
