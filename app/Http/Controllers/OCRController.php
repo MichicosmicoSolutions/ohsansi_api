@@ -18,15 +18,15 @@ class OCRController extends Controller
         ]);
 
         try {
-       
+            // Guardar la imagen
             $imagen = $request->file('imagen');
             $ruta = $imagen->storeAs('ocr', uniqid() . '.' . $imagen->getClientOriginalExtension(), 'public');
             $path = storage_path('app/public/' . $ruta);
 
-         
+            // Ejecutar OCR
             $ocr = (new TesseractOCR($path))
-                ->executable('C:\Program Files\Tesseract-OCR\tesseract.exe') 
-                ->lang('eng'); 
+                ->executable('C:\Program Files\Tesseract-OCR\tesseract.exe') // Ruta a tesseract.exe
+                ->lang('eng'); // Puedes cambiar a 'spa' si prefieres español
 
             $texto = $ocr->run();
 
@@ -36,8 +36,9 @@ class OCRController extends Controller
                 ], 422);
             }
 
-            preg_match('/\b\d{6,}\b/', $texto, $matches);
-            $numeroDetectado = $matches[0] ?? null;
+            // Buscar número con prefijo "N°" o similar
+            preg_match('/N[°º]?\s*(\d{6,})/', $texto, $matches);
+            $numeroDetectado = $matches[1] ?? null;
 
             if (!$numeroDetectado) {
                 return response()->json([
@@ -45,6 +46,7 @@ class OCRController extends Controller
                 ], 422);
             }
 
+            // Buscar boleta
             $boleta = BoletaDePago::where('numero_orden_de_pago', $numeroDetectado)->first();
 
             if (!$boleta) {
@@ -53,6 +55,7 @@ class OCRController extends Controller
                 ], 404);
             }
 
+            // Buscar inscripción
             $inscripcion = Inscriptions::where('boleta_de_pago_id', $boleta->id)->first();
 
             if (!$inscripcion) {
@@ -61,7 +64,7 @@ class OCRController extends Controller
                 ], 404);
             }
 
-
+            // Actualizar estado de inscripción
             $inscripcion->status = InscriptionStatus::COMPLETED;
             $inscripcion->save();
 

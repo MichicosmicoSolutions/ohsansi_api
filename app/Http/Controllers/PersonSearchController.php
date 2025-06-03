@@ -118,7 +118,7 @@ public function searchByStatus($status, Request $request)
         ['path' => $request->url(), 'query' => $request->query()]
     );
 
-    // Devuelve el paginador directamente, no dentro de un array 'data'
+  
     return response()->json($paginated);
 }
 
