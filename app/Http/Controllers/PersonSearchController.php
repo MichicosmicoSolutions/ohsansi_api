@@ -119,9 +119,7 @@ class PersonSearchController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // Devuelve el paginador directamente, no dentro de un array 'data'
-        return response()->json($paginated);
-    }
+
 
     public function searchByArea($area_id)
     {

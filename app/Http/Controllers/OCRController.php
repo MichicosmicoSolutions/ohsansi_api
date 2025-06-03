@@ -25,9 +25,6 @@ class OCRController extends Controller
             $path = storage_path('app/public/' . $ruta);
 
 
-            $ocr = (new TesseractOCR($path))
-                ->executable('/usr/bin/tesseract')
-                ->lang('eng');
 
             $texto = $ocr->run();
 
@@ -37,8 +34,9 @@ class OCRController extends Controller
                 ], 422);
             }
 
-            preg_match('/\b\d{6,}\b/', $texto, $matches);
-            $numeroDetectado = $matches[0] ?? null;
+            // Buscar número con prefijo "N°" o similar
+            preg_match('/N[°º]?\s*(\d{6,})/', $texto, $matches);
+            $numeroDetectado = $matches[1] ?? null;
 
             Log::info("Texto detectado: " . $texto);
 
@@ -48,6 +46,7 @@ class OCRController extends Controller
                 ], 422);
             }
 
+            // Buscar boleta
             $boleta = BoletaDePago::where('numero_orden_de_pago', $numeroDetectado)->first();
 
             if (!$boleta) {
@@ -56,6 +55,7 @@ class OCRController extends Controller
                 ], 404);
             }
 
+            // Buscar inscripción
             $inscripcion = Inscriptions::where('boleta_de_pago_id', $boleta->id)->first();
 
             if (!$inscripcion) {
@@ -64,7 +64,7 @@ class OCRController extends Controller
                 ], 404);
             }
 
-
+            // Actualizar estado de inscripción
             $inscripcion->status = InscriptionStatus::COMPLETED;
             $inscripcion->save();
 
