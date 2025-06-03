@@ -19,6 +19,7 @@ class BoletaDePagoController extends Controller
     {
         $boleta = BoletaDePago::create([
             'numero_orden_de_pago' => $request->input('numero_orden_de_pago'),
+            'status' => 'pending',
             'nombre' => $request->input('nombre'),
             'apellido' => $request->input('apellido'),
             'fecha_nacimiento' => $request->input('fecha_nacimiento'),
@@ -27,6 +28,7 @@ class BoletaDePagoController extends Controller
             'precio_unitario' => $request->input('precio_unitario'),
             'importe' => $request->input('importe'),
             'total' => $request->input('total'),
+             
         ]);
 
         return response()->json([
