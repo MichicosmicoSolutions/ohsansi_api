@@ -14,41 +14,58 @@ class PersonSearchController extends Controller
 {
 
     public function index()
-    {
-        $inscriptions = Inscriptions::with([
-            'competitor_data',
-            'school',
-            'accountable',
-            'legalTutor',
-            'selected_areas.area',
-            'selected_areas.category',
-            'selected_areas.teacher',
-            'olympiad'
-        ])->get()->map(function ($inscription) {
-            return [
-                'id' => $inscription->id,
-                'status' => $inscription->status,
-                'drive_url' => $inscription->drive_url,
-                'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
-                'school' => $inscription->school ? $inscription->school->name : null,
-                'accountable' => $inscription->accountable ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names : null,
-                'legal_tutor' => $inscription->legalTutor ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names : null,
-                'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
-                'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
-                    return [
-                        'area'  => $selectedArea->area ? $selectedArea->area->name : null,
-                        'category' => $selectedArea->category ? $selectedArea->category->name : null,
-                        'teacher' => $selectedArea->teacher ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names : null,
-                        'paid_at' => $selectedArea->paid_at,
-                    ];
-                }),
-                'created_at' => $inscription->created_at,
-                'updated_at' => $inscription->updated_at,
-            ];
-        });
+{
+    $inscriptions = Inscriptions::with([
+        'competitor_data',
+        'school',
+        'accountable.personalData',
+        'legalTutor.personalData',
+        'selected_areas.area',
+        'selected_areas.category',
+        'selected_areas.teacher.personalData',
+        'boletaDePago',
+        'olympiad'
+    ])->get()->map(function ($inscription) {
+        return [
+            'id' => $inscription->id,
+            'status' => $inscription->status,
+            'drive_url' => $inscription->drive_url,
+            'competitor' => $inscription->competitor_data ? $inscription->competitor_data->names . ' ' . $inscription->competitor_data->last_names : null,
+            'school' => $inscription->school ? $inscription->school->name : null,
+            'accountable' => $inscription->accountable ? $inscription->accountable->personalData->names . ' ' . $inscription->accountable->personalData->last_names : null,
+            'legal_tutor' => $inscription->legalTutor ? $inscription->legalTutor->personalData->names . ' ' . $inscription->legalTutor->personalData->last_names : null,
+            'olympiad' => $inscription->olympiad ? $inscription->olympiad->title : null,
+            'boleta_de_pago' => $inscription->boletaDePago ? [
+                'id' => $inscription->boletaDePago->id,
+                'numero_orden_de_pago' => $inscription->boletaDePago->numero_orden_de_pago,
+                'ci' => $inscription->boletaDePago->ci,
+                'status' => $inscription->boletaDePago->status,
+                'nombre' => $inscription->boletaDePago->nombre,
+                'apellido' => $inscription->boletaDePago->apellido,
+                'fecha_nacimiento' => $inscription->boletaDePago->fecha_nacimiento,
+                'cantidad' => $inscription->boletaDePago->cantidad,
+                'concepto' => $inscription->boletaDePago->concepto,
+                'precio_unitario' => $inscription->boletaDePago->precio_unitario,
+                'importe' => $inscription->boletaDePago->importe,
+                'total' => $inscription->boletaDePago->total,
+            ] : null,
+            'selected_areas' => $inscription->selected_areas->map(function ($selectedArea) {
+                return [
+                    'area'  => $selectedArea->area ? $selectedArea->area->name : null,
+                    'category' => $selectedArea->category ? $selectedArea->category->name : null,
+                    'teacher' => $selectedArea->teacher && $selectedArea->teacher->personalData
+                        ? $selectedArea->teacher->personalData->names . ' ' . $selectedArea->teacher->personalData->last_names
+                        : null,
+                    'paid_at' => $selectedArea->paid_at,
+                ];
+            }),
+            'created_at' => $inscription->created_at,
+            'updated_at' => $inscription->updated_at,
+        ];
+    });
 
-        return response()->json($inscriptions);
-    }
+    return response()->json($inscriptions);
+}
     public function searchStudent($ci)
     {
         return response()->json(PersonalData::where('ci', $ci)->first());
