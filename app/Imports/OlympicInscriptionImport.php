@@ -37,59 +37,29 @@ class OlympicInscriptionImport implements ToCollection
         $rows = $collection->skip(1);
 
         foreach ($rows as $row) {
-            if (empty($row[0]) || empty($row[2]) || empty($row[4])) {
-                continue; // Saltar si faltan datos clave
+            $data = $this->mapRowToStructuredData($row);
+
+            if (empty($data['student']['ci']) || empty($data['student']['birthdate'])) {
+                continue;
             }
 
-            // ---------------------------
-            // 1. Crear o buscar estudiante
-            // ---------------------------
-            $birthdate = is_numeric($row[4])
-                ? Date::excelToDateTimeObject($row[4])->format('Y-m-d')
-                : $row[4];
-
-            $studentData = [
-                'ci' => $row[2],
-                'ci_expedition' => $row[3],
-                'birthdate' => $birthdate,
-                'names' => $row[0],
-                'last_names' => $row[1],
-                'email' => $row[5],
-                'phone_number' => $row[6],
-                'gender' => $row[7],
-            ];
-
+            // Crear estudiante
             $student = PersonalData::updateOrCreate(
-                ['ci' => $studentData['ci']],
-                $studentData
+                ['ci' => $data['student']['ci']],
+                $data['student']
             );
 
-            // ----------------------------
-            // 2. Crear o buscar tutor legal
-            // ----------------------------
-            $tutorData = [
-                'ci' => $row[10],
-                'ci_expedition' => $row[11],
-                'birthdate' => now(), // Si no hay en el Excel, puedes asignar temporal o por lógica propia
-                'names' => $row[8],
-                'last_names' => $row[9],
-                'email' => $row[12],
-                'phone_number' => $row[13],
-                'gender' => $row[14],
-            ];
-
+            // Crear tutor legal
             $tutor = PersonalData::updateOrCreate(
-                ['ci' => $tutorData['ci']],
-                $tutorData
+                ['ci' => $data['tutor']['ci']],
+                $data['tutor']
             );
 
             $legalTutorRelation = LegalTutors::firstOrCreate([
                 'personal_data_id' => $tutor->id
             ]);
 
-            // --------------------------------
-            // 3. Generar la inscripción (draft)
-            // --------------------------------
+            // Inscripción
             $identifier = $student->ci . '|' . $student->birthdate;
 
             $inscription = Inscriptions::updateOrCreate(
@@ -106,50 +76,28 @@ class OlympicInscriptionImport implements ToCollection
                 ]
             );
 
-            // -------------------------------------
-            // 4. Obtener área y categoría seleccionada
-            // -------------------------------------
-            $areaCategoryText = $row[15]; // "Área - Categoría"
-            [$areaName, $categoryName] = explode(' - ', $areaCategoryText . ' - ');
+            // Área y categoría
+            [$areaName, $categoryName] = explode(' - ', $data['area_category']);
             $area = Area::where('name', trim($areaName))->first();
             $category = Category::where('name', trim($categoryName))->first();
 
-            if (!$area || !$category) {
-                continue; // Saltar si no se encuentran
-            }
+            if (!$area || !$category) continue;
 
-            // ------------------------
-            // 5. Crear profesor guía
-            // ------------------------
-            $teacherData = [
-                'ci' => $row[18],
-                'ci_expedition' => $row[19],
-                'birthdate' => now(),
-                'names' => $row[16],
-                'last_names' => $row[17],
-                'email' => $row[20],
-                'phone_number' => $row[21],
-                'gender' => $row[22],
-            ];
-
+            // Profesor guía
             $teacherId = null;
-
-            if (!empty($teacherData['ci'])) {
+            if (!empty($data['teacher']['ci'])) {
                 $teacher = PersonalData::updateOrCreate(
-                    ['ci' => $teacherData['ci']],
-                    $teacherData
+                    ['ci' => $data['teacher']['ci']],
+                    $data['teacher']
                 );
 
                 $teacherRelation = Teachers::firstOrCreate([
-                    'personal_data_id' => $teacher->id,
+                    'personal_data_id' => $teacher->id
                 ]);
 
                 $teacherId = $teacher->id;
             }
 
-            // ------------------------
-            // 6. Registrar área elegida
-            // ------------------------
             SelectedAreas::updateOrCreate(
                 [
                     'inscription_id' => $inscription->id,
@@ -162,11 +110,47 @@ class OlympicInscriptionImport implements ToCollection
                 ]
             );
 
-            // ----------------------------
-            // 7. Marcar inscripción completa
-            // ----------------------------
             $inscription->status = InscriptionStatus::PENDING;
             $inscription->save();
         }
+    }
+
+    private function mapRowToStructuredData($row): array
+    {
+        $studentBirthdate = is_numeric($row[4]) ? Date::excelToDateTimeObject($row[4])->format('Y-m-d') : $row[4];
+
+        return [
+            'student' => [
+                'names' => $row[0],
+                'last_names' => $row[1],
+                'ci' => $row[2],
+                'ci_expedition' => $row[3],
+                'birthdate' => $studentBirthdate,
+                'email' => $row[5],
+                'phone_number' => $row[6],
+                'gender' => $row[7],
+            ],
+            'tutor' => [
+                'names' => $row[8],
+                'last_names' => $row[9],
+                'ci' => $row[10],
+                'ci_expedition' => $row[11],
+                'birthdate' => now()->format('Y-m-d'),
+                'email' => $row[12],
+                'phone_number' => $row[13],
+                'gender' => $row[14],
+            ],
+            'area_category' => $row[15],
+            'teacher' => [
+                'names' => $row[16],
+                'last_names' => $row[17],
+                'ci' => $row[18],
+                'ci_expedition' => $row[19],
+                'birthdate' => now()->format('Y-m-d'),
+                'email' => $row[20],
+                'phone_number' => $row[21],
+                'gender' => $row[22],
+            ],
+        ];
     }
 }
