@@ -11,7 +11,9 @@ class BoletaDePagoSeeder extends Seeder
     {
         DB::table('boleta_de_pago')->insert([
             [
-                'numero_orden_de_pago' => '0000282499', // el que pediste
+                'numero_orden_de_pago' => '0000282499',
+                'ci' => '8846245',
+                'status' => 'pending',
                 'nombre' => 'Juan',
                 'apellido' => 'Pérez',
                 'fecha_nacimiento' => '1990-01-01',
@@ -25,6 +27,8 @@ class BoletaDePagoSeeder extends Seeder
             ],
             [
                 'numero_orden_de_pago' => '0000282500',
+                'ci' => '8846246',
+                'status' => 'pending',
                 'nombre' => 'María',
                 'apellido' => 'Gómez',
                 'fecha_nacimiento' => '1995-03-15',
@@ -38,6 +42,8 @@ class BoletaDePagoSeeder extends Seeder
             ],
             [
                 'numero_orden_de_pago' => '0000282501',
+                'ci' => '8846247',
+                'status' => 'pending',
                 'nombre' => 'Carlos',
                 'apellido' => 'Ramírez',
                 'fecha_nacimiento' => '1988-07-23',
@@ -51,6 +57,8 @@ class BoletaDePagoSeeder extends Seeder
             ],
             [
                 'numero_orden_de_pago' => '0000282502',
+                'ci' => '8846248',
+                'status' => 'pending',
                 'nombre' => 'Ana',
                 'apellido' => 'Martínez',
                 'fecha_nacimiento' => '2000-11-10',
@@ -64,6 +72,8 @@ class BoletaDePagoSeeder extends Seeder
             ],
             [
                 'numero_orden_de_pago' => '0000282503',
+                'ci' => '8846249',
+                'status' => 'pending',
                 'nombre' => 'Luis',
                 'apellido' => 'Fernández',
                 'fecha_nacimiento' => '1992-05-05',
@@ -77,6 +87,8 @@ class BoletaDePagoSeeder extends Seeder
             ],
             [
                 'numero_orden_de_pago' => '0000282504',
+                'ci' => '8846250',
+                'status' => 'pending',
                 'nombre' => 'Sofía',
                 'apellido' => 'Lopez',
                 'fecha_nacimiento' => '1998-09-30',

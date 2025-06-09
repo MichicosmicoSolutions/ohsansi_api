@@ -19,12 +19,14 @@ class DatabaseSeeder extends Seeder
         Olympiads::factory(1)->create();
 
         $this->call([
-            InscriptionSeeder::class,
+            
             AreaAndCategoriesSeeder::class,
             OlympiadAreasSeeder::class,
             OlympiadsSeeder::class,
             PersonalDataSeeder::class,
             SchoolsSeeder::class,
+            BoletaDePagoSeeder::class,
+            InscriptionSeeder::class,
             SelectedAreasSeeder::class,
         ]);
     }
