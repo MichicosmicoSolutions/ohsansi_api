@@ -135,7 +135,7 @@ class OlympicInscriptionImport implements ToCollection
                 'last_names' => $row[9],
                 'ci' => $row[10],
                 'ci_expedition' => $row[11],
-                'birthdate' => now()->format('Y-m-d'),
+                'birthdate' => is_numeric($row[11]) ? Date::excelToDateTimeObject($row[11])->format('Y-m-d') : ($row[11] ?: null),
                 'email' => $row[12],
                 'phone_number' => $row[13],
                 'gender' => $row[14],
