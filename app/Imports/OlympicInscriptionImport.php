@@ -77,7 +77,12 @@ class OlympicInscriptionImport implements ToCollection
             );
 
             // Área y categoría
-            [$areaName, $categoryName] = explode(' - ', $data['area_category']);
+            $areaCategoryParts = explode(' - ', $data['area_category']);
+            if (count($areaCategoryParts) !== 2) {
+                continue; // Skip if the format is unexpected
+            }
+
+            [$areaName, $categoryName] = $areaCategoryParts;
             $area = Area::where('name', trim($areaName))->first();
             $category = Category::where('name', trim($categoryName))->first();
 
