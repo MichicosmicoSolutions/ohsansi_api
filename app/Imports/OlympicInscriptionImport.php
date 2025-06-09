@@ -2,11 +2,22 @@
 
 namespace App\Imports;
 
-use App\Models\OlympicInscription;
+use App\Models\Inscriptions;
+use App\Models\Olympiads;
+use App\Models\Schools;
+use App\Models\PersonalData;
+use App\Models\LegalTutors;
+use App\Models\Teachers;
+use App\Models\SelectedAreas;
+use App\Models\Accountables;
 use App\Models\Area;
 use App\Models\Category;
+use App\Enums\InscriptionStatus;
+
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
+
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class OlympicInscriptionImport implements ToCollection
 {
@@ -21,61 +32,141 @@ class OlympicInscriptionImport implements ToCollection
         $this->accountableRelationId = $accountableRelationId;
     }
 
-    /**
-     * @param Collection $collection
-     */
     public function collection(Collection $collection)
     {
-        $rows = $collection->skip(1); // saltar encabezado
+        $rows = $collection->skip(1);
 
         foreach ($rows as $row) {
-            if (empty($row[0])) continue; // si no hay nombres, omitir
+            if (empty($row[0]) || empty($row[2]) || empty($row[4])) {
+                continue; // Saltar si faltan datos clave
+            }
 
-            // Buscar area_id y category_id por el texto mostrado
-            $areaCategoryName = trim($row[15]); // columna P
+            // ---------------------------
+            // 1. Crear o buscar estudiante
+            // ---------------------------
+            $birthdate = is_numeric($row[4])
+                ? Date::excelToDateTimeObject($row[4])->format('Y-m-d')
+                : $row[4];
 
-            // Supongamos que el formato es "Área - Categoría"
-            [$areaName, $categoryName] = explode(' - ', $areaCategoryName . ' - '); // fallback por si falta
+            $studentData = [
+                'ci' => $row[2],
+                'ci_expedition' => $row[3],
+                'birthdate' => $birthdate,
+                'names' => $row[0],
+                'last_names' => $row[1],
+                'email' => $row[5],
+                'phone_number' => $row[6],
+                'gender' => $row[7],
+            ];
 
-            $area = \App\Models\Area::where('name', trim($areaName))->first();
-            $category = \App\Models\Category::where('name', trim($categoryName))->first();
+            $student = PersonalData::updateOrCreate(
+                ['ci' => $studentData['ci']],
+                $studentData
+            );
 
-            OlympicInscription::create([
-                // Estudiante
-                'student_name' => $row[0],
-                'student_lastname' => $row[1],
-                'student_ci' => $row[2],
-                'student_ci_place' => $row[3],
-                'student_birthdate' => \PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($row[4]) ? \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[4]) : $row[4],
-                'student_email' => $row[5],
-                'student_phone' => $row[6],
-                'student_gender' => $row[7],
+            // ----------------------------
+            // 2. Crear o buscar tutor legal
+            // ----------------------------
+            $tutorData = [
+                'ci' => $row[10],
+                'ci_expedition' => $row[11],
+                'birthdate' => now(), // Si no hay en el Excel, puedes asignar temporal o por lógica propia
+                'names' => $row[8],
+                'last_names' => $row[9],
+                'email' => $row[12],
+                'phone_number' => $row[13],
+                'gender' => $row[14],
+            ];
 
-                // Tutor
-                'tutor_name' => $row[8],
-                'tutor_lastname' => $row[9],
-                'tutor_ci' => $row[10],
-                'tutor_ci_place' => $row[11],
-                'tutor_email' => $row[12],
-                'tutor_phone' => $row[13],
-                'tutor_gender' => $row[14],
+            $tutor = PersonalData::updateOrCreate(
+                ['ci' => $tutorData['ci']],
+                $tutorData
+            );
 
-                // Profesor guía
-                'teacher_name' => $row[16],
-                'teacher_lastname' => $row[17],
-                'teacher_ci' => $row[18],
-                'teacher_ci_place' => $row[19],
-                'teacher_email' => $row[20],
-                'teacher_phone' => $row[21],
-                'teacher_gender' => $row[22],
-
-                // Relaciones y metadatos
-                'school_id' => $this->schoolId,
-                'olympiad_id' => $this->olympiadId,
-                'accountable_relation_id' => $this->accountableRelationId,
-                'area_id' => $area?->id,
-                'category_id' => $category?->id,
+            $legalTutorRelation = LegalTutors::firstOrCreate([
+                'personal_data_id' => $tutor->id
             ]);
+
+            // --------------------------------
+            // 3. Generar la inscripción (draft)
+            // --------------------------------
+            $identifier = $student->ci . '|' . $student->birthdate;
+
+            $inscription = Inscriptions::updateOrCreate(
+                [
+                    'identifier' => $identifier,
+                    'olympiad_id' => $this->olympiadId,
+                ],
+                [
+                    'status' => InscriptionStatus::DRAFT,
+                    'legal_tutor_id' => $tutor->id,
+                    'competitor_data_id' => $student->id,
+                    'school_id' => $this->schoolId,
+                    'accountable_id' => $this->accountableRelationId,
+                ]
+            );
+
+            // -------------------------------------
+            // 4. Obtener área y categoría seleccionada
+            // -------------------------------------
+            $areaCategoryText = $row[15]; // "Área - Categoría"
+            [$areaName, $categoryName] = explode(' - ', $areaCategoryText . ' - ');
+            $area = Area::where('name', trim($areaName))->first();
+            $category = Category::where('name', trim($categoryName))->first();
+
+            if (!$area || !$category) {
+                continue; // Saltar si no se encuentran
+            }
+
+            // ------------------------
+            // 5. Crear profesor guía
+            // ------------------------
+            $teacherData = [
+                'ci' => $row[18],
+                'ci_expedition' => $row[19],
+                'birthdate' => now(),
+                'names' => $row[16],
+                'last_names' => $row[17],
+                'email' => $row[20],
+                'phone_number' => $row[21],
+                'gender' => $row[22],
+            ];
+
+            $teacherId = null;
+
+            if (!empty($teacherData['ci'])) {
+                $teacher = PersonalData::updateOrCreate(
+                    ['ci' => $teacherData['ci']],
+                    $teacherData
+                );
+
+                $teacherRelation = Teachers::firstOrCreate([
+                    'personal_data_id' => $teacher->id,
+                ]);
+
+                $teacherId = $teacher->id;
+            }
+
+            // ------------------------
+            // 6. Registrar área elegida
+            // ------------------------
+            SelectedAreas::updateOrCreate(
+                [
+                    'inscription_id' => $inscription->id,
+                    'area_id' => $area->id,
+                ],
+                [
+                    'category_id' => $category->id,
+                    'teacher_id' => $teacherId,
+                    'paid_at' => null,
+                ]
+            );
+
+            // ----------------------------
+            // 7. Marcar inscripción completa
+            // ----------------------------
+            $inscription->status = InscriptionStatus::PENDING;
+            $inscription->save();
         }
     }
 }
