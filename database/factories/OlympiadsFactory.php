@@ -12,10 +12,10 @@ class OlympiadsFactory extends Factory
     public function definition()
     {
         return [
-            'title' => $this->faker->sentence,
+            'title' => 'Olimpiada de general 2025',
             'status' => 'Publico',
-            'description' => $this->faker->paragraph,
-            'price' => 1500,
+            'description' => 'Descripción de la olimpiada de general 2025',
+            'price' => 15,
             'presentation' => $this->faker->paragraph,
             'requirements' => $this->faker->paragraph,
             'awards' => $this->faker->paragraph,
