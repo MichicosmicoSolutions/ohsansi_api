@@ -1649,10 +1649,9 @@ class InscriptionController extends Controller
         }
 
         $data = $validator->validated();
-
-        DB::beginTransaction();
-
+        
         try {
+            DB::beginTransaction();
             $school = Schools::updateOrCreate(
                 ['name' => $data['schoolName']],
                 [
