@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Accountables;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\PersonalData;
@@ -364,6 +365,25 @@ class PersonSearchController extends Controller
 
     return response()->json([
         'boletas' => $boletas
+    ]);
+}
+public function searchAccountable($ci)
+{
+    $personalData = PersonalData::where('ci', $ci)->first();
+
+    if (!$personalData) {
+        return response()->json(['message' => 'CI no encontrado'], 404);
+    }
+
+    $accountable = Accountables::with('personalData')->where('personal_data_id', $personalData->id)->first();
+
+    if (!$accountable) {
+        return response()->json(['message' => 'El CI no pertenece a un responsable (accountable)'], 404);
+    }
+
+    return response()->json([
+        'accountable_id' => $accountable->id,
+        'personal_data' => $accountable->personalData
     ]);
 }
 

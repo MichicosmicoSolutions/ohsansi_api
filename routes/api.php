@@ -150,3 +150,4 @@ Route::get('/buscar', [PersonSearchController::class, 'getBoletasByCiAndBirthdat
 Route::get('/inscriptions/filter', function () {
     return response()->json(['message' => 'Route works']);
 });
+Route::get('/search-accountable/{ci}', [PersonSearchController::class, 'searchAccountable']);
