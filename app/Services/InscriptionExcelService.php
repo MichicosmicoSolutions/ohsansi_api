@@ -27,22 +27,6 @@ class InscriptionExcelService
             $sheet2->setCellValue('C' . ($index + 2), $area['category_id']);
         }
 
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet2 = $spreadsheet->createSheet();
-        $sheet2->setTitle('Areas');
-        $sheet2->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
-
-        $sheet2->setCellValue('A1', 'Name');
-        $sheet2->setCellValue('B1', 'area_id');
-        $sheet2->setCellValue('C1', 'category_id');
-
-        foreach ($areas as $index => $area) {
-            $sheet2->setCellValue('A' . ($index + 2), $area['area']['name'] . ' - ' . $area['category']['name']);
-            $sheet2->setCellValue('B' . ($index + 2), $area['area_id']);
-            $sheet2->setCellValue('C' . ($index + 2), $area['category_id']);
-        }
-
         $sheet->setCellValue('A1', 'Nombres');
         $sheet->setCellValue('B1', 'Apellidos');
         $sheet->setCellValue('C1', 'CI');
