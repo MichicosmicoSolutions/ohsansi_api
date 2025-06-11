@@ -1059,9 +1059,7 @@ class InscriptionController extends Controller
         $ci = $identity['ci'];
         $birthdate = $identity['birthdate'];
         $olympiadId = $identity['olympicId'];
-        $identifier = $ci . '|' . $birthdate;
-
-
+        $identifier = $ci . '|' . $birthdate . '|' . $olympiadId;
 
         $verifyInscription = Inscriptions::where('identifier', $identifier)
             ->where('olympiad_id', $olympiadId)
@@ -1185,7 +1183,7 @@ class InscriptionController extends Controller
             ]);
         } else if ($step === 3) {
             $validator = Validator::make($request->all(), [
-                'selected_areas' => 'required|array|min:1',
+                'selected_areas' => 'required|array|min:1|max:2',
                 'selected_areas.*.data.area_id' => 'required|integer|exists:areas,id',
                 'selected_areas.*.data.category_id' => 'required|integer|exists:categories,id',
 
@@ -1217,6 +1215,8 @@ class InscriptionController extends Controller
 
             $results = [];
 
+            DB::beginTransaction();
+
             foreach ($selectedAreas as $entry) {
                 $areaData = $entry['data'];
                 $teacherData = $entry['teacher'] ?? null;
@@ -1233,6 +1233,14 @@ class InscriptionController extends Controller
                         'personal_data_id' => $teacherId,
                     ]);
                     $teacherId = $teacherRelation->personal_data_id;
+                }
+
+                // Validar que el estudiante no haya seleccionado más de 2 áreas
+                $currentSelectedAreasCount = SelectedAreas::where('inscription_id', $inscription->id)->count();
+                if ($currentSelectedAreasCount >= 2) {
+                    return response()->json([
+                        'error' => 'No puedes seleccionar más de 2 áreas.',
+                    ], 422);
                 }
 
                 // Crear o actualizar en selected_areas
@@ -1254,6 +1262,8 @@ class InscriptionController extends Controller
                     'teacher_id' => $teacherId,
                 ];
             }
+
+            DB::commit();
 
             return response()->json([
                 'message' => 'Áreas seleccionadas registradas exitosamente.',
@@ -1445,7 +1455,7 @@ class InscriptionController extends Controller
                 '*.legal_tutor.phone_number' => 'nullable|string|max:20',
                 '*.legal_tutor.gender' => 'nullable|string|in:M,F,O',
 
-                '*.selected_areas' => 'required|array|min:1',
+                '*.selected_areas' => 'required|array|min:1|max:2',
                 '*.selected_areas.*.data.area_id' => 'required|integer|exists:areas,id',
                 '*.selected_areas.*.data.category_id' => 'required|integer|exists:categories,id',
 
@@ -1493,7 +1503,7 @@ class InscriptionController extends Controller
 
                 LegalTutors::firstOrCreate(['personal_data_id' => $tutor->id]);
 
-                $studentIdentifier = $student->ci . '|' . $student->birthdate;
+                $studentIdentifier = $student->ci . '|' . $student->birthdate . '|' . $olympiadId;
 
                 $inscription = Inscriptions::updateOrCreate(
                     [
@@ -1527,6 +1537,14 @@ class InscriptionController extends Controller
                             'personal_data_id' => $teacherId,
                         ]);
                         $teacherId = $teacherRelation->personal_data_id;
+                    }
+
+                    // Validar que el estudiante no haya seleccionado más de 2 áreas
+                    $currentSelectedAreasCount = SelectedAreas::where('inscription_id', $inscription->id)->count();
+                    if ($currentSelectedAreasCount >= 2) {
+                        return response()->json([
+                            'error' => 'No puedes seleccionar más de 2 áreas.',
+                        ], 422);
                     }
 
                     SelectedAreas::updateOrCreate(
