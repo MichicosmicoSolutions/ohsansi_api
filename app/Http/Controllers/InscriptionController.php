@@ -1425,7 +1425,8 @@ class InscriptionController extends Controller
                 ],
             ]);
         } else if ($step === 2) {
-            $validator = Validator::make($request->all(), [
+            $data = $request->json()->all();
+            $validator = Validator::make($data, [
                 '*.student.ci' => 'required|string|max:20',
                 '*.student.birthdate' => 'required|date',
                 '*.student.ci_expedition' => 'nullable|string|max:10',
