@@ -1235,7 +1235,23 @@ class InscriptionController extends Controller
                     $teacherId = $teacherRelation->personal_data_id;
                 }
 
-                // Validar que el estudiante no haya seleccionado más de 2 áreas
+                $studentId = $inscription->competitor_data_id;
+                $olympiadInscriptions = Inscriptions::where('competitor_data_id', $studentId)
+                    ->where('olympiad_id', $olympiadId)
+                    ->get();
+                $areas = SelectedAreas::whereIn('inscription_id', $olympiadInscriptions->pluck('id'))
+                    ->count();
+                if ($areas >= 2) {
+                    return response()->json([
+                        'error' => 'El estudiante ya tiene 2 áreas seleccionadas para esta olimpiada.',
+                    ], 422);
+                }
+
+
+                $inscription = Inscriptions::where('identifier', $identifier)
+                    ->where('olympiad_id', $olympiadId)
+                    ->first();
+
                 $currentSelectedAreasCount = SelectedAreas::where('inscription_id', $inscription->id)->count();
                 if ($currentSelectedAreasCount >= 2) {
                     return response()->json([
