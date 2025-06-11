@@ -25,6 +25,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\OlympicInscriptionImport;
+use App\Models\BoletaDePago;
 use App\Models\OlympiadAreas;
 use App\Services\InscriptionExcelService;
 
@@ -1277,6 +1278,8 @@ class InscriptionController extends Controller
 
             $accountableData = $validator->validated()['accountable'];
 
+            DB::beginTransaction();
+
             // Guardar o actualizar PersonalData del accountable
             $accountable = PersonalData::updateOrCreate(
                 [
@@ -1299,11 +1302,30 @@ class InscriptionController extends Controller
             }
 
 
+            $olympiad = Olympiads::find($olympiadId);
+            $randomNumber = rand(100000, 999999);
+
+            $boleta = BoletaDePago::create([
+                'numero_orden_de_pago' => $randomNumber,
+                'ci' => $accountable->ci,
+                'status' => 'pending',
+                'nombre' => $accountable->names,
+                'apellido' => $accountable->last_names,
+                'fecha_nacimiento' => $accountable->birthdate,
+                'cantidad' => 1,
+                'concepto' => 'Inscripción Olimpiada: ' . $olympiad->name,
+                'precio_unitario' => $olympiad->price,
+                'importe' => $olympiad->price,
+                'total' => $olympiad->price,
+            ]);
+
+
             $inscription->accountable_id = $accountableRelation->personal_data_id;
             $inscription->status = InscriptionStatus::PENDING;
+            $inscription->boleta_de_pago_id = $boleta->id;
             $inscription->save();
 
-            $olympiad = Olympiads::find($olympiadId);
+            DB::commit();
 
             return response()->json([
                 'message' => 'Responsable de pago guardado correctamente.',
@@ -1311,6 +1333,7 @@ class InscriptionController extends Controller
                     'accountable' => $accountable,
                     'inscription' => $inscription,
                     "price" => $olympiad->price,
+                    'boleta' => $boleta
                 ],
             ]);
         }
@@ -1554,6 +1577,8 @@ class InscriptionController extends Controller
 
             $accountableData = $request->input('accountable');
 
+            DB::beginTransaction();
+
             // Crear o actualizar datos personales
             $personalData = PersonalData::updateOrCreate(
                 [
@@ -1583,6 +1608,33 @@ class InscriptionController extends Controller
                 $inscription->save();
             }
 
+            $inscriptionsByGroup = Inscriptions::where('group_identifier', $groupIdentifier)
+                ->where('olympiad_id', $olympiadId)
+                ->get();
+            $inscriptionNumberInGroup =  Inscriptions::where('group_identifier', $groupIdentifier)
+                ->where('olympiad_id', $olympiadId)->count();
+
+
+            $randomNumber = rand(100000, 999999);
+            $boleta = BoletaDePago::create([
+                'numero_orden_de_pago' => $randomNumber,
+                'ci' => $accountable->ci,
+                'status' => 'pending',
+                'nombre' => $accountable->names,
+                'apellido' => $accountable->last_names,
+                'fecha_nacimiento' => $accountable->birthdate,
+                'cantidad' => $inscriptionNumberInGroup,
+                'concepto' => 'Inscripción Olimpiada: ' . $olympiad->name,
+                'precio_unitario' => $olympiad->price,
+                'importe' => $olympiad->price * $inscriptionNumberInGroup,
+                'total' => $olympiad->price * $inscriptionNumberInGroup,
+            ]);
+
+            foreach ($inscriptionsByGroup as $inscription) {
+                $inscription->boleta_de_pago_id = $boleta->id;
+                $inscription->save();
+            }
+
             // delete base inscription
             $baseInscription = Inscriptions::where('identifier', $identifier)
                 ->where('olympiad_id', $olympiadId)
@@ -1591,11 +1643,14 @@ class InscriptionController extends Controller
                 $baseInscription->delete();
             }
 
+            DB::commit();
+
             return response()->json([
                 'message' => 'Responsable de pago asociado a todas las inscripciones del grupo.',
                 'data' => [
                     'accountable' => $personalData,
                     'inscriptions_updated' => $inscriptions->count(),
+                    "boleta" => $boleta,
                 ],
             ]);
         }
@@ -1649,7 +1704,7 @@ class InscriptionController extends Controller
         }
 
         $data = $validator->validated();
-        
+
         try {
             DB::beginTransaction();
             $school = Schools::updateOrCreate(
