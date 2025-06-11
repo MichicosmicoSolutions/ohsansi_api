@@ -938,8 +938,6 @@ class InscriptionController extends Controller
                 'school',
                 'legalTutor',
                 'legalTutor.personalData',
-                'competitor',
-                'competitor.personalData',
                 'accountable',
                 'accountable.personalData',
                 'selected_areas',
