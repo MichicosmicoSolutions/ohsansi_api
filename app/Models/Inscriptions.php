@@ -117,7 +117,9 @@ class Inscriptions extends Model
         'accountable_id',
         'legal_tutor_id',
         'olympiad_id',
-        'boleta_de_pago_id'
+        'boleta_de_pago_id',
+        'identifier',
+        'group_identifier'
     ];
 
     public function competitor_data()
@@ -168,16 +170,16 @@ class Inscriptions extends Model
         return $this->hasMany(
             SelectedAreas::class,
             'inscription_id'
-           
+
         );
     }
-    
+
     public function area()
     {
         return $this->belongsTo(Areas::class, 'area_id');
     }
     public function boletaDePago()
-{
-    return $this->belongsTo(BoletaDePago::class, 'boleta_de_pago_id');
-}
+    {
+        return $this->belongsTo(BoletaDePago::class, 'boleta_de_pago_id');
+    }
 }

@@ -1497,7 +1497,10 @@ class InscriptionController extends Controller
                 $studentIdentifier = $student->ci . '|' . $student->birthdate;
 
                 $inscription = Inscriptions::updateOrCreate(
-                    ['identifier' => $studentIdentifier, 'olympiad_id' => $olympiadId],
+                    [
+                        'identifier' => $studentIdentifier,
+                        'olympiad_id' => $olympiadId,
+                    ],
                     [
                         'group_identifier' => $groupIdentifier,
                         'school_id' => $schoolId,
