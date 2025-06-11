@@ -50,18 +50,15 @@ class OCRController extends Controller
             }
         }
 
-        DB::beginTransaction();
+        DB::transaction(function () use ($inscripcions, $boleta) {
+            foreach ($inscripcions as $inscripcion) {
+                $inscripcion->status = InscriptionStatus::COMPLETED;
+                $inscripcion->save();
+            }
 
-        foreach ($inscripcions as $inscripcion) {
-            $inscripcion->status = InscriptionStatus::COMPLETED;
-            $inscripcion->save();
-        }
-
-        $boleta->status = 'completed';
-        $boleta->save();
-
-        DB::commit();
-
+            $boleta->status = 'completed';
+            $boleta->save();
+        });
         return response()->json([
             'mensaje' => 'El estado de la inscripción y la boleta de pago han sido actualizados a COMPLETED.',
             'numero_detectado' => $numero
