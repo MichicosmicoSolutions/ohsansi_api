@@ -1463,7 +1463,6 @@ class InscriptionController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $payload = $request->all();
             $results = [];
 
             $baseInscription = Inscriptions::where('identifier', $identifier)
@@ -1478,7 +1477,7 @@ class InscriptionController extends Controller
 
             DB::beginTransaction();
 
-            foreach ($payload as $entry) {
+            foreach ($data as $entry) {
                 $studentData = $entry['student'];
                 $tutorData = $entry['legal_tutor'];
 
