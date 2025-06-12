@@ -943,8 +943,7 @@ class InscriptionController extends Controller
                 'selected_areas',
                 'selected_areas.teacher',
                 'selected_areas.teacher.personalData',
-                // 'competitor_data',
-                // 'competitor_data.personalData'
+                'competitor_data',
             ])
                 ->where('identifier', $identifier)
                 ->where('olympiad_id', $olympiadId)
@@ -997,7 +996,6 @@ class InscriptionController extends Controller
                 'selected_areas.teacher',
                 'selected_areas.teacher.personalData',
                 'competitor_data',
-                'competitor_data.personalData'
             ])
                 ->where('identifier', $groupIdentifier)
                 ->where('olympiad_id', $olympiadId)
