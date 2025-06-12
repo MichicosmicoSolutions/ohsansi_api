@@ -437,7 +437,7 @@ class InscriptionController extends Controller
             ['name' => $request->input('name')],
             [
                 'name' => $request->input('name'),
-                'department' => ucfirst(strtolower($request->input('department'))),
+                'department' => ucwords(strtolower($request->input('department'))),
                 'province' => $request->input('province'),
                 'course' => $request->input('course'),
             ]
@@ -1108,7 +1108,7 @@ class InscriptionController extends Controller
             $school = Schools::updateOrCreate(
                 ['name' => $schoolData['name']],
                 [
-                    'department' => ucfirst(strtolower($schoolData['department'])),
+                    'department' => ucwords(strtolower($schoolData['department'])),
                     'province' => $schoolData['province'],
                 ]
             );
@@ -1491,7 +1491,7 @@ class InscriptionController extends Controller
             $school = Schools::updateOrCreate(
                 ['name' => $schoolData['name']],
                 [
-                    'department' => ucfirst(strtolower($schoolData['department'])),
+                    'department' => ucwords(strtolower($schoolData['department'])),
                     'province' => $schoolData['province'],
                 ]
             );
@@ -1838,7 +1838,7 @@ class InscriptionController extends Controller
                 ['name' => $data['schoolName']],
                 [
 
-                    'department' => ucfirst(strtolower($data['schoolDepartment'])),
+                    'department' => ucwords(strtolower($data['schoolDepartment'])),
                     'province' => $data['schoolProvince'],
                 ]
             );
