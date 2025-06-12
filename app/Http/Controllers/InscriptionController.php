@@ -1103,7 +1103,7 @@ class InscriptionController extends Controller
             $school = Schools::updateOrCreate(
                 ['name' => $schoolData['name']],
                 [
-                    'department' => $schoolData['department'],
+                    'department' => strtolower($schoolData['department']),
                     'province' => $schoolData['province'],
                 ]
             );
