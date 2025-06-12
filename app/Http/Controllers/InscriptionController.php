@@ -1273,7 +1273,6 @@ class InscriptionController extends Controller
                         $teacherId = $teacherRelation->personal_data_id;
                     }
 
-
                     $studentId = $inscription->competitor_data_id;
                     $olympiadInscriptions = Inscriptions::where('competitor_data_id', $studentId)
                         ->where('olympiad_id', $olympiadId)
@@ -1299,6 +1298,10 @@ class InscriptionController extends Controller
                         }
                     }
 
+                    SelectedAreas::where('inscription_id', $inscription->id)
+                        ->where('area_id', $areaData['area_id'])
+                        ->delete();
+
                     $selectedArea = SelectedAreas::updateOrCreate(
                         [
                             'inscription_id' => $inscription->id,
@@ -1307,7 +1310,6 @@ class InscriptionController extends Controller
                             'area_id' => $areaData['area_id'],
                             'category_id' => $areaData['category_id'],
                             'teacher_id' => $teacherId,
-                            'paid_at' => null, // O colocar valor si ya se pagó
                         ]
                     );
 
@@ -1629,6 +1631,10 @@ class InscriptionController extends Controller
                                 ], 422);
                             }
                         }
+
+                        SelectedAreas::where('inscription_id', $inscription->id)
+                            ->where('area_id', $areaData['area_id'])
+                            ->delete();
 
                         SelectedAreas::updateOrCreate(
                             [
