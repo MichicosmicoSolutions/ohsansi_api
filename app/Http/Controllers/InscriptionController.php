@@ -943,6 +943,7 @@ class InscriptionController extends Controller
                 'selected_areas',
                 'selected_areas.teacher',
                 'selected_areas.teacher.personalData',
+                'competitorData'
             ])
                 ->where('identifier', $identifier)
                 ->where('olympiad_id', $olympiadId)
@@ -950,22 +951,31 @@ class InscriptionController extends Controller
 
             if (!$inscription) {
                 return response()->json([
-                    'error' => 'Inscription not found.',
+                    'error' => 'Inscripción no encontrada.',
                 ], 400);
             }
 
             if ($inscription->status !== InscriptionStatus::DRAFT) {
                 return response()->json([
-                    'error' => 'Inscription is not in draft status.',
+                    'error' => 'La inscripción no está en estado borrador.',
                 ], 409);
             }
 
             $olympiad = Olympiads::find($olympiadId);
+            $currentStep = 0;
+
+            if ($inscription->competitor_data) {
+                $currentStep = 3;
+            } elseif ($inscription->student) {
+                $currentStep = 2;
+            } elseif ($inscription->school) {
+                $currentStep = 1;
+            }
 
             return response()->json([
                 'message' => 'Datos del formulario cargados correctamente.',
                 'data' => [
-                    'person' => null,
+                    'step' => $currentStep,
                     'inscription' => $inscription,
                     'olympiad' => [
                         'id' => $olympiad->id,
@@ -985,6 +995,7 @@ class InscriptionController extends Controller
                 'selected_areas',
                 'selected_areas.teacher',
                 'selected_areas.teacher.personalData',
+                'competitorData'
             ])
                 ->where('identifier', $groupIdentifier)
                 ->where('olympiad_id', $olympiadId)
@@ -992,16 +1003,23 @@ class InscriptionController extends Controller
 
             if ($inscriptions->isEmpty()) {
                 return response()->json([
-                    'error' => 'No inscriptions found for the provided identifier.',
+                    'error' => 'No se encontraron inscripciones.',
                 ], 404);
             }
 
             foreach ($inscriptions as $inscription) {
                 if ($inscription->status !== InscriptionStatus::DRAFT) {
                     return response()->json([
-                        'error' => 'One or more inscriptions are not in draft status.',
+                        'error' => 'Las inscripciones no están en estado borrador.',
                     ], 409);
                 }
+            }
+
+            $currentStep = 0;
+            if ($inscriptions->first()->legalTutor) {
+                $currentStep = 2;
+            } elseif ($inscriptions->first()->school) {
+                $currentStep = 1;
             }
 
             $olympiad = Olympiads::find($olympiadId);
@@ -1404,7 +1422,7 @@ class InscriptionController extends Controller
             ->first();
         if ($verifyInscription && $verifyInscription->status !== InscriptionStatus::DRAFT) {
             return response()->json([
-                'error' => 'Inscription already exists and is not in draft status.'
+                'error' => 'La inscripción ya existe y no está en estado borrador.'
             ], 409);
         }
 
@@ -1636,7 +1654,7 @@ class InscriptionController extends Controller
                 ->get();
 
             if ($inscriptions->isEmpty()) {
-                return response()->json(['error' => 'No inscriptions found for this group identifier'], 404);
+                return response()->json(['error' => 'No hay inscripciones con ese agrupador'], 404);
             }
 
             foreach ($inscriptions as $inscription) {
