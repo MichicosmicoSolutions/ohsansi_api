@@ -924,23 +924,12 @@ class InscriptionController extends Controller
         $identifier = $ci . '|' . $birthdate;
         $groupIdentifier = $ci . '|' . $birthdate . '|' . $olympiadId;
 
-        return ([
-            'ci' => $ci,
-            'birthdate' => $birthdate,
-            'olympiadId' => $olympiadId,
-            'type' => $type,
-            'identifier' => $identifier,
-            'groupIdentifier' => $groupIdentifier,
-        ]);
-
         if (empty($identifier)) {
             return response()->json(['error' => 'El identificador no puede ser nulo'], 422);
         }
         if (!in_array($type, ['single', 'multiple'])) {
             return response()->json(['error' => 'El tipo es invalido'], 422);
         }
-        // Check if the inscription exists and is in draft status
-
 
         if ($type === 'single') {
             $inscription = Inscriptions::with([
