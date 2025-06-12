@@ -1286,25 +1286,25 @@ class InscriptionController extends Controller
                         ], 422);
                     }
 
-
                     $inscription = Inscriptions::where('identifier', $identifier)
                         ->where('olympiad_id', $olympiadId)
                         ->first();
 
-                    $currentSelectedAreasCount = SelectedAreas::where('inscription_id', $inscription->id)->count();
-                    if ($currentSelectedAreasCount >= 2) {
-                        return response()->json([
-                            'error' => 'No puedes seleccionar más de 2 áreas.',
-                        ], 422);
+                    if ($inscription->status !== InscriptionStatus::DRAFT) {
+                        $currentSelectedAreasCount = SelectedAreas::where('inscription_id', $inscription->id)->count();
+                        if ($currentSelectedAreasCount >= 2) {
+                            return response()->json([
+                                'error' => 'No puedes seleccionar más de 2 áreas.',
+                            ], 422);
+                        }
                     }
 
-                    // Crear o actualizar en selected_areas
                     $selectedArea = SelectedAreas::updateOrCreate(
                         [
                             'inscription_id' => $inscription->id,
-                            'area_id' => $areaData['area_id'],
                         ],
                         [
+                            'area_id' => $areaData['area_id'],
                             'category_id' => $areaData['category_id'],
                             'teacher_id' => $teacherId,
                             'paid_at' => null, // O colocar valor si ya se pagó
@@ -1621,19 +1621,21 @@ class InscriptionController extends Controller
                         }
 
                         // Validar que el estudiante no haya seleccionado más de 2 áreas
-                        $currentSelectedAreasCount = SelectedAreas::where('inscription_id', $inscription->id)->count();
-                        if ($currentSelectedAreasCount >= 2) {
-                            return response()->json([
-                                'error' => 'No puedes seleccionar más de 2 áreas.',
-                            ], 422);
+                        if ($inscription->status !== InscriptionStatus::DRAFT) {
+                            $currentSelectedAreasCount = SelectedAreas::where('inscription_id', $inscription->id)->count();
+                            if ($currentSelectedAreasCount >= 2) {
+                                return response()->json([
+                                    'error' => 'No puedes seleccionar más de 2 áreas.',
+                                ], 422);
+                            }
                         }
 
                         SelectedAreas::updateOrCreate(
                             [
                                 'inscription_id' => $inscription->id,
-                                'area_id' => $areaData['area_id'],
                             ],
                             [
+                                'area_id' => $areaData['area_id'],
                                 'category_id' => $areaData['category_id'],
                                 'teacher_id' => $teacherId,
                                 'paid_at' => null,
