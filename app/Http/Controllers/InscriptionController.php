@@ -925,10 +925,10 @@ class InscriptionController extends Controller
         $groupIdentifier = $ci . '|' . $birthdate . '|' . $olympiadId;
 
         if (empty($identifier)) {
-            return response()->json(['error' => 'Identifier cannot be empty'], 422);
+            return response()->json(['error' => 'El identificador no puede ser nulo'], 422);
         }
         if (!in_array($type, ['single', 'multiple'])) {
-            return response()->json(['error' => 'Invalid type provided'], 422);
+            return response()->json(['error' => 'El tipo es invalido'], 422);
         }
         // Check if the inscription exists and is in draft status
 
@@ -943,7 +943,8 @@ class InscriptionController extends Controller
                 'selected_areas',
                 'selected_areas.teacher',
                 'selected_areas.teacher.personalData',
-                'competitorData'
+                'competitor_data',
+                'competitor_data.personalData'
             ])
                 ->where('identifier', $identifier)
                 ->where('olympiad_id', $olympiadId)
@@ -995,7 +996,8 @@ class InscriptionController extends Controller
                 'selected_areas',
                 'selected_areas.teacher',
                 'selected_areas.teacher.personalData',
-                'competitorData'
+                'competitor_data',
+                'competitor_data.personalData'
             ])
                 ->where('identifier', $groupIdentifier)
                 ->where('olympiad_id', $olympiadId)
@@ -1084,7 +1086,7 @@ class InscriptionController extends Controller
             ->first();
         if ($verifyInscription && $verifyInscription->status !== InscriptionStatus::DRAFT) {
             return response()->json([
-                'error' => 'Inscription already exists and is not in draft status.'
+                'error' => 'La inscripción ya existe y no está en estado borrador.',
             ], 409);
         }
 
