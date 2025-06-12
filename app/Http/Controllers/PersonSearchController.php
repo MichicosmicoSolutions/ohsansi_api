@@ -250,16 +250,15 @@ class PersonSearchController extends Controller
             });
         }
 
-        if ($request->has('category_id')) {
-            $query->whereHas(
-                'selected_areas',
-                function ($q) use ($request) {
-                    $q->whereHas('category', function ($q2) use ($request) {
-                        $q2->where('id', $request->query('category_id'));
-                    });
-                }
-            );
-        }
+       if ($request->has('course')) {
+    $course = $request->query('course');
+
+    $query->whereHas('selected_areas', function ($q) use ($course) {
+        $q->whereHas('category', function ($q2) use ($course) {
+            $q2->whereJsonContains('range_course', $course);
+        });
+    });
+}
 
         if ($request->has('olympiad_id')) {
             $query->where('olympiad_id', $request->query('olympiad_id'));
