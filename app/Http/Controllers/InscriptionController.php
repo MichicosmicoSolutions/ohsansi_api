@@ -435,7 +435,12 @@ class InscriptionController extends Controller
         }
         $school = Schools::firstOrCreate(
             ['name' => $request->input('name')],
-            $request->all()
+            [
+                'name' => $request->input('name'),
+                'department' => strtolower($request->input('department')),
+                'province' => $request->input('province'),
+                'course' => $request->input('course'),
+            ]
         );
         $inscription->school()->associate($school);
         $inscription->save();
@@ -1486,7 +1491,7 @@ class InscriptionController extends Controller
             $school = Schools::updateOrCreate(
                 ['name' => $schoolData['name']],
                 [
-                    'department' => $schoolData['department'],
+                    'department' => strtolower($schoolData['department']),
                     'province' => $schoolData['province'],
                 ]
             );
@@ -1832,7 +1837,8 @@ class InscriptionController extends Controller
             $school = Schools::updateOrCreate(
                 ['name' => $data['schoolName']],
                 [
-                    'department' => $data['schoolDepartment'],
+
+                    'department' => strtolower($data['schoolDepartment']),
                     'province' => $data['schoolProvince'],
                 ]
             );
