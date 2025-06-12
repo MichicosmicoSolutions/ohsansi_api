@@ -924,6 +924,15 @@ class InscriptionController extends Controller
         $identifier = $ci . '|' . $birthdate;
         $groupIdentifier = $ci . '|' . $birthdate . '|' . $olympiadId;
 
+        return ([
+            'ci' => $ci,
+            'birthdate' => $birthdate,
+            'olympiadId' => $olympiadId,
+            'type' => $type,
+            'identifier' => $identifier,
+            'groupIdentifier' => $groupIdentifier,
+        ]);
+
         if (empty($identifier)) {
             return response()->json(['error' => 'El identificador no puede ser nulo'], 422);
         }
