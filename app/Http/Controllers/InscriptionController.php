@@ -921,7 +921,7 @@ class InscriptionController extends Controller
         $birthdate = $request->input('birthdate');
         $olympiadId = $request->input('olympicId');
         $type = $request->input('type');
-        $identifier = $ci . '|' . $birthdate;
+        $identifier = $ci . '|' . $birthdate . '|' . $olympiadId;
         $groupIdentifier = $ci . '|' . $birthdate . '|' . $olympiadId;
 
         if (empty($identifier)) {
@@ -1407,7 +1407,7 @@ class InscriptionController extends Controller
         $ci = $identity['ci'];
         $birthdate = $identity['birthdate'];
         $olympiadId = $identity['olympicId'];
-        $identifier = $ci . '|' . $birthdate;
+        $identifier = $ci . '|' . $birthdate . '|' . $olympiadId;
         $groupIdentifier = $identity['ci'] . '|' . $identity['birthdate'] . '|' . $olympiadId;
 
         $olympiad = Olympiads::find($olympiadId);
