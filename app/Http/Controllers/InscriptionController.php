@@ -1027,7 +1027,7 @@ class InscriptionController extends Controller
             return response()->json([
                 'message' => 'Datos del formulario cargados correctamente.',
                 'data' => [
-                    'person' => null,
+                    'step' => $currentStep,
                     'inscriptions' => $inscriptions,
                     'olympiad' => [
                         'id' => $olympiad->id,
