@@ -119,7 +119,8 @@ class Inscriptions extends Model
         'olympiad_id',
         'boleta_de_pago_id',
         'identifier',
-        'group_identifier'
+        'group_identifier',
+        'course',
     ];
 
     public function competitor_data()
