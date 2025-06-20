@@ -1907,7 +1907,6 @@ class InscriptionController extends Controller
             'schoolName' => 'required|string|max:255',
             'schoolDepartment' => 'required|string|max:255',
             'schoolProvince' => 'required|string|max:255',
-
             'accountableCi' => 'required|string|max:20',
             'accountableBirthdate' => 'required|date',
             'accountableCiExpedition' => 'nullable|string|max:10',
@@ -1935,7 +1934,8 @@ class InscriptionController extends Controller
                 ]
             );
 
-            $accountable = PersonalData::updateOrCreate(
+
+            $accountable = PersonalData::firstOrCreate(
                 ['ci' => $data['accountableCi'], 'birthdate' => $data['accountableBirthdate']],
                 [
                     'ci_expedition' => $data['accountableCiExpedition'],
@@ -1947,11 +1947,14 @@ class InscriptionController extends Controller
                 ]
             );
 
+
             $accountableRelation = Accountables::firstOrCreate([
                 'personal_data_id' => $accountable->id,
             ]);
 
-            Excel::import(new OlympicInscriptionImport($school->id, $olympiadId, $accountableRelation->id), $request->file('file'));
+
+            Excel::import(new OlympicInscriptionImport($school->id, $olympiad, $accountable->id, $accountable, $request->file('file'),), $request->file('file'));
+
 
             DB::commit();
             return response()->json([
@@ -1963,6 +1966,7 @@ class InscriptionController extends Controller
             ]);
         } catch (QueryException $e) {
             DB::rollBack();
+            Log::error($e);
             if ($e->getCode() === '23505') {
                 return response()->json([
                     'error' => 'Uno o más registros ya existen con el mismo CI o correo electrónico.'
@@ -1971,6 +1975,11 @@ class InscriptionController extends Controller
 
             return response()->json([
                 'error' => 'Error de base de datos: ' . $e->getMessage()
+            ], 500);
+        } catch (Exception $e) {
+            Log::error($e);
+            return response()->json([
+                'error' => 'Error inesperado: ' . $e->getMessage()
             ], 500);
         }
     }
