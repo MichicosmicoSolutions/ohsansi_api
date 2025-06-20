@@ -28,6 +28,7 @@ use App\Imports\OlympicInscriptionImport;
 use App\Models\BoletaDePago;
 use App\Models\OlympiadAreas;
 use App\Services\InscriptionExcelService;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class InscriptionController
@@ -144,7 +145,7 @@ class InscriptionController extends Controller
      *              required={"ci", "birthdate"},
      *              type="object",
      *              @OA\Property(property="ci", type="integer", description="Competitor's Cédula de Identidad", example=1234567),
-     *              @OA\Property(property="birthdate", type="string", format="date", description="Competitor's birthdate (YYYY-MM-DD)", example="2005-08-15")
+     *              @OA\Property(property="birthdate", type="string", Gat="date", description="Competitor's birthdate (YYYY-MM-DD)", example="2005-08-15")
      *          )
      *      ),
      *      @OA\Response(
@@ -208,6 +209,9 @@ class InscriptionController extends Controller
             ], 422);
         }
 
+        $ci = $request->ci;
+        $birthdate = $request->birthdate;
+
 
         $person = PersonalData::with([
             'inscription' => function ($query) use ($olympiadId) {
@@ -221,24 +225,63 @@ class InscriptionController extends Controller
             'inscription.selected_areas.teacher.personalData',
             'inscription.accountable',
             'inscription.accountable.personalData',
-        ])->where('ci', $request->ci)
-            ->where('birthdate', $request->birthdate)->first();
+            'inscription.competitor_data',
+            'inscription.boletaDePago'
+        ])
+            ->where('ci', $request->ci)
+            ->where('birthdate', $request->birthdate)
+            ->first();
 
         if (!$person) {
-            $person = new PersonalData();
-            $person->ci = $request->ci;
-            $person->birthdate = $request->birthdate;
-            $person->save();
+            return response()->json([
+                'message' => 'Person not found'
+            ], 404);
         }
 
+        if (!($person->isAccountable() || $person->isTutor() || $person->isCompetitor())) {
+            return response()->json([
+                'message' => 'Person not found'
+            ], 404);
+        }
+        $relations = [
+            'school',
+            'legalTutor',
+            'legalTutor.personalData',
+            'accountable',
+            'accountable.personalData',
+            'selected_areas',
+            'selected_areas.teacher',
+            'selected_areas.teacher.personalData',
+            'competitor_data',
+            'boletaDePago'
+        ];
 
         $responseData = $person->toArray();
-        // Add helper flags
-        $responseData['is_accountable'] = $person->isAccountable();
-        $responseData['is_competitor'] = $person->isCompetitor();
-        $responseData['is_tutor'] = $person->isTutor();
-        $responseData['is_teacher'] = $person->isTeacher();
+        $existInscriptions = false;
 
+        if ($person->isTutor()) {
+            $query = Inscriptions::with($relations);
+            $query->whereHas('legalTutor.personalData', function ($q) use ($olympiadId, $ci, $birthdate) {
+                $q->where('ci', $ci)->where('birthdate', $birthdate)->where('olympiad_id', $olympiadId);
+            });
+            $inscriptions = $query->get();
+            $responseData['inscriptions'] = $inscriptions;
+            $existInscriptions = $inscriptions->isNotEmpty();
+        } else if ($person->isAccountable()) {
+            $query = Inscriptions::with($relations);
+            $query->whereHas('accountable.personalData', function ($q) use ($olympiadId, $ci, $birthdate) {
+                $q->where('ci', $ci)->where('birthdate', $birthdate)->where('olympiad_id', $olympiadId);
+            });
+            $inscriptions = $query->get();
+            $responseData['inscriptions'] = $inscriptions;
+            $existInscriptions = $inscriptions->isNotEmpty();
+        }
+
+        // Add helper flags
+        $responseData['is_accountable'] = $existInscriptions ? $person->isAccountable() : false;
+        $responseData['is_competitor'] = $existInscriptions ? $person->isCompetitor() : true;
+        $responseData['is_tutor'] = $existInscriptions ? $person->isTutor() : false;
+        $responseData['is_teacher'] = $existInscriptions ? $person->isTeacher() : false;
 
         return response()->json([
             'data' => $responseData,
@@ -305,22 +348,17 @@ class InscriptionController extends Controller
             ], 404);
         }
 
+        $data = $validator->validated();
+
         DB::beginTransaction();
         try {
             $person = PersonalData::firstOrCreate(
-                ['ci' => $request->ci],
-                $request->all()
+                ['ci' => $data['ci']],
+                $data
             );
 
-            if (!$person->isCompetitor() && ($person->isTutor() || $person->isAccountable() || $person->isTeacher())) {
-                DB::rollBack();
-                return response()->json([
-                    "message" => "El CI proporcionado yá está registrado pero no pertenece a un competidor",
-                    "data" => $person
-                ], 409);
-            }
 
-            PersonalData::where('ci', $request->ci)->update($request->all());
+            PersonalData::where('ci', $data['ci'])->update($data);
 
             Inscriptions::firstOrCreate(
                 [
@@ -331,14 +369,15 @@ class InscriptionController extends Controller
                     'status' => InscriptionStatus::PENDING,
                     'competitor_data_id' => $person->id,
                     'olympiad_id' => $olympiadId,
+                    'identifier' => "{$person->ci}|{$person->birthdate}|{$olympiadId}",
                 ]
             );
             DB::commit();
+
             $person = PersonalData::with([
                 'inscription' => function ($query) use ($olympiadId) {
                     $query->where('olympiad_id', $olympiadId);
-                },
-                'accountable'
+                }
             ])->find($person->id);
 
             return response()->json([
@@ -347,13 +386,26 @@ class InscriptionController extends Controller
             ], 201);
         } catch (QueryException $qe) {
             DB::rollBack();
+            if ($qe->getCode() === '23505') {
+                preg_match('/Key \((.*?)\)=\((.*?)\)/', $qe->getMessage(), $matches);
+                $e = $matches[1];
+                return response()->json([
+                    'errors' => [
+                        'details' => " El valor para el campo '{$e}' está duplicado.",
+                    ]
+                ], 409);
+            }
             return response()->json([
-                'errors' => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde.",
-            ], 409);
+                "errors" => [
+                    "details" => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde.",
+                ]
+            ], 500);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
-                'errors' => $e->getMessage(),
+                "errors" => [
+                    "details" => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde.",
+                ]
             ], 500);
         }
     }
@@ -439,15 +491,18 @@ class InscriptionController extends Controller
                 'name' => $request->input('name'),
                 'department' => ucwords(strtolower($request->input('department'))),
                 'province' => $request->input('province'),
-                'course' => $request->input('course'),
             ]
         );
+        $inscription->course = $request->input('course');
         $inscription->school()->associate($school);
         $inscription->save();
 
+        $schoolResponse = $school->toArray();
+        $schoolResponse['course'] = $inscription->course;
+
         return response()->json([
             'message' => 'Escuela creada con éxito.',
-            'data' => $school,
+            'data' => $schoolResponse,
         ], 200);
     }
 
@@ -671,7 +726,7 @@ class InscriptionController extends Controller
             ], 422);
         }
 
-        $olympiad = Inscriptions::find($olympiadId);
+        $olympiad = Olympiads::find($olympiadId);
         if (!$olympiad) {
             return response()->json([
                 'errors' => ['details' => 'Olympiad not found'],
@@ -847,6 +902,9 @@ class InscriptionController extends Controller
 
         $inscription = Inscriptions::with([
             'accountable',
+            'accountable.personalData',
+            'selected_areas',
+            'boletaDePago'
         ])->find($inscriptionId);
 
         if (!$inscription) {
@@ -857,13 +915,6 @@ class InscriptionController extends Controller
             ], 404);
         }
 
-        if ($inscription->accountable) {
-            return response()->json([
-                'errors' => [
-                    'details' => 'Inscription already has an accountable',
-                ]
-            ], 409);
-        }
 
         DB::beginTransaction();
         try {
@@ -871,16 +922,47 @@ class InscriptionController extends Controller
                 ['ci' => $request->input('ci')],
                 $request->all()
             );
+
             $accountable = Accountables::firstOrCreate(
                 ['personal_data_id' => $personalData->id],
                 ['personal_data_id' => $personalData->id]
             );
+
+            $randomNumber = rand(100000, 999999);
+            $count = count($inscription->selected_areas);
+            $boleta = BoletaDePago::firstOrCreate([
+                'id' => $inscription->id,
+            ], [
+                'numero_orden_de_pago' => $randomNumber,
+                'ci' => $personalData->ci,
+                'status' => 'pending',
+                'nombre' => $personalData->names,
+                'apellido' => $personalData->last_names,
+                'fecha_nacimiento' => $personalData->birthdate,
+                'cantidad' => $count,
+                'concepto' => 'Inscripción Olimpiada: ' . $olympiad->name,
+                'precio_unitario' => $olympiad->price,
+                'importe' => $olympiad->price,
+                'total' => $olympiad->price * $count,
+            ]);
+
             $inscription->accountable()->associate($accountable);
+            $inscription->status = InscriptionStatus::PENDING;
+            $inscription->boleta_de_pago_id = $boleta->id;
             $inscription->save();
+
             DB::commit();
+
+
+
             return response()->json([
-                'message' => 'Accountable created successfully',
-                'data' => $personalData,
+                'message' => 'Responsable de pago guardado correctamente.',
+                'data' => [
+                    'accountable' => $accountable,
+                    'inscription' => $inscription,
+                    "price" => $olympiad->price,
+                    'boleta' => $boleta
+                ],
             ], 201);
         } catch (QueryException $qe) {
             DB::rollBack();
@@ -901,6 +983,7 @@ class InscriptionController extends Controller
             ], 500);
         } catch (Exception $e) {
             DB::rollBack();
+            Log::error($e);
             return response()->json([
                 "errors" => [
                     "details" => "Ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente más tarde.",
@@ -926,6 +1009,7 @@ class InscriptionController extends Controller
         $birthdate = $request->input('birthdate');
         $olympiadId = $request->input('olympicId');
         $type = $request->input('type');
+
         $identifier = $ci . '|' . $birthdate . '|' . $olympiadId;
         $groupIdentifier = $ci . '|' . $birthdate . '|' . $olympiadId;
 

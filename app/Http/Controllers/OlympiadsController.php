@@ -35,10 +35,14 @@ class OlympiadsController extends Controller
         return $normalized;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $olympiads = Olympiads::with('areas')->get();
-
+        $publish = $request->input('publish');
+        $query = Olympiads::with('areas');
+        if ($publish !== null) {
+            $query->where('publish', $publish);
+        }
+        $olympiads = $query->get();
         return response()->json(['data' => $olympiads]);
     }
     /**
@@ -83,40 +87,40 @@ class OlympiadsController extends Controller
      *      )
      * )
      */
-  public function showAreas(Request $request)
-{
-    $olympicId  = $request->route('id');
-    $queryParams = $request->all();
+    public function showAreas(Request $request)
+    {
+        $olympicId  = $request->route('id');
+        $queryParams = $request->all();
 
-    $validator = Validator::make($queryParams, [
-        'course' => ['sometimes', 'string', Rule::in(RangeCourse::getValues())],
-    ], [
-        'course.sometimes' => 'The course is not valid.',
-        'course.string' => 'The course must be a string.',
-        'course.in' => 'The course is not valid value.',
-    ]);
+        $validator = Validator::make($queryParams, [
+            'course' => ['sometimes', 'string', Rule::in(RangeCourse::getValues())],
+        ], [
+            'course.sometimes' => 'The course is not valid.',
+            'course.string' => 'The course must be a string.',
+            'course.in' => 'The course is not valid value.',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 400);
-    }
-
-    $areas = Areas::with(['olympiadCategories' => function ($query) use ($queryParams) {
-        if (isset($queryParams['course'])) {
-            $query->where('range_course', 'like', '%' . $queryParams['course'] . '%');
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
         }
-    }])
-    ->whereHas('olympiads', function ($query) use ($olympicId) {
-        $query->where('olympiads.id', $olympicId);
-    })
-    ->get();
 
-    // Eliminar duplicados por ID de olympiadCategories
-    $areas->each(function ($area) {
-        $area->olympiadCategories = $area->olympiadCategories->unique('id')->values();
-    });
+        $areas = Areas::with(['olympiadCategories' => function ($query) use ($queryParams) {
+            if (isset($queryParams['course'])) {
+                $query->where('range_course', 'like', '%' . $queryParams['course'] . '%');
+            }
+        }])
+            ->whereHas('olympiads', function ($query) use ($olympicId) {
+                $query->where('olympiads.id', $olympicId);
+            })
+            ->get();
 
-    return response()->json(['data' => $areas]);
-}
+        // Eliminar duplicados por ID de olympiadCategories
+        $areas->each(function ($area) {
+            $area->olympiadCategories = $area->olympiadCategories->unique('id')->values();
+        });
+
+        return response()->json(['data' => $areas]);
+    }
 
 
     public function store(Request $request)
@@ -229,7 +233,7 @@ class OlympiadsController extends Controller
 
     public function publish(Request $request, $id)
     {
-    
+
         $validator = Validator::make($request->all(), [
             'title' => 'nullable|string',
             'description' => 'nullable|string',
@@ -240,7 +244,7 @@ class OlympiadsController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'Contacts' => 'nullable|string',
-            'status' => 'required|boolean', 
+            'status' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -267,18 +271,18 @@ class OlympiadsController extends Controller
             ], 400);
         }
 
-    
+
         if (isset($data['end_date']) && Carbon::parse($data['end_date'])->isPast()) {
             $data['publish'] = Publish::Cerrado; // Establecer "cerrado" si ya pasó la fecha
         } else {
-  
+
             $data['publish'] = $data['publish'] ?? Publish::Inscripcion;
         }
 
-   
+
         $data['status'] = $request->boolean('status') ? 'true' : 'false';
 
-  
+
         $olympiad = $this->service->update($id, $data);
 
         if (!$olympiad) {
